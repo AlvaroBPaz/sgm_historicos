@@ -629,6 +629,7 @@ def listar_fila_ocr_revisao():
     processando = database.listar_sessoes_ocr(status="PROCESSANDO_IA")
     pendentes = database.listar_sessoes_ocr(status="PENDENTE_IA")
     erros = database.listar_sessoes_ocr(status="ERRO_IA")
+    erros_api = database.listar_sessoes_ocr(status="ERRO_API")
     rejeitados = database.listar_sessoes_ocr(status="REJEITADO_INVALIDO")
     
     return {
@@ -636,9 +637,11 @@ def listar_fila_ocr_revisao():
         "processando_ia": processando,
         "pendentes_ia": pendentes,
         "erros_ia": erros,
+        "erros_api": erros_api,
         "rejeitados": rejeitados,
         "total_para_revisar": len(aguardando),
-        "total_rejeitados": len(rejeitados)
+        "total_rejeitados": len(rejeitados),
+        "total_erros_api": len(erros_api)
     }
 
 @app.get("/api/ocr/sessao/{sessao_id}")
@@ -686,6 +689,26 @@ def descartar_sessao_ocr(sessao_id: str):
         with database.get_db() as conn:
             conn.execute("DELETE FROM fila_ocr WHERE sessao_id = ?", (sessao_id,))
     return {"sucesso": True, "sessao_id": sessao_id}
+
+@app.post("/api/ocr/sessao/{sessao_id}/tentar-novamente")
+def tentar_novamente_ocr(sessao_id: str):
+    """Permite ao usuário reenviar manualmente para a fila um envelope que falhou com ERRO_API."""
+    sessao = database.obter_sessao_ocr(sessao_id)
+    if not sessao:
+        raise HTTPException(status_code=404, detail="Sessão não encontrada.")
+
+    database.atualizar_status_ocr(
+        sessao_id=sessao_id,
+        status="PENDENTE_IA",
+        erro=None,
+        zerar_tentativas_erro=True
+    )
+    return {
+        "sucesso": True,
+        "sessao_id": sessao_id,
+        "status": "PENDENTE_IA",
+        "mensagem": "Sessão reinserida na fila de processamento da IA."
+    }
 
 @app.post("/api/ocr/sessao/{sessao_id}/aprovar-e-salvar")
 def aprovar_e_salvar_revisao(sessao_id: str, payload: AprovarRevisaoIARequest):

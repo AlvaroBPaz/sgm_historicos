@@ -35,11 +35,12 @@ import database
 logger = logging.getLogger("sgm_historicos.ocr_worker")
 
 # Modelo oficial do Gemini para visão multimodal e transcrição de documentos
-MODELO_GEMINI = "gemini-3.8-flash"
+# Por padrão, utiliza o modelo ativo mais barato (gemini-flash-lite-latest) ou override via GEMINI_MODEL
+MODELO_GEMINI = os.getenv("GEMINI_MODEL", "gemini-flash-lite-latest").strip()
 
-# Limite estrito: 12 chamadas por minuto = 1 chamada a cada 5 segundos
-INTERVALO_MINIMO_REQUISICAO_SEGUNDOS = 5.0
-MAX_TENTATIVAS_IA = 4
+# Intervalo mínimo obrigatório de 6 segundos entre chamadas (máximo 10 requisições por minuto)
+INTERVALO_MINIMO_REQUISICAO_SEGUNDOS = 6.0
+MAX_TENTATIVAS_IA = 1
 
 
 # ==============================================================================
@@ -232,12 +233,12 @@ class GeminiClientWorker:
         return None
 
     def _esperar_taxa_limite(self) -> None:
-        """Garante o espaçamento mínimo de 5 segundos entre requisições (máx 12/min)."""
+        """Garante o espaçamento mínimo obrigatório de 6 segundos entre requisições (máx 10/min)."""
         with self._lock:
             agora = time.time()
             tempo_desde_ultima = agora - self._ultima_requisicao_ts
             if tempo_desde_ultima < INTERVALO_MINIMO_REQUISICAO_SEGUNDOS:
-                espera = INTERVALO_MINIMO_REQUISICAO_SEQUISICAO = INTERVALO_MINIMO_REQUISICAO_SEGUNDOS - tempo_desde_ultima
+                espera = INTERVALO_MINIMO_REQUISICAO_SEGUNDOS - tempo_desde_ultima
                 time.sleep(espera)
             self._ultima_requisicao_ts = time.time()
 
@@ -292,50 +293,43 @@ class GeminiClientWorker:
             system_instruction=SYSTEM_PROMPT_HISTORICO
         )
 
-        # Execução com controle de taxa e retry exponencial
-        max_tentativas = MAX_TENTATIVAS_IA
-        atraso_backoff = 5.0
-        modelos_candidatos = [MODELO_GEMINI, "gemini-flash-latest", "gemini-2.5-flash-lite"]
-        modelo_idx = 0
+        # Rate Limiter Local: pausa mínima obrigatória de 6 segundos entre chamadas
+        self._esperar_taxa_limite()
 
-        for tentativa in range(1, max_tentativas + 1):
-            try:
+        # Determina modelo a ser utilizado (removidas quaisquer referências a versões inexistentes)
+        # Prioriza o modelo configurado (gemini-flash-lite-latest ou gemini-2.5-flash / gemini-2.0-flash)
+        modelo_primario = MODELO_GEMINI
+
+        try:
+            resposta = client.models.generate_content(
+                model=modelo_primario,
+                contents=conteudos,
+                config=config
+            )
+        except Exception as exc:
+            erro_str = str(exc)
+            # Se gemini-2.5-flash ou gemini-2.0-flash retornar 404 (descontinuado para novas contas pelo Google),
+            # tenta única transição de segurança para o modelo mais barato e ativo (gemini-flash-lite-latest)
+            if ("404" in erro_str or "NOT_FOUND" in erro_str) and "flash-lite" not in modelo_primario:
+                logger.warning(
+                    f"Modelo '{modelo_primario}' indisponível para esta conta (404). Acionando modelo econômico 'gemini-flash-lite-latest'..."
+                )
                 self._esperar_taxa_limite()
-                modelo_atual = modelos_candidatos[min(modelo_idx, len(modelos_candidatos) - 1)]
                 resposta = client.models.generate_content(
-                    model=modelo_atual,
+                    model="gemini-flash-lite-latest",
                     contents=conteudos,
                     config=config
                 )
+            else:
+                # Falhou uma vez: propaga o erro imediatamente (sem loop infinito)
+                raise
 
-                # Parsing seguro para o Schema Pydantic
-                texto_json = resposta.text
-                if not texto_json:
-                    raise ValueError("Gemini retornou resposta vazia.")
+        # Parsing seguro para o Schema Pydantic
+        texto_json = resposta.text
+        if not texto_json:
+            raise ValueError("Gemini retornou resposta vazia.")
 
-                return HistoricoExtraidoSchema.model_validate_json(texto_json)
-
-            except Exception as exc:
-                erro_str = str(exc)
-                logger.warning(
-                    f"Tentativa {tentativa}/{max_tentativas} falhou para o Gemini ({modelos_candidatos[min(modelo_idx, len(modelos_candidatos) - 1)]}): {erro_str}"
-                )
-
-                if "404" in erro_str or "NOT_FOUND" in erro_str:
-                    modelo_idx += 1
-
-                # Se atingiu o limite de tentativas, propaga a exceção
-                if tentativa == max_tentativas:
-                    raise
-
-                # Se for Rate Limit (HTTP 429), aplica exponential backoff
-                if "429" in erro_str or "RESOURCE_EXHAUSTED" in erro_str or "quota" in erro_str.lower():
-                    time.sleep(atraso_backoff)
-                    atraso_backoff *= 2.0
-                else:
-                    time.sleep(3.0)
-
-        raise RuntimeError("Falha inesperada no laço de requisição do Gemini.")
+        return HistoricoExtraidoSchema.model_validate_json(texto_json)
 
 
 # Instância global do cliente
@@ -468,25 +462,23 @@ def processar_sessao_ocr(
 
     except Exception as exc:
         msg_erro = str(exc)
-        logger.error(f"Erro no processamento IA da sessão {sessao_id}: {msg_erro}")
+        logger.error(f"Erro na chamada da API Gemini para a sessão {sessao_id}: {msg_erro}")
 
-        # Verifica se ainda pode tentar novamente
-        sessao_atual = database.obter_sessao_ocr(sessao_id, caminho_db=caminho_db)
-        tentativas = sessao_atual.get("tentativas_ia", 0) if sessao_atual else 1
-
-        novo_status = "ERRO_IA" if tentativas >= MAX_TENTATIVAS_IA else "PENDENTE_IA"
+        # TRAVA CONTRA LOOP INFINITO: Falhou 1 vez -> status muda imediatamente para 'ERRO_API'
+        # e incrementa tentativas_erro, parando qualquer reprocessamento automático.
         database.atualizar_status_ocr(
             sessao_id=sessao_id,
-            status=novo_status,
+            status="ERRO_API",
             erro=msg_erro,
+            incrementar_tentativa_erro=True,
             caminho_db=caminho_db
         )
 
         return {
             "sucesso": False,
             "sessao_id": sessao_id,
-            "status": novo_status,
-            "mensagem": f"Falha na IA: {msg_erro}"
+            "status": "ERRO_API",
+            "mensagem": f"Falha na API: {msg_erro}"
         }
 
 

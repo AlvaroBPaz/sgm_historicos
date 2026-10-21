@@ -475,15 +475,15 @@ class AppControlePrincipal {
           : "bg-slate-700 text-slate-300 px-2 py-0.5 rounded-full text-xs font-bold";
       }
 
-      this.renderizarCardsFilaIa(data.aguardando_revisao || [], data.rejeitados || []);
+      this.renderizarCardsFilaIa(data.aguardando_revisao || [], data.rejeitados || [], data.erros_api || []);
     } catch (e) {}
   }
 
-  renderizarCardsFilaIa(lista, rejeitados = []) {
+  renderizarCardsFilaIa(lista, rejeitados = [], errosApi = []) {
     const box = document.getElementById("containerCardsFilaIa");
     if (!box) return;
 
-    if (lista.length === 0 && rejeitados.length === 0) {
+    if (lista.length === 0 && rejeitados.length === 0 && errosApi.length === 0) {
       box.innerHTML = `
         <div class="col-span-3 text-center py-12 text-slate-500">
           <span class="text-3xl block mb-2">🎉</span>
@@ -495,7 +495,36 @@ class AppControlePrincipal {
 
     let html = "";
 
-    // 1. Cards de Documentos Rejeitados pelo Controle de Qualidade / Gemini
+    // 1. Cards de Erro na API do Gemini (Parados na fila para reenvio manual pelo operador)
+    if (errosApi.length > 0) {
+      html += errosApi.map(e => `
+        <div class="bg-amber-50 rounded-xl border-2 border-amber-500 p-4 shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="bg-amber-600 text-white text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wide">FALHA NA API GEMINI</span>
+              <span class="text-xs text-amber-700 font-mono font-bold">${e.sessao_id.substring(0, 8)}...</span>
+            </div>
+            <h4 class="font-bold text-amber-950 text-sm mb-1.5 flex items-center gap-1.5">
+              <span>⚠️</span> Erro ao Transcrever Documento
+            </h4>
+            <p class="text-xs text-amber-950 bg-white p-2.5 rounded border border-amber-300 leading-relaxed font-mono break-all max-h-24 overflow-y-auto">
+              ${e.ultimo_erro || "Erro inesperado na chamada da API do Gemini."}
+            </p>
+          </div>
+
+          <div class="mt-4 flex gap-2">
+            <button type="button" onclick="window.appMain.tentarNovamenteOcr('${e.sessao_id}')" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs py-2 rounded-lg flex items-center justify-center gap-1.5 transition">
+              <span>🔄</span> Tentar Novamente
+            </button>
+            <button type="button" onclick="window.appMain.descartarSessaoRejeitada('${e.sessao_id}')" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs px-3 py-2 rounded-lg flex items-center justify-center transition" title="Descartar envelope">
+              <span>🗑️</span>
+            </button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    // 2. Cards de Documentos Rejeitados pelo Controle de Qualidade / Gemini
     if (rejeitados.length > 0) {
       html += rejeitados.map(r => `
         <div class="bg-red-50 rounded-xl border-2 border-red-500 p-4 shadow-sm flex flex-col justify-between">
@@ -521,7 +550,7 @@ class AppControlePrincipal {
       `).join("");
     }
 
-    // 2. Cards de Documentos Válidos Aguardando Revisão
+    // 3. Cards de Documentos Válidos Aguardando Revisão
     html += lista.map(s => {
       let dados = {};
       try { dados = JSON.parse(s.json_extraido_ia || "{}"); } catch (e) {}
@@ -547,6 +576,17 @@ class AppControlePrincipal {
     }).join("");
 
     box.innerHTML = html;
+  }
+
+  async tentarNovamenteOcr(sessaoId) {
+    try {
+      const res = await fetch(`/api/ocr/sessao/${sessaoId}/tentar-novamente`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || "Erro ao reenviar envelope para a fila.");
+      this.atualizarContadorFilaIa();
+    } catch (e) {
+      alert(`Erro: ${e.message}`);
+    }
   }
 
   async descartarSessaoRejeitada(sessaoId) {

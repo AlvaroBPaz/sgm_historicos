@@ -171,11 +171,12 @@ DDL_FILA_OCR = """
 CREATE TABLE IF NOT EXISTS fila_ocr (
     sessao_id TEXT PRIMARY KEY,
     escola_id INTEGER,
-    status TEXT DEFAULT 'CAPTURANDO' CHECK(status IN ('CAPTURANDO', 'PENDENTE_IA', 'PROCESSANDO_IA', 'AGUARDANDO_REVISAO', 'CONCLUIDO', 'ERRO_IA', 'REJEITADO_INVALIDO')),
+    status TEXT DEFAULT 'CAPTURANDO' CHECK(status IN ('CAPTURANDO', 'PENDENTE_IA', 'PROCESSANDO_IA', 'AGUARDANDO_REVISAO', 'CONCLUIDO', 'ERRO_IA', 'ERRO_API', 'REJEITADO_INVALIDO')),
     origem_captura TEXT CHECK(origem_captura IN ('MOBILE_QR', 'SCANNER_PC')),
     paginas_locais_json TEXT DEFAULT '[]',
     json_extraido_ia TEXT,
     tentativas_ia INTEGER DEFAULT 0,
+    tentativas_erro INTEGER DEFAULT 0,
     ultimo_erro TEXT,
     criado_em TEXT NOT NULL,
     atualizado_em TEXT NOT NULL
@@ -382,23 +383,32 @@ def init_db(caminho_db: Optional[Union[str, Path]] = None) -> Path:
         if "matricula" not in colunas_alunos:
             conn.execute("ALTER TABLE alunos ADD COLUMN matricula TEXT")
 
-        # Migração da tabela fila_ocr para suportar REJEITADO_INVALIDO no CHECK
+        # Migração da tabela fila_ocr para suportar REJEITADO_INVALIDO, ERRO_API no CHECK e coluna tentativas_erro
         schema_ocr = conn.execute("SELECT sql FROM sqlite_master WHERE name='fila_ocr'").fetchone()
-        if schema_ocr and "REJEITADO_INVALIDO" not in schema_ocr[0]:
-            conn.execute("ALTER TABLE fila_ocr RENAME TO fila_ocr_migracao_temp")
-            conn.execute(DDL_FILA_OCR)
-            conn.execute("""
-                INSERT INTO fila_ocr (
-                    sessao_id, escola_id, status, origem_captura, paginas_locais_json,
-                    json_extraido_ia, tentativas_ia, ultimo_erro, criado_em, atualizado_em
-                )
-                SELECT
-                    sessao_id, escola_id, status, origem_captura, paginas_locais_json,
-                    json_extraido_ia, tentativas_ia, ultimo_erro, criado_em, atualizado_em
-                FROM fila_ocr_migracao_temp
-            """)
-            conn.execute("DROP TABLE fila_ocr_migracao_temp")
-            conn.execute("CREATE INDEX IF NOT EXISTS idx_fila_ocr_status ON fila_ocr(status)")
+        if schema_ocr:
+            colunas_ocr = [c["name"] for c in conn.execute("PRAGMA table_info(fila_ocr)").fetchall()]
+            if "tentativas_erro" not in colunas_ocr:
+                try:
+                    conn.execute("ALTER TABLE fila_ocr ADD COLUMN tentativas_erro INTEGER DEFAULT 0")
+                except Exception:
+                    pass
+
+            schema_ocr_atual = conn.execute("SELECT sql FROM sqlite_master WHERE name='fila_ocr'").fetchone()
+            if schema_ocr_atual and ("ERRO_API" not in schema_ocr_atual[0] or "REJEITADO_INVALIDO" not in schema_ocr_atual[0]):
+                conn.execute("ALTER TABLE fila_ocr RENAME TO fila_ocr_migracao_temp")
+                conn.execute(DDL_FILA_OCR)
+                conn.execute("""
+                    INSERT INTO fila_ocr (
+                        sessao_id, escola_id, status, origem_captura, paginas_locais_json,
+                        json_extraido_ia, tentativas_ia, tentativas_erro, ultimo_erro, criado_em, atualizado_em
+                    )
+                    SELECT
+                        sessao_id, escola_id, status, origem_captura, paginas_locais_json,
+                        json_extraido_ia, tentativas_ia, 0, ultimo_erro, criado_em, atualizado_em
+                    FROM fila_ocr_migracao_temp
+                """)
+                conn.execute("DROP TABLE fila_ocr_migracao_temp")
+                conn.execute("CREATE INDEX IF NOT EXISTS idx_fila_ocr_status ON fila_ocr(status)")
         
         # 4. Pré-cadastro e atualização das Escolas Municipais Oficiais
         for esc in ESCOLAS_INICIAIS:
@@ -1200,7 +1210,7 @@ def obter_historico_completo(
 CAMPOS_TABELA_FILA_OCR = [
     "sessao_id", "escola_id", "status", "origem_captura",
     "paginas_locais_json", "json_extraido_ia", "tentativas_ia",
-    "ultimo_erro", "criado_em", "atualizado_em"
+    "tentativas_erro", "ultimo_erro", "criado_em", "atualizado_em"
 ]
 
 
@@ -1220,6 +1230,7 @@ def criar_sessao_ocr(
         "paginas_locais_json": "[]",
         "json_extraido_ia": None,
         "tentativas_ia": 0,
+        "tentativas_erro": 0,
         "ultimo_erro": None,
         "criado_em": agora,
         "atualizado_em": agora
@@ -1228,10 +1239,10 @@ def criar_sessao_ocr(
     sql = """
     INSERT INTO fila_ocr (
         sessao_id, escola_id, status, origem_captura, paginas_locais_json,
-        json_extraido_ia, tentativas_ia, ultimo_erro, criado_em, atualizado_em
+        json_extraido_ia, tentativas_ia, tentativas_erro, ultimo_erro, criado_em, atualizado_em
     ) VALUES (
         :sessao_id, :escola_id, :status, :origem_captura, :paginas_locais_json,
-        :json_extraido_ia, :tentativas_ia, :ultimo_erro, :criado_em, :atualizado_em
+        :json_extraido_ia, :tentativas_ia, :tentativas_erro, :ultimo_erro, :criado_em, :atualizado_em
     )
     """
     with get_db(caminho_db) as conn:
@@ -1289,6 +1300,8 @@ def atualizar_status_ocr(
     json_extraido: Optional[str] = None,
     erro: Optional[str] = None,
     incrementar_tentativa: bool = False,
+    incrementar_tentativa_erro: bool = False,
+    zerar_tentativas_erro: bool = False,
     caminho_db: Optional[Union[str, Path]] = None
 ) -> Optional[Dict[str, Any]]:
     """Atualiza o estado da sessão de OCR no pipeline assíncrono."""
@@ -1299,6 +1312,10 @@ def atualizar_status_ocr(
 
         agora = data_hora_utc_iso()
         tentativas = sessao.get("tentativas_ia", 0) + (1 if incrementar_tentativa else 0)
+        
+        tentativas_err = 0 if zerar_tentativas_erro else (
+            sessao.get("tentativas_erro", 0) + (1 if incrementar_tentativa_erro else 0)
+        )
 
         conn.execute(
             """
@@ -1307,10 +1324,11 @@ def atualizar_status_ocr(
                 json_extraido_ia = COALESCE(?, json_extraido_ia),
                 ultimo_erro = ?,
                 tentativas_ia = ?,
+                tentativas_erro = ?,
                 atualizado_em = ?
             WHERE sessao_id = ?
             """,
-            (status, json_extraido, erro, tentativas, agora, sessao_id)
+            (status, json_extraido, erro, tentativas, tentativas_err, agora, sessao_id)
         )
         row = conn.execute("SELECT * FROM fila_ocr WHERE sessao_id = ?", (sessao_id,)).fetchone()
         return row_to_dict(row)

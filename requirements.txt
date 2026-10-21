@@ -1,0 +1,29 @@
+# SGM-Históricos — Sistema Municipal de Acervo Passivo e Histórico Escolar
+# Dependências oficiais da aplicação (Python 3.11+)
+
+# Servidor Web e API REST Local
+fastapi>=0.115.0
+uvicorn>=0.30.0
+python-multipart>=0.0.9
+
+# Janela Nativa Desktop (Microsoft Edge WebView2)
+pywebview>=5.1
+
+# Validação e Modelagem Estruturada de Dados
+pydantic>=2.8.0
+
+# Processamento de Imagens e Scanner
+opencv-python-headless>=4.10.0
+Pillow>=10.4.0
+qrcode[pil]>=7.4.2
+
+# Inteligência Artificial — Google Gemini 2.5 Flash
+google-genai>=0.1.1
+
+# Integração com Nuvem (Supabase & Google Drive)
+supabase>=2.8.0
+google-api-python-client>=2.145.0
+google-auth>=2.35.0
+
+# Segurança, Criptografia e HMAC
+cryptography>=43.0.0

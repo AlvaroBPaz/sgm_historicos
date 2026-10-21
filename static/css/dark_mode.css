@@ -525,6 +525,71 @@ html.dark #containerSplitReview .bg-slate-950 {
 }
 
 /* ============================================================================== */
+/* MODAL DE IMPRESSÃO EMBUTIDA (TEMA CLARO E ESCURO) */
+/* ============================================================================== */
+#modalImpressaoEmbutida {
+  background-color: rgba(15, 23, 42, 0.45);
+}
+
+#headerImpressaoModal {
+  background-color: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  color: #0f172a;
+}
+
+#tituloImpressaoModal {
+  color: #0f172a;
+}
+
+#areaDocImpressao {
+  background-color: #cbd5e1;
+}
+
+#btnFecharImpressaoModal {
+  background-color: #ffffff;
+  border-color: #cbd5e1;
+  color: #334155;
+}
+
+#btnFecharImpressaoModal:hover {
+  background-color: #f1f5f9;
+  color: #0f172a;
+}
+
+html.dark #modalImpressaoEmbutida {
+  background-color: rgba(0, 0, 0, 0.85) !important;
+}
+
+html.dark #headerImpressaoModal {
+  background-color: #1e1e1e !important;
+  border-bottom: 1px solid #383838 !important;
+  color: #f1f5f9 !important;
+}
+
+html.dark #tituloImpressaoModal {
+  color: #f1f5f9 !important;
+}
+
+html.dark #areaDocImpressao {
+  background-color: #141414 !important;
+}
+
+html.dark #btnFecharImpressaoModal {
+  background-color: #262626 !important;
+  border-color: #404040 !important;
+  color: #cbd5e1 !important;
+}
+
+html.dark #btnFecharImpressaoModal:hover {
+  background-color: #333333 !important;
+  color: #ffffff !important;
+}
+
+html.dark #iframeImpressaoA4 {
+  border-color: #383838 !important;
+}
+
+/* ============================================================================== */
 /* REGRA OBRIGATÓRIA 3: PROTEÇÃO DE IMPRESSÃO A4 */
 /* ============================================================================== */
 @media print {

@@ -399,9 +399,12 @@
       <p id="txtMotivoRejeicaoPc" class="text-xs sm:text-sm text-red-800 leading-relaxed font-semibold mb-6 bg-white p-3.5 rounded-xl border border-red-200 text-left">
         Foto embaçada ou documento não reconhecido.
       </p>
-      <div class="flex flex-col sm:flex-row gap-2 justify-center">
+      <div class="flex flex-col gap-2 justify-center">
         <button id="btnTirarOutraFotoPc" type="button" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold text-xs py-3 px-4 rounded-xl shadow-md transition flex items-center justify-center gap-2">
           <span>📸</span> Tirar Outra Foto / Enviar Nova Imagem
+        </button>
+        <button id="btnForcarAceiteFotoPc" type="button" class="w-full bg-white hover:bg-red-50 text-red-700 border border-red-300 font-bold text-xs py-2.5 px-4 rounded-xl shadow-sm transition flex items-center justify-center gap-2">
+          <span>⚠️</span> Usar Esta Imagem Mesmo Assim (Forçar)
         </button>
       </div>
     </div>
@@ -420,6 +423,39 @@
   <!-- CONTAINER DO MODAL SPLIT-SCREEN DE REVISÃO IA (CONTROLADO POR split_review.js) -->
   <!-- ============================================================================== -->
   <div id="containerSplitReview"></div>
+
+
+  <!-- ============================================================================== -->
+  <!-- MODAL DE PRÉ-VISUALIZAÇÃO E IMPRESSÃO A4 EMBUTIDA (COERENTE COM TEMA CLARO E ESCURO) -->
+  <!-- ============================================================================== -->
+  <div id="modalImpressaoEmbutida" class="fixed inset-0 z-50 bg-slate-900/40 dark:bg-black/85 backdrop-blur-sm flex flex-col hidden overflow-hidden select-none transition-colors">
+    
+    <!-- BARRA SUPERIOR DE AÇÕES -->
+    <header id="headerImpressaoModal" class="bg-white dark:bg-[#1e1e1e] border-b border-slate-200 dark:border-[#383838] px-4 py-2.5 flex items-center justify-between shrink-0 shadow-sm dark:shadow-md transition-colors">
+      <div class="flex items-center gap-3">
+        <span class="bg-blue-600 dark:bg-[#84167A] text-white text-[11px] font-black px-2.5 py-0.5 rounded tracking-wide uppercase">
+          IMPRESSÃO OFICIAL
+        </span>
+        <h2 class="text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2" id="tituloImpressaoModal">
+          <span>📜</span> Histórico Escolar Oficial — Pré-visualização A4
+        </h2>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button id="btnImprimirIframe" type="button" class="text-xs font-bold px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 dark:bg-[#84167A] dark:hover:bg-[#9B1D90] text-white shadow-sm flex items-center gap-1.5 transition active:scale-95">
+          <span>🖨️</span> Imprimir / Salvar em PDF
+        </button>
+        <button id="btnFecharImpressaoModal" type="button" class="text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+          ✕ Fechar
+        </button>
+      </div>
+    </header>
+
+    <!-- ÁREA CENTRAL COM O DOCUMENTO A4 -->
+    <div id="areaDocImpressao" class="flex-1 bg-slate-200 dark:bg-[#141414] p-2 sm:p-4 flex items-center justify-center overflow-hidden transition-colors">
+      <iframe id="iframeImpressaoA4" class="w-full h-full max-w-4xl bg-white rounded-lg shadow-xl dark:shadow-2xl border border-slate-300 dark:border-[#383838]" src="about:blank"></iframe>
+    </div>
+  </div>
 
 
   <!-- SCRIPTS MODULARES OFICIAIS -->

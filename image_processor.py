@@ -181,45 +181,66 @@ def avaliar_qualidade_imagem(
     if roi.size == 0:
         roi = gray_1000
 
-    # 3. Verificação de Iluminação (média nos 80% centrais)
+    # 3. Pré-cálculo abrangente de métricas ópticas nos 80% centrais (ROI)
     brilho_medio = float(np.mean(roi))
     pixels_estourados = int(np.sum(roi > 248))
     pct_estouro_centro = (pixels_estourados / float(roi.size)) * 100.0
 
-    if brilho_medio < 65.0:
+    # 4. Análise de bordas Canny (detecção de escrita, tabelas e linhas do documento)
+    edges = cv2.Canny(roi, 50, 150)
+    densidade_bordas = float(np.count_nonzero(edges) / float(edges.size))
+
+    # 5. Verificação de Foco e Anti-Tremido (Laplaciano com suavização Gaussiana 3x3)
+    roi_suavizada = cv2.GaussianBlur(roi, (3, 3), 0)
+    score_foco = float(cv2.Laplacian(roi_suavizada, cv2.CV_64F).var())
+
+    min_pixel = float(np.min(roi))
+    tem_tinta_ou_linhas = min_pixel < 120.0
+
+    # --- REGRAS DE VALIDAÇÃO CALIBRADAS PARA FOTOS REAIS DE HISTÓRICOS ---
+
+    # Regra 1: Iluminação Mínima (evita fotos na penumbra ou com sombras densas)
+    # Limiar calibrado em 38.0 para suportar iluminação ambiente residencial/escritório
+    if brilho_medio < 38.0:
         return QualidadeFotoResult(
             aprovado=False,
             motivo_rejeicao="Foto muito escura ou com sombra cobrindo o documento! Acenda a luz do ambiente ou posicione a folha em local mais iluminado.",
             codigo_erro="FOTO_ESCURA",
-            score_nitidez=0.0,
+            score_nitidez=score_foco,
             brilho_medio=brilho_medio,
             pct_estouro_centro=pct_estouro_centro,
-            densidade_bordas=0.0
+            densidade_bordas=densidade_bordas
         )
 
-    if brilho_medio > 242.0 or pct_estouro_centro > 15.0:
-        motivo = (
-            "Foto excessivamente clara ou estourada! Afaste a fonte direta de luz."
-            if brilho_medio > 242.0 else
-            "Reflexo ou estouro de flash cegando o centro do documento! Desative o flash da câmera e use apenas a iluminação do ambiente."
-        )
-        codigo = "FLASH_ESTOURADO" if pct_estouro_centro > 15.0 else "FOTO_ESTOURADA"
+    # Regra 2: Iluminação Máxima Total (imagem completamente lavada/cega em luz)
+    if brilho_medio > 250.0:
         return QualidadeFotoResult(
             aprovado=False,
-            motivo_rejeicao=motivo,
-            codigo_erro=codigo,
-            score_nitidez=0.0,
+            motivo_rejeicao="Foto excessivamente clara ou estourada! Afaste a fonte direta de luz.",
+            codigo_erro="FOTO_ESTOURADA",
+            score_nitidez=score_foco,
             brilho_medio=brilho_medio,
             pct_estouro_centro=pct_estouro_centro,
-            densidade_bordas=0.0
+            densidade_bordas=densidade_bordas
         )
 
-    # 4. Verificação de Foco e Anti-Tremido:
-    # Aplica GaussianBlur(3, 3) antes do Laplaciano para remover granulação espúria da câmera
-    roi_suavizada = cv2.GaussianBlur(roi, (3, 3), 0)
-    score_foco = float(cv2.Laplacian(roi_suavizada, cv2.CV_64F).var())
+    # Regra 3: Estouro de Flash Cegando o Centro (glare reflexivo que apaga o texto)
+    # Distingue folha de papel branca limpa (que tem tinta/linhas escuras) de reflexo cego especular
+    if pct_estouro_centro > 18.0 and not tem_tinta_ou_linhas and densidade_bordas < 0.010:
+        return QualidadeFotoResult(
+            aprovado=False,
+            motivo_rejeicao="Reflexo ou estouro de flash cegando o centro do documento! Desative o flash da câmera e use apenas a iluminação do ambiente.",
+            codigo_erro="FLASH_ESTOURADO",
+            score_nitidez=score_foco,
+            brilho_medio=brilho_medio,
+            pct_estouro_centro=pct_estouro_centro,
+            densidade_bordas=densidade_bordas
+        )
 
-    if score_foco < 130.0:
+    # Regra 4: Foco e Anti-Tremido
+    # Fotos reais de documentos históricos pelo celular atingem entre 30.0 e 60.0.
+    # Desfoques severos e tremidos de mão caem abaixo de 18.0.
+    if score_foco < 18.0 or (score_foco < 24.0 and densidade_bordas < 0.005):
         return QualidadeFotoResult(
             aprovado=False,
             motivo_rejeicao="Foto embaçada ou tremida (Índice de nitidez insuficiente). Apoie o celular, foque no documento e tire outra foto.",
@@ -227,14 +248,12 @@ def avaliar_qualidade_imagem(
             score_nitidez=score_foco,
             brilho_medio=brilho_medio,
             pct_estouro_centro=pct_estouro_centro,
-            densidade_bordas=0.0
+            densidade_bordas=densidade_bordas
         )
 
-    # 5. Verificação de Densidade de Texto/Tabela usando bordas Canny
-    edges = cv2.Canny(roi, 50, 150)
-    densidade_bordas = float(np.count_nonzero(edges) / float(edges.size))
-
-    if densidade_bordas < 0.015:
+    # Regra 5: Detecção de Documento (superfície vazia sem texto, tabela ou linhas)
+    # Uma mesa de madeira ou parede lisa tem densidade ~0.000, enquanto documentos reais têm >= 0.002
+    if densidade_bordas < 0.0015:
         return QualidadeFotoResult(
             aprovado=False,
             motivo_rejeicao="Nenhum documento com texto/tabelas foi detectado na imagem. Enquadre a folha do Histórico Escolar.",

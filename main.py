@@ -20,7 +20,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, File, UploadFile, HTTPException, Query, Body, Request, status
+from fastapi import FastAPI, File, UploadFile, Form, HTTPException, Query, Body, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse, Response
 from fastapi.staticfiles import StaticFiles
@@ -472,7 +472,7 @@ def iniciar_sessao_digitalizacao(dados: IniciarSessaoScanRequest):
     img_qr = qr.make_image(fill_color="black", back_color="white")
     
     buf = io.BytesIO()
-    img_qr.save(buf, format="PNG")
+    img_qr.save(buf)
     import base64
     qr_b64 = f"data:image/png;base64,{base64.b64encode(buf.getvalue()).decode()}"
 
@@ -498,7 +498,7 @@ def obter_qrcode_imagem(sessao_id: str):
     img_qr = qr.make_image(fill_color="black", back_color="white")
     
     buf = io.BytesIO()
-    img_qr.save(buf, format="PNG")
+    img_qr.save(buf)
     buf.seek(0)
     return Response(content=buf.getvalue(), media_type="image/png")
 
@@ -511,10 +511,16 @@ def servir_pagina_mobile_scan(sessao_id: str):
     return FileResponse(str(caminho_html), media_type="text/html")
 
 @app.post("/api/scan/{sessao_id}/upload-pagina")
-async def upload_pagina_mobile(sessao_id: str, arquivo: UploadFile = File(...)):
+async def upload_pagina_mobile(
+    sessao_id: str,
+    arquivo: UploadFile = File(...),
+    forcar_aceite: bool = Form(False)
+):
     """
-    Recebe a foto enviada pelo celular, submete instantaneamente ao Porteiro de
-    Qualidade OpenCV (anti-tremido e iluminação), aplica CLAHE e comprime para WebP.
+    Recebe a foto enviada pelo celular ou PC, submete ao Porteiro de Qualidade OpenCV
+    (anti-tremido e iluminação calibrados), aplica CLAHE e comprime para WebP.
+    Permite bypass manual (forcar_aceite=True) para documentos históricos de arquivo
+    morto com desgaste natural ou grafia desbotada.
     """
     sessao = database.obter_sessao_ocr(sessao_id)
     if not sessao:
@@ -532,10 +538,17 @@ async def upload_pagina_mobile(sessao_id: str, arquivo: UploadFile = File(...)):
             origem=conteudo_bytes,
             sessao_id=sessao_id,
             numero_pagina=numero_pagina,
-            verificar_qualidade=True
+            verificar_qualidade=not forcar_aceite
         )
 
         database.adicionar_pagina_ocr(sessao_id, resultado_proc["caminho_webp"])
+
+        logger.info(
+            f"[PORTEIRO] Página {numero_pagina} aprovada para sessão {sessao_id}: "
+            f"Nitidez={resultado_proc['score_nitidez']}, Brilho={resultado_proc['brilho_medio']}, "
+            f"Flash={resultado_proc['pct_estouro_centro']}%, Bordas={resultado_proc['densidade_bordas']}, "
+            f"Forçado={forcar_aceite}"
+        )
 
         return {
             "sucesso": True,
@@ -548,6 +561,10 @@ async def upload_pagina_mobile(sessao_id: str, arquivo: UploadFile = File(...)):
         }
 
     except image_processor.QualidadeInsuficienteError as qerr:
+        logger.warning(
+            f"[PORTEIRO] Página rejeitada para sessão {sessao_id}: "
+            f"Código={qerr.codigo_erro}, Motivo='{qerr.motivo}', Métricas={qerr.metricas}"
+        )
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=qerr.motivo

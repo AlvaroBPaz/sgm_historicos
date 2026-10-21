@@ -213,8 +213,8 @@ class SplitReviewManager {
 
               <!-- OBSERVAÇÕES E LEIS EXTRAÍDAS -->
               <div class="bg-white p-4 rounded-lg border border-slate-200">
-                <label class="block text-xs font-bold text-slate-700 mb-1">Observações Históricas / Leis da Época</label>
-                <textarea id="split_observacoes" rows="2" class="w-full border border-slate-300 rounded p-2 text-xs focus:ring-2 focus:ring-blue-500">${obs.valor || ''}</textarea>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Observações Históricas / Leis da Época / Pareceres</label>
+                <textarea id="split_observacoes" rows="3" placeholder="Observações do histórico, equivalências, parecer descritivo ou anotações da ficha..." class="w-full border border-slate-300 rounded p-2.5 text-xs focus:ring-2 focus:ring-blue-500">${obs.valor || ''}</textarea>
               </div>
 
             </div>

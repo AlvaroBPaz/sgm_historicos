@@ -392,6 +392,9 @@
       <button type="button" id="btnTirarOutraFotoModal" class="btn-tirar-outra">
         📸 Tirar Outra Foto
       </button>
+      <button type="button" id="btnForcarAceiteFotoModal" style="margin-top: 10px; background: transparent; border: 1.5px solid #dc2626; color: #dc2626; padding: 11px 16px; border-radius: 10px; font-weight: 700; font-size: 13px; width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+        ⚠️ Usar Esta Imagem Mesmo Assim (Forçar)
+      </button>
     </div>
   </div>
 
@@ -516,6 +519,8 @@
       }
     }
 
+    let ultimoArquivoTentado = null;
+
     function fecharModalRejeicaoETirarOutra() {
       const modal = document.getElementById('modalRejeicaoFoto');
       modal.style.display = 'none';
@@ -523,7 +528,55 @@
       cameraInput.click();
     }
 
+    async function fecharModalEForcarAceite() {
+      const modal = document.getElementById('modalRejeicaoFoto');
+      modal.style.display = 'none';
+      if (!ultimoArquivoTentado) {
+        mostrarAlerta("warning", "Nenhuma foto recente disponível para forçar aceite.");
+        return;
+      }
+
+      ocultarAlerta();
+      btnFotografar.style.display = 'none';
+      spinnerContainer.classList.add('active');
+      const spinnerTexto = spinnerContainer.querySelector('p');
+      if (spinnerTexto) spinnerTexto.textContent = "Processando e aceitando página sob autorização manual...";
+
+      const formData = new FormData();
+      formData.append('arquivo', ultimoArquivoTentado);
+      formData.append('forcar_aceite', 'true');
+
+      try {
+        const response = await fetch(`/api/scan/${sessaoId}/upload-pagina`, {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await response.json();
+        spinnerContainer.classList.remove('active');
+        if (spinnerTexto) spinnerTexto.textContent = "Porteiro OpenCV analisando nitidez e contraste...";
+        btnFotografar.style.display = 'flex';
+
+        if (response.ok && data.sucesso) {
+          totalPaginas = data.total_paginas || (totalPaginas + 1);
+          mostrarAlerta("warning", `✓ Página ${data.pagina_numero} aceita sob autorização do operador! (Compactado: ${data.tamanho_kb} KB)`);
+          adicionarMiniatura(data.pagina_numero, data.caminho_preview || ultimoArquivoTentado);
+          atualizarInterfaceGaleria();
+          ultimoArquivoTentado = null;
+        } else {
+          const motivo = data.detail || data.mensagem || "Erro ao processar página forçada.";
+          mostrarAlerta("danger", `⛔ ${motivo}`);
+        }
+      } catch (err) {
+        spinnerContainer.classList.remove('active');
+        if (spinnerTexto) spinnerTexto.textContent = "Porteiro OpenCV analisando nitidez e contraste...";
+        btnFotografar.style.display = 'flex';
+        mostrarAlerta("danger", `Falha de conexão com o computador da escola: ${err.message}`);
+      }
+    }
+
     document.getElementById('btnTirarOutraFotoModal').addEventListener('click', fecharModalRejeicaoETirarOutra);
+    document.getElementById('btnForcarAceiteFotoModal').addEventListener('click', fecharModalEForcarAceite);
 
     // Abertura da câmera
     btnFotografar.addEventListener('click', () => cameraInput.click());
@@ -534,6 +587,7 @@
       const file = e.target.files[0];
       if (!file) return;
 
+      ultimoArquivoTentado = file;
       ocultarAlerta();
       btnFotografar.style.display = 'none';
       spinnerContainer.classList.add('active');

@@ -234,7 +234,7 @@ class AppControlePrincipal {
         <tr class="linha-aluno border-b border-slate-200 transition-colors">
           <td class="p-3">
             <div class="font-bold text-slate-900 nome-aluno text-destaque-blue">${a.nome_completo}</div>
-            <div class="text-xs text-slate-500 flex items-center gap-2">
+            <div class="text-xs text-slate-500 flex items-center gap-2 mt-0.5">
               <span>Nasc: ${a.data_nascimento || 'Não informada'}</span>
               ${a.rg_numero ? `<span>RG: ${a.rg_numero}</span>` : ''}
             </div>
@@ -296,7 +296,34 @@ class AppControlePrincipal {
   }
 
   abrirImpressaoA4(alunoUuid) {
-    window.open(`/impressao/${alunoUuid}`, "_blank");
+    const modal = document.getElementById("modalImpressaoEmbutida");
+    const iframe = document.getElementById("iframeImpressaoA4");
+    if (!modal || !iframe) {
+      window.open(`/impressao/${alunoUuid}`, "_blank");
+      return;
+    }
+
+    iframe.src = `/impressao/${alunoUuid}`;
+    modal.classList.remove("hidden");
+  }
+
+  fecharImpressaoEmbutida() {
+    const modal = document.getElementById("modalImpressaoEmbutida");
+    const iframe = document.getElementById("iframeImpressaoA4");
+    if (modal) modal.classList.add("hidden");
+    if (iframe) iframe.src = "about:blank";
+  }
+
+  imprimirDocumentoEmbutido() {
+    const iframe = document.getElementById("iframeImpressaoA4");
+    if (iframe && iframe.contentWindow) {
+      try {
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+      } catch (e) {
+        console.error("Erro ao disparar impressão:", e);
+      }
+    }
   }
 
   // ============================================================================
@@ -346,6 +373,14 @@ class AppControlePrincipal {
     this.abrirModalScanner();
   }
 
+  fecharModalRejeicaoEForcarAceite() {
+    const modal = document.getElementById("modalRejeicaoFotoPc");
+    if (modal) modal.classList.add("hidden");
+    if (this.ultimoArquivoScanPc) {
+      this.uploadImagemPc(this.ultimoArquivoScanPc, true);
+    }
+  }
+
   iniciarMonitoramentoSessaoScan(sessaoId) {
     if (this.intervaloPollingScan) clearInterval(this.intervaloPollingScan);
 
@@ -380,17 +415,21 @@ class AppControlePrincipal {
     }, 2000);
   }
 
-  async uploadImagemPc(file) {
+  async uploadImagemPc(file, forcar = false) {
     if (!this.sessaoScanAtiva || !file) return;
+    this.ultimoArquivoScanPc = file;
 
     const btn = document.getElementById("btnUploadArquivoPc");
     if (btn) {
       btn.disabled = true;
-      btn.textContent = "Processando...";
+      btn.textContent = forcar ? "Forçando aceite..." : "Processando...";
     }
 
     const formData = new FormData();
     formData.append("arquivo", file);
+    if (forcar) {
+      formData.append("forcar_aceite", "true");
+    }
 
     try {
       const res = await fetch(`/api/scan/${this.sessaoScanAtiva}/upload-pagina`, {
@@ -404,7 +443,7 @@ class AppControlePrincipal {
       }
 
       if (!res.ok || !data.sucesso) {
-        // Bloqueio rigoroso: foto reprovada pelo OpenCV (erro 422)
+        // Bloqueio do Porteiro de Qualidade (erro 422)
         const motivo = data.detail || data.mensagem || "Foto rejeitada pelo Porteiro de Qualidade.";
         this.exibirModalRejeicao(motivo);
       }
@@ -688,22 +727,43 @@ class AppControlePrincipal {
       }
     });
 
-    // Botão de Retentativa do Modal de Rejeição
+    // Botões do Modal de Rejeição de Foto
     document.getElementById("btnTirarOutraFotoPc")?.addEventListener("click", () => {
       this.fecharModalRejeicaoETirarOutra();
     });
+    document.getElementById("btnForcarAceiteFotoPc")?.addEventListener("click", () => {
+      this.fecharModalRejeicaoEForcarAceite();
+    });
 
-    // Fechar Modal de Edição Matriz ao clicar no fundo escuro ou tecla Escape
+    // Controles do Modal de Impressão Embutida (Sem Navegador Externo)
+    document.getElementById("btnFecharImpressaoModal")?.addEventListener("click", () => {
+      this.fecharImpressaoEmbutida();
+    });
+    document.getElementById("btnImprimirIframe")?.addEventListener("click", () => {
+      this.imprimirDocumentoEmbutido();
+    });
+
+    // Fechar Modal de Edição Matriz ou Impressão ao clicar no fundo escuro ou tecla Escape
     document.getElementById("modalEdicaoMatriz")?.addEventListener("click", (e) => {
       if (e.target.id === "modalEdicaoMatriz") {
         this.fecharModalEdicao();
       }
     });
+    document.getElementById("modalImpressaoEmbutida")?.addEventListener("click", (e) => {
+      if (e.target.id === "modalImpressaoEmbutida") {
+        this.fecharImpressaoEmbutida();
+      }
+    });
+
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
         const modalMatriz = document.getElementById("modalEdicaoMatriz");
         if (modalMatriz && !modalMatriz.classList.contains("hidden")) {
           this.fecharModalEdicao();
+        }
+        const modalImp = document.getElementById("modalImpressaoEmbutida");
+        if (modalImp && !modalImp.classList.contains("hidden")) {
+          this.fecharImpressaoEmbutida();
         }
       }
     });

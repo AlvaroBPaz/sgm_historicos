@@ -137,7 +137,7 @@ class HistoricoExtraidoSchema(BaseModel):
     )
     observacoes_historico: Optional[CampoExtraido] = Field(
         default_factory=lambda: CampoExtraido(valor="", baixa_confianca=False),
-        description="Observações gerais, leis de equivalência (ex: Lei 5.692/71, Lei 9.394/96), ressalvas"
+        description="Observações gerais, leis da época (ex: Lei 5.692/71, Lei 9.394/96), ressalvas, pareceres descritivos ou relatórios do aluno encontrados na ficha/histórico"
     )
 
 
@@ -161,24 +161,32 @@ ETAPA 1: VALIDAÇÃO OBRIGATÓRIA ANTES DA TRANSCRIÇÃO (TRAVA ANTI-FOTO INVÁL
    - Se ambos forem verdadeiros, preencha com string vazia "".
 
 ETAPA 2: DIRETRIZES DE TRANSCRIÇÃO (CASO O DOCUMENTO SEJA VÁLIDO E LEGÍVEL):
-1. REGIME DE ENSINO:
+1. HISTÓRICOS ESCOLARES E FICHAS INDIVIDUAIS:
+   - Todos os documentos escaneados alimentam a estrutura oficial do Histórico Escolar do aluno.
+   - Se o documento for uma Ficha Individual Anual (de uma única série/ano):
+     * Transcreva aquela série em 'series_cursadas' (ano letivo, série, dias letivos, carga horária e resultado) e as notas da disciplina correspondente em 'notas_curriculares'.
+     * Se a ficha contiver relatório descritivo, parecer pedagógico ou observações individuais do aluno, transcreva integralmente dentro de 'observacoes_historico'.
+   - Se o documento for um Histórico Escolar tradicional com várias séries:
+     * Transcreva as séries e notas nas respectivas colunas de 1 a 9.
+
+2. REGIME DE ENSINO:
    - '8_ANOS': Típico do Ensino de 1º Grau antigo (1ª Série à 8ª Série, sob as Leis 5.692/71 e anteriores).
    - '9_ANOS': Ensino Fundamental contemporâneo (1º Ano ao 9º Ano, pós-2006).
    - 'EJA_ETAPAS': Educação de Jovens e Adultos (Fases, Etapas ou Exames Supletivos).
 
-2. DISCIPLINAS HISTÓRICAS E CONTEMPORÂNEAS:
+3. DISCIPLINAS HISTÓRICAS E CONTEMPORÂNEAS:
    - Respeite rigorosamente a nomenclatura original escrita no papel (ex: 'Estudos Sociais',
      'Educação Moral e Cívica', 'OSPB', 'Programas de Saúde', 'Ciências Físicas e Biológicas',
      'Educação Artística', 'Práticas Agrícolas', 'Língua Portuguesa', 'Matemática').
 
-3. SINALIZAÇÃO DE BAIXA CONFIANÇA (baixa_confianca = true):
+4. SINALIZAÇÃO DE BAIXA CONFIANÇA (baixa_confianca = true):
    - Você DEVE marcar 'baixa_confianca: true' sempre que houver:
      * Rasura ou carimbo sobreposto a um número ou letra;
      * Letra cursiva com traçado ambíguo (ex: dúvida entre '3', '5' ou '8', ou entre '6' e '0');
      * Borrão de tinta, umidade ou papel desbotado pelo tempo;
      * Nome civil grafado com caracteres de difícil distinção.
 
-4. SÉRIES NÃO CURSADAS OU TRANSFERÊNCIAS:
+5. SÉRIES NÃO CURSADAS OU TRANSFERÊNCIAS:
    - Se uma série/coluna não foi cursada naquela escola, preencha o resultado como 'Não Cursado'
      e preencha as notas das disciplinas correspondentes com o traço padrão: '---'.
 """

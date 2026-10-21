@@ -304,7 +304,7 @@ class EditorMatrizHistorico {
           <!-- SEÇÃO 4: OBSERVAÇÕES E LEIS HISTÓRICAS -->
           <div class="border-t border-slate-200 pt-4">
             <label class="block text-xs font-bold text-slate-700 mb-1">
-              Observações do Histórico (Leis da Época, Equivalências ou Ressalvas)
+              Observações do Histórico (Leis da Época, Equivalências, Pareceres ou Ressalvas)
             </label>
             <textarea id="campo_observacoes" rows="2" placeholder="Ex: Concluiu o 1º Grau conforme Lei Federal nº 5.692/71. Escola autorizada pela Portaria CEE nº..." class="w-full bg-white border border-slate-300 rounded p-2.5 text-xs focus:ring-2 focus:ring-blue-500 text-slate-800"></textarea>
           </div>

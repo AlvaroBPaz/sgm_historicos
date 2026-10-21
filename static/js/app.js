@@ -333,17 +333,39 @@ class AppControlePrincipal {
     }
   }
 
+  exibirModalRejeicao(motivo) {
+    const modal = document.getElementById("modalRejeicaoFotoPc");
+    const txt = document.getElementById("txtMotivoRejeicaoPc");
+    if (txt) txt.textContent = motivo;
+    if (modal) modal.classList.remove("hidden");
+  }
+
+  fecharModalRejeicaoETirarOutra() {
+    const modal = document.getElementById("modalRejeicaoFotoPc");
+    if (modal) modal.classList.add("hidden");
+    this.abrirModalScanner();
+  }
+
   iniciarMonitoramentoSessaoScan(sessaoId) {
     if (this.intervaloPollingScan) clearInterval(this.intervaloPollingScan);
 
     const containerThumbs = document.getElementById("scanPaginasRecebidasGrid");
-    containerThumbs.innerHTML = `<p class="text-xs text-slate-400 col-span-3 text-center py-4">Aguardando fotos do celular...</p>`;
+    containerThumbs.innerHTML = `<p class="text-xs text-slate-400 col-span-3 text-center py-4">Aguardando fotos do celular ou PC...</p>`;
 
     this.intervaloPollingScan = setInterval(async () => {
       try {
         const res = await fetch(`/api/scan/${sessaoId}/status`);
         if (res.ok) {
           const dados = await res.json();
+
+          // Bloqueio rigoroso: se rejeitado pela IA
+          if (dados.status === "REJEITADO_INVALIDO") {
+            clearInterval(this.intervaloPollingScan);
+            document.getElementById("modalScanner").classList.add("hidden");
+            this.exibirModalRejeicao(dados.ultimo_erro || "Documento rejeitado pela IA por não ser um Histórico Escolar válido ou estar ilegível.");
+            return;
+          }
+
           if (dados.paginas && dados.paginas.length > 0) {
             containerThumbs.innerHTML = dados.paginas.map((p, idx) => `
               <div class="relative bg-slate-100 rounded border border-slate-300 aspect-[3/4] overflow-hidden">
@@ -358,6 +380,43 @@ class AppControlePrincipal {
     }, 2000);
   }
 
+  async uploadImagemPc(file) {
+    if (!this.sessaoScanAtiva || !file) return;
+
+    const btn = document.getElementById("btnUploadArquivoPc");
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = "Processando...";
+    }
+
+    const formData = new FormData();
+    formData.append("arquivo", file);
+
+    try {
+      const res = await fetch(`/api/scan/${this.sessaoScanAtiva}/upload-pagina`, {
+        method: "POST",
+        body: formData
+      });
+      const data = await res.json();
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = "Foto / PDF do PC";
+      }
+
+      if (!res.ok || !data.sucesso) {
+        // Bloqueio rigoroso: foto reprovada pelo OpenCV (erro 422)
+        const motivo = data.detail || data.mensagem || "Foto rejeitada pelo Porteiro de Qualidade.";
+        this.exibirModalRejeicao(motivo);
+      }
+    } catch (e) {
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = "Foto / PDF do PC";
+      }
+      this.exibirModalRejeicao(`Erro no envio: ${e.message}`);
+    }
+  }
+
   async acionarScannerUsbPc() {
     if (!this.sessaoScanAtiva) return;
     const btn = document.getElementById("btnAcionarScannerWia");
@@ -368,17 +427,17 @@ class AppControlePrincipal {
       const res = await fetch(`/api/scan/${this.sessaoScanAtiva}/scanner-pc`, { method: "POST" });
       const data = await res.json();
       btn.disabled = false;
-      btn.textContent = "Digitalizar no Scanner USB do PC";
+      btn.textContent = "Scanner USB (WIA)";
 
       if (!res.ok) {
-        alert(data.detail || "Erro ao acionar scanner.");
+        this.exibirModalRejeicao(data.detail || "Erro ao acionar scanner.");
       } else {
         alert(`✓ Página digitalizada com sucesso!`);
       }
     } catch (e) {
       btn.disabled = false;
-      btn.textContent = "Digitalizar no Scanner USB do PC";
-      alert(`Erro: ${e.message}`);
+      btn.textContent = "Scanner USB (WIA)";
+      this.exibirModalRejeicao(`Erro: ${e.message}`);
     }
   }
 
@@ -416,15 +475,15 @@ class AppControlePrincipal {
           : "bg-slate-700 text-slate-300 px-2 py-0.5 rounded-full text-xs font-bold";
       }
 
-      this.renderizarCardsFilaIa(data.aguardando_revisao || []);
+      this.renderizarCardsFilaIa(data.aguardando_revisao || [], data.rejeitados || []);
     } catch (e) {}
   }
 
-  renderizarCardsFilaIa(lista) {
+  renderizarCardsFilaIa(lista, rejeitados = []) {
     const box = document.getElementById("containerCardsFilaIa");
     if (!box) return;
 
-    if (lista.length === 0) {
+    if (lista.length === 0 && rejeitados.length === 0) {
       box.innerHTML = `
         <div class="col-span-3 text-center py-12 text-slate-500">
           <span class="text-3xl block mb-2">🎉</span>
@@ -434,7 +493,36 @@ class AppControlePrincipal {
       return;
     }
 
-    box.innerHTML = lista.map(s => {
+    let html = "";
+
+    // 1. Cards de Documentos Rejeitados pelo Controle de Qualidade / Gemini
+    if (rejeitados.length > 0) {
+      html += rejeitados.map(r => `
+        <div class="bg-red-50 rounded-xl border-2 border-red-500 p-4 shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="bg-red-600 text-white text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wide">FOTO RECUSADA PELA IA</span>
+              <span class="text-xs text-red-400 font-mono">${r.sessao_id.substring(0, 8)}...</span>
+            </div>
+            <h4 class="font-bold text-red-950 text-sm mb-1.5 flex items-center gap-1.5">
+              <span>⛔</span> Documento Inválido ou Ilegível
+            </h4>
+            <p class="text-xs text-red-800 bg-white p-2.5 rounded border border-red-200 leading-relaxed font-medium">
+              ${r.ultimo_erro || "A imagem enviada não é um Histórico Escolar ou está ilegível."}
+            </p>
+          </div>
+
+          <div class="mt-4 flex gap-2">
+            <button type="button" onclick="window.appMain.descartarSessaoRejeitada('${r.sessao_id}')" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold text-xs py-2 rounded-lg flex items-center justify-center gap-1 transition">
+              <span>🗑️</span> Descartar Envelope
+            </button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    // 2. Cards de Documentos Válidos Aguardando Revisão
+    html += lista.map(s => {
       let dados = {};
       try { dados = JSON.parse(s.json_extraido_ia || "{}"); } catch (e) {}
       const nome = dados.dados_civis?.nome_completo?.valor || "Aluno Não Identificado";
@@ -457,6 +545,18 @@ class AppControlePrincipal {
         </div>
       `;
     }).join("");
+
+    box.innerHTML = html;
+  }
+
+  async descartarSessaoRejeitada(sessaoId) {
+    if (!confirm("Deseja descartar este envelope reprovado?")) return;
+    try {
+      await fetch(`/api/ocr/sessao/${sessaoId}`, { method: "DELETE" });
+      this.atualizarContadorFilaIa();
+    } catch (e) {
+      alert(`Erro ao descartar: ${e.message}`);
+    }
   }
 
   async atualizarStatusSincronizacao() {
@@ -535,6 +635,23 @@ class AppControlePrincipal {
     });
     document.getElementById("btnAcionarScannerWia")?.addEventListener("click", () => this.acionarScannerUsbPc());
     document.getElementById("btnScanFinalizarIa")?.addEventListener("click", () => this.finalizarEnvelopeScan());
+
+    // Upload de Imagem do PC
+    const btnUploadPc = document.getElementById("btnUploadArquivoPc");
+    const inputArquivoPc = document.getElementById("inputArquivoPcUpload");
+    btnUploadPc?.addEventListener("click", () => inputArquivoPc?.click());
+    inputArquivoPc?.addEventListener("change", (e) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        this.uploadImagemPc(file);
+        inputArquivoPc.value = "";
+      }
+    });
+
+    // Botão de Retentativa do Modal de Rejeição
+    document.getElementById("btnTirarOutraFotoPc")?.addEventListener("click", () => {
+      this.fecharModalRejeicaoETirarOutra();
+    });
 
     // Fechar Modal de Edição Matriz ao clicar no fundo escuro ou tecla Escape
     document.getElementById("modalEdicaoMatriz")?.addEventListener("click", (e) => {

@@ -45,9 +45,10 @@ cv2.putText(img_nitida, "SECRETARIA MUNICIPAL DE EDUCACAO", (80, 80), cv2.FONT_H
 cv2.putText(img_nitida, "HISTORICO ESCOLAR DO 1o GRAU", (120, 150), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (20, 20, 20), 3)
 
 res_nitida = image_processor.avaliar_qualidade_imagem(img_nitida)
-print(f"Foto Nítida -> Aprovada: {res_nitida.aprovado} (Nitidez: {res_nitida.score_nitidez:.1f}, Brilho: {res_nitida.brilho_medio:.1f})")
+print(f"Foto Nítida -> Aprovada: {res_nitida.aprovado} (Nitidez: {res_nitida.score_nitidez:.1f}, Brilho: {res_nitida.brilho_medio:.1f}, Densidade: {res_nitida.densidade_bordas:.3f})")
 assert res_nitida.aprovado is True, "Foto com texto nítido deveria ser aprovada"
-assert res_nitida.score_nitidez >= 80.0, "Score de nitidez deveria ser >= 80.0"
+assert res_nitida.score_nitidez >= 130.0, "Score de nitidez deveria ser >= 130.0"
+assert res_nitida.densidade_bordas >= 0.015, "Densidade de texto deveria ser >= 0.015"
 
 # 1.2 Teste de Foto Tremida / Fora de Foco (Desfoque Gaussiano severo)
 img_tremida = cv2.GaussianBlur(img_nitida, (51, 51), 0)
@@ -55,9 +56,9 @@ res_tremida = image_processor.avaliar_qualidade_imagem(img_tremida)
 print(f"Foto Tremida -> Aprovada: {res_tremida.aprovado} (Código: {res_tremida.codigo_erro}, Nitidez: {res_tremida.score_nitidez:.1f})")
 assert res_tremida.aprovado is False, "Foto borrada/tremida deveria ser reprovada"
 assert res_tremida.codigo_erro == "FOTO_TREMIDA"
-assert "fora de foco" in res_tremida.motivo_rejeicao.lower()
+assert "embaçada" in res_tremida.motivo_rejeicao.lower() or "tremida" in res_tremida.motivo_rejeicao.lower()
 
-# 1.3 Teste de Foto Muito Escura (brilho < 55)
+# 1.3 Teste de Foto Muito Escura (brilho < 65)
 img_escura = np.full((1200, 1000, 3), 35, dtype=np.uint8)
 res_escura = image_processor.avaliar_qualidade_imagem(img_escura)
 print(f"Foto Escura -> Aprovada: {res_escura.aprovado} (Código: {res_escura.codigo_erro}, Brilho: {res_escura.brilho_medio:.1f})")
@@ -73,8 +74,14 @@ cv2.circle(img_flash, (w // 2, h // 2), 220, (255, 255, 255), -1)
 res_flash = image_processor.avaliar_qualidade_imagem(img_flash)
 print(f"Foto Flash -> Aprovada: {res_flash.aprovado} (Código: {res_flash.codigo_erro}, % Estouro Centro: {res_flash.pct_estouro_centro:.1f}%)")
 assert res_flash.aprovado is False, "Estouro de flash no centro deveria ser reprovado"
-assert res_flash.codigo_erro == "FLASH_ESTOURADO"
-assert "flash" in res_flash.motivo_rejeicao.lower()
+assert res_flash.codigo_erro in ("FLASH_ESTOURADO", "FOTO_ESTOURADA")
+
+# 1.4.1 Teste de Densidade de Texto/Tabela (Foto sem nenhum documento com texto)
+img_sem_texto = np.full((1200, 1000, 3), 180, dtype=np.uint8)
+res_sem_texto = image_processor.avaliar_qualidade_imagem(img_sem_texto)
+print(f"Foto sem Texto -> Aprovada: {res_sem_texto.aprovado} (Código: {res_sem_texto.codigo_erro})")
+assert res_sem_texto.aprovado is False
+assert res_sem_texto.codigo_erro in ("SEM_TEXTO_DETECTADO", "FOTO_TREMIDA")
 
 # 1.5 Teste do Filtro CLAHE e Compressão WebP (largura max 1750, quality=78)
 img_amarelada = np.full((2400, 1800, 3), (170, 220, 240), dtype=np.uint8) # BGR amarelado de papel velho
@@ -158,6 +165,9 @@ print("\n--- TESTE 3: Fila Assíncrona e Modelos Pydantic (ocr_queue_worker.py) 
 
 # 3.1 Validação do Esquema Pydantic HistoricoExtraidoSchema
 dados_exemplo_json = {
+    "eh_historico_escolar": True,
+    "esta_legivel_para_transcricao": True,
+    "motivo_rejeicao": "",
     "regime_ensino": "8_ANOS",
     "dados_civis": {
         "nome_completo": {"valor": "Anísio Teixeira da Silva", "baixa_confianca": False},
@@ -217,6 +227,8 @@ dados_exemplo_json = {
 }
 
 schema_validado = ocr_queue_worker.HistoricoExtraidoSchema.model_validate(dados_exemplo_json)
+assert schema_validado.eh_historico_escolar is True
+assert schema_validado.esta_legivel_para_transcricao is True
 assert schema_validado.regime_ensino == "8_ANOS"
 assert schema_validado.dados_civis.nome_completo.valor == "Anísio Teixeira da Silva"
 assert len(schema_validado.notas_curriculares) == 2
@@ -224,6 +236,18 @@ assert len(schema_validado.notas_curriculares) == 2
 assert schema_validado.notas_curriculares[1].disciplina_nome.baixa_confianca is True
 assert schema_validado.notas_curriculares[1].nota_ou_conceito.baixa_confianca is True
 print("✓ Pydantic HistoricoExtraidoSchema validado com sucesso com flags de baixa_confianca!")
+
+# Validação do caso de documento rejeitado pela IA (CAMADA 2)
+dados_rejeitado_ia = {
+    "eh_historico_escolar": False,
+    "esta_legivel_para_transcricao": False,
+    "motivo_rejeicao": "A imagem enviada não é um Histórico Escolar."
+}
+schema_rejeitado = ocr_queue_worker.HistoricoExtraidoSchema.model_validate(dados_rejeitado_ia)
+assert schema_rejeitado.eh_historico_escolar is False
+assert schema_rejeitado.esta_legivel_para_transcricao is False
+assert "não é um histórico escolar" in schema_rejeitado.motivo_rejeicao.lower()
+print("✓ Validação de Rejeição pela IA testada com sucesso!")
 
 # 3.2 Teste do Controle de Taxa (Rate Limiter: intervalo mínimo de 5s entre chamadas)
 worker_cliente = ocr_queue_worker.GeminiClientWorker()

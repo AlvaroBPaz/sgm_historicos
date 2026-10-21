@@ -629,13 +629,16 @@ def listar_fila_ocr_revisao():
     processando = database.listar_sessoes_ocr(status="PROCESSANDO_IA")
     pendentes = database.listar_sessoes_ocr(status="PENDENTE_IA")
     erros = database.listar_sessoes_ocr(status="ERRO_IA")
+    rejeitados = database.listar_sessoes_ocr(status="REJEITADO_INVALIDO")
     
     return {
         "aguardando_revisao": aguardando,
         "processando_ia": processando,
         "pendentes_ia": pendentes,
         "erros_ia": erros,
-        "total_para_revisar": len(aguardando)
+        "rejeitados": rejeitados,
+        "total_para_revisar": len(aguardando),
+        "total_rejeitados": len(rejeitados)
     }
 
 @app.get("/api/ocr/sessao/{sessao_id}")
@@ -644,6 +647,12 @@ def obter_dados_revisao_split(sessao_id: str):
     sessao = database.obter_sessao_ocr(sessao_id)
     if not sessao:
         raise HTTPException(status_code=404, detail="Sessão não encontrada.")
+
+    if sessao.get("status") == "REJEITADO_INVALIDO":
+        raise HTTPException(
+            status_code=400,
+            detail=sessao.get("ultimo_erro") or "Este documento foi rejeitado pela Inteligência Artificial por não ser um Histórico Escolar válido ou estar ilegível."
+        )
 
     paginas = json.loads(sessao.get("paginas_locais_json") or "[]")
     json_ia = None
@@ -660,6 +669,23 @@ def obter_dados_revisao_split(sessao_id: str):
         "paginas": paginas,
         "dados_ia": json_ia
     }
+
+@app.delete("/api/ocr/sessao/{sessao_id}")
+def descartar_sessao_ocr(sessao_id: str):
+    """Descarta ou remove uma sessão rejeitada ou cancelada da fila."""
+    sessao = database.obter_sessao_ocr(sessao_id)
+    if sessao:
+        paginas = json.loads(sessao.get("paginas_locais_json") or "[]")
+        for p in paginas:
+            try:
+                arq = Path(p)
+                if arq.exists():
+                    arq.unlink()
+            except Exception:
+                pass
+        with database.get_db() as conn:
+            conn.execute("DELETE FROM fila_ocr WHERE sessao_id = ?", (sessao_id,))
+    return {"sucesso": True, "sessao_id": sessao_id}
 
 @app.post("/api/ocr/sessao/{sessao_id}/aprovar-e-salvar")
 def aprovar_e_salvar_revisao(sessao_id: str, payload: AprovarRevisaoIARequest):

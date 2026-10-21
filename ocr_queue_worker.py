@@ -110,18 +110,32 @@ class NotaDisciplinaExtraida(BaseModel):
 
 
 class HistoricoExtraidoSchema(BaseModel):
-    """Esquema completo unificado do Histórico Escolar emitido pela IA."""
-    regime_ensino: str = Field(
+    """Esquema completo unificado do Histórico Escolar emitido pela IA com validação de legitimidade."""
+    eh_historico_escolar: bool = Field(
+        description="True SOMENTE se a imagem contiver claramente um Histórico Escolar, Ficha Individual de Aluno ou Boletim/Certificado Escolar. Se for foto de pessoa, objeto, paisagem, tela aleatória ou outro documento qualquer (RG, CNH, etc.), retorne False."
+    )
+    esta_legivel_para_transcricao: bool = Field(
+        description="False se a imagem estiver tão embaçada, cortada ou distante que não seja possível ler com segurança o nome do aluno ou a grade de disciplinas/notas. Retorne True se for possível transcrever com segurança."
+    )
+    motivo_rejeicao: Optional[str] = Field(
+        default="",
+        description="Explicação clara em português para o usuário caso eh_historico_escolar seja False ou esta_legivel_para_transcricao seja False (ex: 'A imagem enviada não é um Histórico Escolar' ou 'A foto está muito desfocada na tabela de notas. Por favor, tire outra foto mais nítida'). Se aprovado, retorne string vazia."
+    )
+    regime_ensino: Optional[str] = Field(
+        default="8_ANOS",
         description="Regime educacional do documento: '8_ANOS' (1ª a 8ª Série), '9_ANOS' (1º ao 9º Ano) ou 'EJA_ETAPAS'"
     )
-    dados_civis: DadosCivisExtraidos
-    series_cursadas: List[SerieVidaEscolarExtraida] = Field(
+    dados_civis: Optional[DadosCivisExtraidos] = None
+    series_cursadas: Optional[List[SerieVidaEscolarExtraida]] = Field(
+        default_factory=list,
         description="Lista de séries/anos cursadas identificadas nas colunas da folha"
     )
-    notas_curriculares: List[NotaDisciplinaExtraida] = Field(
+    notas_curriculares: Optional[List[NotaDisciplinaExtraida]] = Field(
+        default_factory=list,
         description="Matriz completa de disciplinas e respectivas notas/conceitos por série"
     )
-    observacoes_historico: CampoExtraido = Field(
+    observacoes_historico: Optional[CampoExtraido] = Field(
+        default_factory=lambda: CampoExtraido(valor="", baixa_confianca=False),
         description="Observações gerais, leis de equivalência (ex: Lei 5.692/71, Lei 9.394/96), ressalvas"
     )
 
@@ -131,14 +145,21 @@ class HistoricoExtraidoSchema(BaseModel):
 # ==============================================================================
 
 SYSTEM_PROMPT_HISTORICO = """
-Você é um especialista em paleografia e transcrição de documentos escolares públicos brasileiros
+Você é um auditor e especialista em paleografia e transcrição de documentos escolares públicos brasileiros
 dos séculos XX e XXI (períodos de 1960 a 2026), atuando na digitalização do Acervo Passivo
 Municipal de Educação.
 
-Sua tarefa é analisar as imagens das páginas do histórico escolar do ex-aluno (frente, verso e anexos)
-e extrair com máxima fidelidade todas as informações para o esquema JSON estruturado solicitado.
+ETAPA 1: VALIDAÇÃO OBRIGATÓRIA ANTES DA TRANSCRIÇÃO (TRAVA ANTI-FOTO INVÁLIDA):
+1. 'eh_historico_escolar':
+   - Retorne TRUE SOMENTE se a imagem contiver claramente um Histórico Escolar oficial, Ficha Individual de Aluno, Certificado/Boletim Escolar de 1º/2º Grau ou Ensino Fundamental/Médio.
+   - Retorne FALSE IMEDIATAMENTE se a imagem contiver fotos de pessoas, selfies, objetos de escritório, xícaras, animais, paisagens, paredes, telas de computador/celular, ou outros documentos não escolares (ex: RG, CPF, CNH, carteira de trabalho, comprovante de residência, certidão isolada).
+2. 'esta_legivel_para_transcricao':
+   - Retorne FALSE se a imagem estiver tão embaçada, fora de foco, escura, cortada, com reflexos severos ou distante que impeça ler com segurança o nome do estudante ou a matriz de notas/disciplinas.
+3. 'motivo_rejeicao':
+   - Se 'eh_historico_escolar' for false ou 'esta_legivel_para_transcricao' for false, forneça uma explicação direta e cortês em português (ex: "A imagem enviada não é um Histórico Escolar" ou "A foto está muito desfocada na tabela de notas. Por favor, tire outra foto mais nítida").
+   - Se ambos forem verdadeiros, preencha com string vazia "".
 
-DIRETRIZES FUNDAMENTAIS DE TRANSCRIÇÃO:
+ETAPA 2: DIRETRIZES DE TRANSCRIÇÃO (CASO O DOCUMENTO SEJA VÁLIDO E LEGÍVEL):
 1. REGIME DE ENSINO:
    - '8_ANOS': Típico do Ensino de 1º Grau antigo (1ª Série à 8ª Série, sob as Leis 5.692/71 e anteriores).
    - '9_ANOS': Ensino Fundamental contemporâneo (1º Ano ao 9º Ano, pós-2006).
@@ -155,7 +176,6 @@ DIRETRIZES FUNDAMENTAIS DE TRANSCRIÇÃO:
      * Letra cursiva com traçado ambíguo (ex: dúvida entre '3', '5' ou '8', ou entre '6' e '0');
      * Borrão de tinta, umidade ou papel desbotado pelo tempo;
      * Nome civil grafado com caracteres de difícil distinção.
-   - Isso alertará o funcionário humano para revisão detalhada na tela de conferência.
 
 4. SÉRIES NÃO CURSADAS OU TRANSFERÊNCIAS:
    - Se uma série/coluna não foi cursada naquela escola, preencha o resultado como 'Não Cursado'
@@ -382,7 +402,51 @@ def processar_sessao_ocr(
         resultado_schema = gemini_worker.transcrever_envelope_multimodal(paginas_locais)
         json_serializado = resultado_schema.model_dump_json(indent=2)
 
+        # 2. TRAVA ANTI-FOTO INVÁLIDA NA API DO GEMINI (CAMADA 2)
+        if not getattr(resultado_schema, "eh_historico_escolar", True) or not getattr(resultado_schema, "esta_legivel_para_transcricao", True):
+            motivo_recusa = (
+                resultado_schema.motivo_rejeicao
+                or ("A imagem enviada não é um Histórico Escolar." if not resultado_schema.eh_historico_escolar
+                    else "A foto está muito desfocada ou cortada para permitir transcrição segura.")
+            )
+            logger.warning(f"Sessão {sessao_id} REJEITADA pela IA: {motivo_recusa}")
+
+            # Exclui as imagens inválidas do disco para não ocupar armazenamento
+            for p_caminho in paginas_locais:
+                try:
+                    arq = Path(p_caminho)
+                    if arq.exists():
+                        arq.unlink()
+                except Exception as del_err:
+                    logger.warning(f"Erro ao excluir imagem inválida {p_caminho}: {del_err}")
+
+            # Atualiza o status no banco para REJEITADO_INVALIDO e limpa lista de páginas
+            database.atualizar_status_ocr(
+                sessao_id=sessao_id,
+                status="REJEITADO_INVALIDO",
+                json_extraido=json_serializado,
+                erro=motivo_recusa,
+                caminho_db=caminho_db
+            )
+            try:
+                with database.get_db(caminho_db) as conn:
+                    conn.execute("UPDATE fila_ocr SET paginas_locais_json = '[]' WHERE sessao_id = ?", (sessao_id,))
+            except Exception:
+                pass
+
+            return {
+                "sucesso": False,
+                "sessao_id": sessao_id,
+                "status": "REJEITADO_INVALIDO",
+                "motivo_rejeicao": motivo_recusa,
+                "mensagem": f"Documento Rejeitado: {motivo_recusa}"
+            }
+
         # Transcrição concluída: envelope pronto para a Tela Dividida de Revisão
+        nome_aluno = ""
+        if resultado_schema.dados_civis and resultado_schema.dados_civis.nome_completo:
+            nome_aluno = resultado_schema.dados_civis.nome_completo.valor or ""
+
         sessao_atualizada = database.atualizar_status_ocr(
             sessao_id=sessao_id,
             status="AGUARDANDO_REVISAO",
@@ -395,10 +459,10 @@ def processar_sessao_ocr(
             "sucesso": True,
             "sessao_id": sessao_id,
             "status": "AGUARDANDO_REVISAO",
-            "aluno_nome": resultado_schema.dados_civis.nome_completo.valor,
-            "regime": resultado_schema.regime_ensino,
-            "total_series": len(resultado_schema.series_cursadas),
-            "total_notas": len(resultado_schema.notas_curriculares),
+            "aluno_nome": nome_aluno,
+            "regime": resultado_schema.regime_ensino or "8_ANOS",
+            "total_series": len(resultado_schema.series_cursadas or []),
+            "total_notas": len(resultado_schema.notas_curriculares or []),
             "mensagem": "Transcrição do histórico escolar realizada com sucesso!"
         }
 

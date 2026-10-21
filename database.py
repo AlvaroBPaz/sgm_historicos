@@ -171,7 +171,7 @@ DDL_FILA_OCR = """
 CREATE TABLE IF NOT EXISTS fila_ocr (
     sessao_id TEXT PRIMARY KEY,
     escola_id INTEGER,
-    status TEXT DEFAULT 'CAPTURANDO' CHECK(status IN ('CAPTURANDO', 'PENDENTE_IA', 'PROCESSANDO_IA', 'AGUARDANDO_REVISAO', 'CONCLUIDO', 'ERRO_IA')),
+    status TEXT DEFAULT 'CAPTURANDO' CHECK(status IN ('CAPTURANDO', 'PENDENTE_IA', 'PROCESSANDO_IA', 'AGUARDANDO_REVISAO', 'CONCLUIDO', 'ERRO_IA', 'REJEITADO_INVALIDO')),
     origem_captura TEXT CHECK(origem_captura IN ('MOBILE_QR', 'SCANNER_PC')),
     paginas_locais_json TEXT DEFAULT '[]',
     json_extraido_ia TEXT,
@@ -381,6 +381,24 @@ def init_db(caminho_db: Optional[Union[str, Path]] = None) -> Path:
         colunas_alunos = [c["name"] for c in conn.execute("PRAGMA table_info(alunos)").fetchall()]
         if "matricula" not in colunas_alunos:
             conn.execute("ALTER TABLE alunos ADD COLUMN matricula TEXT")
+
+        # Migração da tabela fila_ocr para suportar REJEITADO_INVALIDO no CHECK
+        schema_ocr = conn.execute("SELECT sql FROM sqlite_master WHERE name='fila_ocr'").fetchone()
+        if schema_ocr and "REJEITADO_INVALIDO" not in schema_ocr[0]:
+            conn.execute("ALTER TABLE fila_ocr RENAME TO fila_ocr_migracao_temp")
+            conn.execute(DDL_FILA_OCR)
+            conn.execute("""
+                INSERT INTO fila_ocr (
+                    sessao_id, escola_id, status, origem_captura, paginas_locais_json,
+                    json_extraido_ia, tentativas_ia, ultimo_erro, criado_em, atualizado_em
+                )
+                SELECT
+                    sessao_id, escola_id, status, origem_captura, paginas_locais_json,
+                    json_extraido_ia, tentativas_ia, ultimo_erro, criado_em, atualizado_em
+                FROM fila_ocr_migracao_temp
+            """)
+            conn.execute("DROP TABLE fila_ocr_migracao_temp")
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_fila_ocr_status ON fila_ocr(status)")
         
         # 4. Pré-cadastro e atualização das Escolas Municipais Oficiais
         for esc in ESCOLAS_INICIAIS:

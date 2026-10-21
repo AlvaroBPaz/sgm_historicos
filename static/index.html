@@ -355,11 +355,17 @@
         <!-- LADO DIREITO: SCANNER USB DO PC E PÁGINAS RECEBIDAS -->
         <div class="flex flex-col justify-between space-y-4">
           <div>
-            <span class="text-xs font-bold text-slate-800 uppercase tracking-wide block mb-2">Ou Escanear pelo Computador</span>
+            <span class="text-xs font-bold text-slate-800 uppercase tracking-wide block mb-2">Ou Escanear / Enviar do Computador</span>
             
-            <button id="btnAcionarScannerWia" type="button" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs py-2.5 rounded-lg flex items-center justify-center gap-2 transition">
-              <span>🖨️</span> Digitalizar no Scanner USB do PC
-            </button>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <button id="btnAcionarScannerWia" type="button" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs py-2.5 rounded-lg flex items-center justify-center gap-1.5 transition">
+                <span>🖨️</span> Scanner USB (WIA)
+              </button>
+              <button id="btnUploadArquivoPc" type="button" class="w-full bg-indigo-700 hover:bg-indigo-800 text-white font-bold text-xs py-2.5 rounded-lg flex items-center justify-center gap-1.5 transition">
+                <span>📁</span> Foto / PDF do PC
+              </button>
+              <input type="file" id="inputArquivoPcUpload" accept="image/*,.pdf" class="hidden">
+            </div>
           </div>
 
           <!-- MINIATURAS DAS PÁGINAS QUE O CELULAR VAI ENVIANDO EM TEMPO REAL -->
@@ -376,6 +382,27 @@
           </button>
         </div>
 
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ============================================================================== -->
+  <!-- MODAL DE REJEIÇÃO VISUAL DE FOTO (OPENCV E IA - BLOQUEIO RIGOROSO) -->
+  <!-- ============================================================================== -->
+  <div id="modalRejeicaoFotoPc" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-red-50 border-2 border-red-500 rounded-2xl max-w-md w-full p-6 text-center shadow-2xl">
+      <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center text-3xl font-black mx-auto mb-4 border border-red-200">
+        ⛔
+      </div>
+      <h3 class="text-lg font-black text-red-900 mb-2 uppercase tracking-wide">Foto Reprovada pelo Controle de Qualidade</h3>
+      <p id="txtMotivoRejeicaoPc" class="text-xs sm:text-sm text-red-800 leading-relaxed font-semibold mb-6 bg-white p-3.5 rounded-xl border border-red-200 text-left">
+        Foto embaçada ou documento não reconhecido.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-2 justify-center">
+        <button id="btnTirarOutraFotoPc" type="button" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold text-xs py-3 px-4 rounded-xl shadow-md transition flex items-center justify-center gap-2">
+          <span>📸</span> Tirar Outra Foto / Enviar Nova Imagem
+        </button>
       </div>
     </div>
   </div>

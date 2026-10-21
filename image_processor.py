@@ -53,6 +53,7 @@ class QualidadeFotoResult:
     score_nitidez: float
     brilho_medio: float
     pct_estouro_centro: float
+    densidade_bordas: float = 0.0
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -61,7 +62,8 @@ class QualidadeFotoResult:
             "codigo_erro": self.codigo_erro,
             "score_nitidez": round(self.score_nitidez, 2),
             "brilho_medio": round(self.brilho_medio, 2),
-            "pct_estouro_centro": round(self.pct_estouro_centro, 2)
+            "pct_estouro_centro": round(self.pct_estouro_centro, 2),
+            "densidade_bordas": round(self.densidade_bordas, 4)
         }
 
 
@@ -109,107 +111,149 @@ def carregar_imagem_bgr(
 # PORTEIRO DE QUALIDADE (SEÇÃO 6.3 DO SPEC)
 # ==============================================================================
 
-def calcular_nitidez_laplaciano(
-    gray: np.ndarray,
-    largura_base: int = 1200
-) -> float:
-    """
-    Calcula a variância do Laplaciano para avaliar nitidez/foco.
-    Redimensiona para largura base de 1200px para normalizar o teste
-    independentemente de a câmera ter 12MP, 48MP ou 2MP.
-    """
-    h, w = gray.shape[:2]
-    if w <= 0 or h <= 0:
-        return 0.0
-
-    if w != largura_base:
-        escala = largura_base / float(w)
-        novo_h = max(1, int(round(h * escala)))
-        gray_norm = cv2.resize(gray, (largura_base, novo_h), interpolation=cv2.INTER_AREA)
-    else:
-        gray_norm = gray
-
-    # cv2.CV_64F garante precisão flutuante nas derivadas de segunda ordem
-    lap = cv2.Laplacian(gray_norm, cv2.CV_64F)
-    return float(lap.var())
-
-
-def calcular_iluminacao(
-    gray: np.ndarray
-) -> Tuple[float, float]:
-    """
-    Avalia a iluminação da cena:
-    - Retorna o brilho médio geral (0 a 255);
-    - Retorna a porcentagem de pixels cegados/estourados (> 248) na área central (50% do centro).
-    """
-    h, w = gray.shape[:2]
-    brilho_medio = float(np.mean(gray))
-
-    # Região central (25% a 75% da altura e largura)
-    y1, y2 = int(h * 0.25), int(h * 0.75)
-    x1, x2 = int(w * 0.25), int(w * 0.75)
-    centro = gray[y1:y2, x1:x2]
-
-    if centro.size == 0:
-        return brilho_medio, 0.0
-
-    pixels_estourados = int(np.sum(centro > 248))
-    pct_estouro_centro = (pixels_estourados / float(centro.size)) * 100.0
-
-    return brilho_medio, pct_estouro_centro
-
+# ==============================================================================
+# PORTEIRO DE QUALIDADE OPENCV RIGOROSO (CAMADA 1)
+# ==============================================================================
 
 def avaliar_qualidade_imagem(
     origem: Union[str, Path, bytes, np.ndarray, Image.Image]
 ) -> QualidadeFotoResult:
     """
-    Porteiro de Qualidade oficial do SGM-Históricos.
-    Realiza as 3 verificações em menos de 0,2 segundo.
+    Porteiro de Qualidade OpenCV com bloqueio rigoroso em 5 etapas:
+    1. Redimensionamento em escala de cinza para largura fixa de 1000px (mantendo proporção);
+    2. Recorte dos 80% centrais da imagem (ROI);
+    3. Verificação de Iluminação: brilho médio < 65 (escura) ou > 242 (estourada);
+    4. Anti-tremido/Foco: cv2.GaussianBlur(roi, (3, 3), 0) antes de cv2.Laplacian(roi, cv2.CV_64F).var() >= 130.0;
+    5. Densidade de texto/tabela: cv2.Canny(roi, 50, 150) com densidade >= 0.015 (1,5%).
+    NUNCA possui fallback de aprovação em caso de erro ou imagem duvidosa.
     """
-    bgr = carregar_imagem_bgr(origem)
-    gray = cv2.cvtColor(bgr, cv2.COLOR_BGR2GRAY)
+    try:
+        bgr = carregar_imagem_bgr(origem)
+    except Exception as err:
+        return QualidadeFotoResult(
+            aprovado=False,
+            motivo_rejeicao=f"Não foi possível abrir o arquivo de imagem: {err}",
+            codigo_erro="IMAGEM_CORROMPIDA",
+            score_nitidez=0.0,
+            brilho_medio=0.0,
+            pct_estouro_centro=0.0,
+            densidade_bordas=0.0
+        )
 
-    # 1. Teste de Escuridão e Flash Estourado (Iluminação)
-    brilho_medio, pct_estouro = calcular_iluminacao(gray)
-    if brilho_medio < 55.0:
+    if bgr is None or not isinstance(bgr, np.ndarray) or bgr.size == 0:
+        return QualidadeFotoResult(
+            aprovado=False,
+            motivo_rejeicao="Imagem vazia ou inválida recebida.",
+            codigo_erro="IMAGEM_VAZIA",
+            score_nitidez=0.0,
+            brilho_medio=0.0,
+            pct_estouro_centro=0.0,
+            densidade_bordas=0.0
+        )
+
+    # 1. Redimensiona a imagem em escala de cinza para largura fixa de 1000px (mantendo proporção)
+    gray = cv2.cvtColor(bgr, cv2.COLOR_BGR2GRAY)
+    h, w = gray.shape[:2]
+    if w <= 10 or h <= 10:
+        return QualidadeFotoResult(
+            aprovado=False,
+            motivo_rejeicao="Dimensões da imagem excessivamente pequenas para leitura.",
+            codigo_erro="DIMENSAO_INVALIDA",
+            score_nitidez=0.0,
+            brilho_medio=0.0,
+            pct_estouro_centro=0.0,
+            densidade_bordas=0.0
+        )
+
+    if w != 1000:
+        escala = 1000.0 / float(w)
+        novo_h = max(1, int(round(h * escala)))
+        gray_1000 = cv2.resize(gray, (1000, novo_h), interpolation=cv2.INTER_AREA)
+    else:
+        gray_1000 = gray
+
+    h_norm, w_norm = gray_1000.shape[:2]
+
+    # 2. Extrai os 80% centrais da imagem (10% de margem em cada borda)
+    y1, y2 = int(h_norm * 0.10), int(h_norm * 0.90)
+    x1, x2 = int(w_norm * 0.10), int(w_norm * 0.90)
+    roi = gray_1000[y1:y2, x1:x2]
+    if roi.size == 0:
+        roi = gray_1000
+
+    # 3. Verificação de Iluminação (média nos 80% centrais)
+    brilho_medio = float(np.mean(roi))
+    pixels_estourados = int(np.sum(roi > 248))
+    pct_estouro_centro = (pixels_estourados / float(roi.size)) * 100.0
+
+    if brilho_medio < 65.0:
         return QualidadeFotoResult(
             aprovado=False,
             motivo_rejeicao="Foto muito escura ou com sombra cobrindo o documento! Acenda a luz do ambiente ou posicione a folha em local mais iluminado.",
             codigo_erro="FOTO_ESCURA",
             score_nitidez=0.0,
             brilho_medio=brilho_medio,
-            pct_estouro_centro=pct_estouro
+            pct_estouro_centro=pct_estouro_centro,
+            densidade_bordas=0.0
         )
 
-    if pct_estouro > 25.0:
+    if brilho_medio > 242.0 or pct_estouro_centro > 15.0:
+        motivo = (
+            "Foto excessivamente clara ou estourada! Afaste a fonte direta de luz."
+            if brilho_medio > 242.0 else
+            "Reflexo ou estouro de flash cegando o centro do documento! Desative o flash da câmera e use apenas a iluminação do ambiente."
+        )
+        codigo = "FLASH_ESTOURADO" if pct_estouro_centro > 15.0 else "FOTO_ESTOURADA"
         return QualidadeFotoResult(
             aprovado=False,
-            motivo_rejeicao="Reflexo ou estouro de flash cegando o centro do documento! Desative o flash da câmera e use apenas a iluminação do ambiente.",
-            codigo_erro="FLASH_ESTOURADO",
+            motivo_rejeicao=motivo,
+            codigo_erro=codigo,
             score_nitidez=0.0,
             brilho_medio=brilho_medio,
-            pct_estouro_centro=pct_estouro
+            pct_estouro_centro=pct_estouro_centro,
+            densidade_bordas=0.0
         )
 
-    # 2. Teste de Foco e Anti-Tremido (Nitidez)
-    score_nitidez = calcular_nitidez_laplaciano(gray, largura_base=1200)
-    if score_nitidez < 80.0:
+    # 4. Verificação de Foco e Anti-Tremido:
+    # Aplica GaussianBlur(3, 3) antes do Laplaciano para remover granulação espúria da câmera
+    roi_suavizada = cv2.GaussianBlur(roi, (3, 3), 0)
+    score_foco = float(cv2.Laplacian(roi_suavizada, cv2.CV_64F).var())
+
+    if score_foco < 130.0:
         return QualidadeFotoResult(
             aprovado=False,
-            motivo_rejeicao="Foto tremida ou fora de foco! Apoie os braços ou use um suporte e tente novamente.",
+            motivo_rejeicao="Foto embaçada ou tremida (Índice de nitidez insuficiente). Apoie o celular, foque no documento e tire outra foto.",
             codigo_erro="FOTO_TREMIDA",
-            score_nitidez=score_nitidez,
+            score_nitidez=score_foco,
             brilho_medio=brilho_medio,
-            pct_estouro_centro=pct_estouro
+            pct_estouro_centro=pct_estouro_centro,
+            densidade_bordas=0.0
         )
 
+    # 5. Verificação de Densidade de Texto/Tabela usando bordas Canny
+    edges = cv2.Canny(roi, 50, 150)
+    densidade_bordas = float(np.count_nonzero(edges) / float(edges.size))
+
+    if densidade_bordas < 0.015:
+        return QualidadeFotoResult(
+            aprovado=False,
+            motivo_rejeicao="Nenhum documento com texto/tabelas foi detectado na imagem. Enquadre a folha do Histórico Escolar.",
+            codigo_erro="SEM_TEXTO_DETECTADO",
+            score_nitidez=score_foco,
+            brilho_medio=brilho_medio,
+            pct_estouro_centro=pct_estouro_centro,
+            densidade_bordas=densidade_bordas
+        )
+
+    # Imagem 100% aprovada pelo Porteiro
     return QualidadeFotoResult(
         aprovado=True,
         motivo_rejeicao=None,
         codigo_erro=None,
-        score_nitidez=score_nitidez,
+        score_nitidez=score_foco,
         brilho_medio=brilho_medio,
-        pct_estouro_centro=pct_estouro
+        pct_estouro_centro=pct_estouro_centro,
+        densidade_bordas=densidade_bordas
     )
 
 
@@ -297,23 +341,12 @@ def processar_pagina_documento(
     bgr = carregar_imagem_bgr(origem)
 
     # 1. Validação pelo Porteiro
-    if verificar_qualidade:
-        avaliacao = avaliar_qualidade_imagem(bgr)
-        if not avaliacao.aprovado:
-            raise QualidadeInsuficienteError(
-                motivo=avaliacao.motivo_rejeicao or "Qualidade insuficiente.",
-                codigo_erro=avaliacao.codigo_erro or "ERRO_QUALIDADE",
-                metricas=avaliacao.to_dict()
-            )
-    else:
-        gray = cv2.cvtColor(bgr, cv2.COLOR_BGR2GRAY)
-        avaliacao = QualidadeFotoResult(
-            aprovado=True,
-            motivo_rejeicao=None,
-            codigo_erro=None,
-            score_nitidez=calcular_nitidez_laplaciano(gray),
-            brilho_medio=float(np.mean(gray)),
-            pct_estouro_centro=0.0
+    avaliacao = avaliar_qualidade_imagem(bgr)
+    if verificar_qualidade and not avaliacao.aprovado:
+        raise QualidadeInsuficienteError(
+            motivo=avaliacao.motivo_rejeicao or "Qualidade insuficiente.",
+            codigo_erro=avaliacao.codigo_erro or "ERRO_QUALIDADE",
+            metricas=avaliacao.to_dict()
         )
 
     # 2. Melhoria de Contraste CLAHE
@@ -348,5 +381,6 @@ def processar_pagina_documento(
         "altura": h_final,
         "score_nitidez": round(avaliacao.score_nitidez, 2),
         "brilho_medio": round(avaliacao.brilho_medio, 2),
-        "pct_estouro_centro": round(avaliacao.pct_estouro_centro, 2)
+        "pct_estouro_centro": round(avaliacao.pct_estouro_centro, 2),
+        "densidade_bordas": round(avaliacao.densidade_bordas, 4)
     }

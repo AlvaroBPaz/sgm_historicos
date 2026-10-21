@@ -57,7 +57,7 @@ def test_template_impressao_a4_oficial():
     assert "dado_nome_completo" in html
     assert "dado_data_nascimento" in html
     assert "dado_certidao" in html
-    assert "dado_localizador_arquivo" in html
+    assert "dado_cpf" in html
 
     # Matriz e estabelecimentos
     assert "tabelaEstabelecimentosA4" in html, "Falta quadro de estabelecimentos frequentados"

@@ -212,7 +212,7 @@ class AppControlePrincipal {
     if (alunos.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="6" class="p-8 text-center text-slate-500">
+          <td colspan="5" class="p-8 text-center text-slate-500">
             <span class="text-3xl block mb-2">📂</span>
             Nenhum ex-aluno localizado com os filtros selecionados.
           </td>
@@ -223,24 +223,17 @@ class AppControlePrincipal {
 
     tbody.innerHTML = alunos.map(a => {
       // Badge de Status
-      let badgeStatus = '<span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded text-[11px] font-bold">Rascunho IA</span>';
+      let badgeStatus = '<span class="status-badge status-pendente bg-amber-100 text-amber-800 px-2 py-0.5 rounded text-[11px] font-bold">Rascunho IA</span>';
       if (a.status_ficha === "LACRADO_HOMOLOGADO") {
-        badgeStatus = '<span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-[11px] font-bold flex items-center gap-1">🔒 Homologado</span>';
+        badgeStatus = '<span class="status-badge status-sucesso bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-[11px] font-bold flex items-center gap-1">🔒 Homologado</span>';
       } else if (a.status_ficha === "DIGITADO") {
-        badgeStatus = '<span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-[11px] font-bold">Digitado</span>';
+        badgeStatus = '<span class="status-badge status-digitado bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-[11px] font-bold">Digitado</span>';
       }
 
-      // Localização no Arquivo
-      const loc = [
-        a.arquivo_caixa ? `Cx: ${a.arquivo_caixa}` : '',
-        a.arquivo_pasta ? `P: ${a.arquivo_pasta}` : '',
-        a.arquivo_ano_referencia ? `Ano: ${a.arquivo_ano_referencia}` : ''
-      ].filter(Boolean).join(" | ") || "Sem localização";
-
       return `
-        <tr class="border-b border-slate-200 hover:bg-slate-50 transition-colors">
+        <tr class="linha-aluno border-b border-slate-200 transition-colors">
           <td class="p-3">
-            <div class="font-bold text-slate-900">${a.nome_completo}</div>
+            <div class="font-bold text-slate-900 nome-aluno text-destaque-blue">${a.nome_completo}</div>
             <div class="text-xs text-slate-500 flex items-center gap-2">
               <span>Nasc: ${a.data_nascimento || 'Não informada'}</span>
               ${a.rg_numero ? `<span>RG: ${a.rg_numero}</span>` : ''}
@@ -249,9 +242,6 @@ class AppControlePrincipal {
           <td class="p-3 text-xs text-slate-600">
             <div class="font-semibold text-slate-700">${a.escola_nome || 'Escola ' + a.escola_id}</div>
             <div class="text-[11px] text-slate-400 font-mono">${a.codigo_autenticidade || '---'}</div>
-          </td>
-          <td class="p-3 text-xs text-slate-700 font-medium">
-            ${loc}
           </td>
           <td class="p-3 text-xs">
             <span class="font-semibold text-slate-800">${a.regime_ensino === '8_ANOS' ? '8 Anos (1ª-8ª)' : (a.regime_ensino === '9_ANOS' ? '9 Anos (1º-9º)' : 'EJA')}</span>
@@ -580,20 +570,20 @@ class AppControlePrincipal {
     secaoFilaIa?.classList.add("hidden");
     secaoSme?.classList.add("hidden");
 
-    tabAcervo.className = "px-4 py-2 font-bold text-xs rounded-lg transition-colors text-slate-600 hover:bg-slate-100";
-    tabFilaIa.className = "px-4 py-2 font-bold text-xs rounded-lg transition-colors text-slate-600 hover:bg-slate-100 flex items-center gap-1.5";
-    if (tabPainelSme) tabPainelSme.className = "px-4 py-2 font-bold text-xs rounded-lg transition-colors text-slate-600 hover:bg-slate-100";
+    tabAcervo.className = "tab-inativa px-4 py-2 font-bold text-xs rounded-lg transition-colors text-slate-600 hover:bg-slate-100";
+    tabFilaIa.className = "tab-inativa px-4 py-2 font-bold text-xs rounded-lg transition-colors text-slate-600 hover:bg-slate-100 flex items-center gap-1.5";
+    if (tabPainelSme) tabPainelSme.className = "tab-inativa px-4 py-2 font-bold text-xs rounded-lg transition-colors text-slate-600 hover:bg-slate-100";
 
     if (aba === "acervo") {
       secaoAcervo?.classList.remove("hidden");
-      tabAcervo.className = "px-4 py-2 font-bold text-xs rounded-lg transition-colors bg-white shadow-sm text-blue-900 border border-slate-200";
+      tabAcervo.className = "tab-ativa px-4 py-2 font-bold text-xs rounded-lg transition-colors bg-white shadow-sm text-blue-900 border border-slate-200";
     } else if (aba === "filaIa") {
       secaoFilaIa?.classList.remove("hidden");
-      tabFilaIa.className = "px-4 py-2 font-bold text-xs rounded-lg transition-colors bg-white shadow-sm text-blue-900 border border-slate-200 flex items-center gap-1.5";
+      tabFilaIa.className = "tab-ativa px-4 py-2 font-bold text-xs rounded-lg transition-colors bg-white shadow-sm text-blue-900 border border-slate-200 flex items-center gap-1.5";
       this.atualizarContadorFilaIa();
     } else if (aba === "sme") {
       secaoSme?.classList.remove("hidden");
-      if (tabPainelSme) tabPainelSme.className = "px-4 py-2 font-bold text-xs rounded-lg transition-colors bg-white shadow-sm text-blue-900 border border-slate-200";
+      if (tabPainelSme) tabPainelSme.className = "tab-ativa px-4 py-2 font-bold text-xs rounded-lg transition-colors bg-white shadow-sm text-blue-900 border border-slate-200";
       this.carregarPainelSme();
     }
   }

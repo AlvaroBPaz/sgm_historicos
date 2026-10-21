@@ -1,0 +1,31 @@
+# Ambiente virtual Python
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Banco de dados local e dados sensíveis
+*.db
+*.db-wal
+*.db-shm
+data_local/
+local_data/
+
+# Imagens de alunos escaneadas
+*.jpg
+*.jpeg
+*.png
+*.webp
+scans/
+
+# Chaves de API e credenciais
+.env
+config.json
+credentials_*.json
+service_account.json
+*.enc
+
+# Configurações do editor / IDE
+.antigravity/
+.vscode/
+.idea/

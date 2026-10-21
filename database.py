@@ -813,7 +813,7 @@ def listar_alunos(
 ) -> Tuple[List[Dict[str, Any]], int]:
     """
     Lista alunos com paginação e busca multifatorial:
-    nome_completo, cpf, rg_numero, codigo_autenticidade, arquivo_ano_referencia.
+    nome_completo, cpf, rg_numero, codigo_autenticidade.
     Retorna tupla: (lista_alunos, total_contagem).
     """
     where_clauses = ["1=1"]
@@ -834,12 +834,10 @@ def listar_alunos(
                 a.nome_completo LIKE ? OR
                 a.cpf LIKE ? OR
                 a.rg_numero LIKE ? OR
-                a.codigo_autenticidade LIKE ? OR
-                a.arquivo_ano_referencia LIKE ? OR
-                a.arquivo_caixa LIKE ?
+                a.codigo_autenticidade LIKE ?
             )"""
         )
-        params.extend([termo, termo, termo, termo, termo, termo])
+        params.extend([termo, termo, termo, termo])
 
     where_sql = " AND ".join(where_clauses)
 

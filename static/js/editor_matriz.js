@@ -182,32 +182,7 @@ class EditorMatrizHistorico {
 
         <div class="p-5 sm:p-6 space-y-6">
 
-          <!-- SEÇÃO 1: LOCALIZAÇÃO FÍSICA NO ARQUIVO MORTO -->
-          <div class="bg-amber-50/70 border border-amber-200 rounded-lg p-4">
-            <h3 class="text-xs font-bold text-amber-900 uppercase tracking-wider mb-3 flex items-center gap-2">
-              <span>🗄️</span> Localizador Físico da Pasta (Onde encontrar o papel original)
-            </h3>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
-              <div>
-                <label class="block text-xs font-medium text-slate-700 mb-1">Estante / Armário</label>
-                <input type="text" id="campo_estante" placeholder="Ex: E-02" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1.5 focus:ring-2 focus:ring-blue-500 text-slate-800">
-              </div>
-              <div>
-                <label class="block text-xs font-medium text-slate-700 mb-1">Caixa Arquivo Morto</label>
-                <input type="text" id="campo_caixa" placeholder="Ex: CX-1988" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1.5 focus:ring-2 focus:ring-blue-500 text-slate-800">
-              </div>
-              <div>
-                <label class="block text-xs font-medium text-slate-700 mb-1">Número da Pasta</label>
-                <input type="text" id="campo_pasta" placeholder="Ex: P-42" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1.5 focus:ring-2 focus:ring-blue-500 text-slate-800">
-              </div>
-              <div>
-                <label class="block text-xs font-medium text-slate-700 mb-1">Ano de Referência / Saída</label>
-                <input type="text" id="campo_ano_ref" placeholder="Ex: 1988" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1.5 focus:ring-2 focus:ring-blue-500 text-slate-800 font-semibold text-blue-900">
-              </div>
-            </div>
-          </div>
-
-          <!-- SEÇÃO 2: DADOS CIVIS DO EX-ALUNO -->
+          <!-- SEÇÃO 1: DADOS CIVIS DO EX-ALUNO -->
           <div>
             <h3 class="text-xs font-bold text-slate-600 uppercase tracking-wider mb-3 flex items-center gap-2">
               <span>👤</span> Dados Civis e Filiação
@@ -248,7 +223,7 @@ class EditorMatrizHistorico {
             </div>
           </div>
 
-          <!-- SEÇÃO 3: DOCUMENTAÇÃO CIVIL ANTIGA (OPCIONAL) -->
+          <!-- SEÇÃO 2: DOCUMENTAÇÃO CIVIL ANTIGA (OPCIONAL) -->
           <div class="border-t border-slate-200 pt-4">
             <details class="group">
               <summary class="cursor-pointer text-xs font-bold text-blue-700 uppercase tracking-wider flex items-center justify-between list-none">
@@ -293,7 +268,7 @@ class EditorMatrizHistorico {
             </details>
           </div>
 
-          <!-- SEÇÃO 4: MATRIZ CURRICULAR DE SÉRIES E NOTAS -->
+          <!-- SEÇÃO 3: MATRIZ CURRICULAR DE SÉRIES E NOTAS -->
           <div class="border-t border-slate-200 pt-5">
             <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
               <div>
@@ -323,7 +298,7 @@ class EditorMatrizHistorico {
             </div>
           </div>
 
-          <!-- SEÇÃO 5: OBSERVAÇÕES E LEIS HISTÓRICAS -->
+          <!-- SEÇÃO 4: OBSERVAÇÕES E LEIS HISTÓRICAS -->
           <div class="border-t border-slate-200 pt-4">
             <label class="block text-xs font-bold text-slate-700 mb-1">
               Observações do Histórico (Leis da Época, Equivalências ou Ressalvas)
@@ -463,30 +438,31 @@ class EditorMatrizHistorico {
     // CORPO: DISCIPLINAS DA BASE COMUM E DIVERSIFICADA
     const baseComum = this.disciplinas.filter(d => d.categoria === "BASE_COMUM");
     const diversificada = this.disciplinas.filter(d => d.categoria === "DIVERSIFICADA");
+    let contadorZebra = 0;
 
     if (baseComum.length > 0) {
       html += `
-        <tr class="bg-slate-200/80 font-bold text-slate-700">
+        <tr class="secao-cat bg-slate-200/80 font-bold text-slate-700">
           <td colspan="${this.seriesColunas.length + 2}" class="p-2 tracking-wider uppercase text-[11px]">
             I - Base Nacional Comum
           </td>
         </tr>
       `;
       baseComum.forEach(d => {
-        html += this.gerarLinhaDisciplinaHtml(d);
+        html += this.gerarLinhaDisciplinaHtml(d, contadorZebra++);
       });
     }
 
     if (diversificada.length > 0) {
       html += `
-        <tr class="bg-slate-200/80 font-bold text-slate-700">
+        <tr class="secao-cat bg-slate-200/80 font-bold text-slate-700">
           <td colspan="${this.seriesColunas.length + 2}" class="p-2 tracking-wider uppercase text-[11px]">
             II - Parte Diversificada
           </td>
         </tr>
       `;
       diversificada.forEach(d => {
-        html += this.gerarLinhaDisciplinaHtml(d);
+        html += this.gerarLinhaDisciplinaHtml(d, contadorZebra++);
       });
     }
 
@@ -494,22 +470,23 @@ class EditorMatrizHistorico {
     tabela.innerHTML = html;
   }
 
-  gerarLinhaDisciplinaHtml(disc) {
+  gerarLinhaDisciplinaHtml(disc, index = 0) {
+    const zebraClasse = (index % 2 === 0) ? "linha-impar" : "linha-par";
     return `
-      <tr class="border-b border-slate-200 hover:bg-slate-50 transition-colors">
+      <tr class="linha-disciplina ${zebraClasse} border-b border-slate-200 transition-colors">
         <td class="p-2 font-medium text-slate-800 border-r border-slate-300">
-          <input type="text" value="${disc.nome}" onchange="window.editorMatriz.atualizarNomeDisciplina('${disc.id}', this.value)" class="w-full bg-transparent border-0 border-b border-transparent hover:border-slate-300 focus:border-blue-500 focus:bg-white px-1 py-0.5 text-xs font-semibold">
+          <input type="text" value="${disc.nome}" onchange="window.editorMatriz.atualizarNomeDisciplina('${disc.id}', this.value)" class="input-disciplina-nome w-full bg-transparent border-0 border-b border-transparent hover:border-slate-300 focus:border-blue-500 px-1 py-0.5 text-xs font-semibold">
         </td>
         ${this.seriesColunas.map(s => {
           const valNota = disc.notas[s.col] !== undefined ? disc.notas[s.col] : "";
           return `
-            <td class="p-1 border-r border-slate-300">
-              <input type="text" id="nota_${disc.id}_col_${s.col}" value="${valNota}" placeholder="---" onchange="window.editorMatriz.atualizarNota('${disc.id}', ${s.col}, this.value)" class="w-full text-center bg-white border border-slate-300 rounded py-1 text-xs font-bold text-slate-900 focus:ring-2 focus:ring-blue-500">
+            <td class="p-1 border-r border-slate-300 celula-nota">
+              <input type="text" id="nota_${disc.id}_col_${s.col}" value="${valNota}" placeholder="---" onchange="window.editorMatriz.atualizarNota('${disc.id}', ${s.col}, this.value)" class="input-nota w-full text-center border border-slate-300 rounded py-1 text-xs font-bold text-slate-900 transition-all">
             </td>
           `;
         }).join("")}
         <td class="p-1 text-center">
-          <button type="button" title="Excluir Matéria" onclick="window.editorMatriz.removerDisciplina('${disc.id}')" class="text-rose-500 hover:text-rose-700 hover:bg-rose-50 p-1 rounded font-bold">
+          <button type="button" title="Excluir Matéria" onclick="window.editorMatriz.removerDisciplina('${disc.id}')" class="btn-excluir-materia text-rose-500 hover:text-rose-700 hover:bg-rose-50 p-1 rounded font-bold">
             🗑️
           </button>
         </td>
@@ -535,11 +512,6 @@ class EditorMatrizHistorico {
   carregarDadosAlunoCompleto(aluno, vidaEscolar = [], notasCurriculares = []) {
     this.alunoAtualUuid = aluno.uuid || null;
     this.alterarRegime(aluno.regime_ensino || "8_ANOS");
-
-    document.getElementById("campo_estante").value = aluno.arquivo_estante || "";
-    document.getElementById("campo_caixa").value = aluno.arquivo_caixa || "";
-    document.getElementById("campo_pasta").value = aluno.arquivo_pasta || "";
-    document.getElementById("campo_ano_ref").value = aluno.arquivo_ano_referencia || "";
 
     document.getElementById("campo_nome_completo").value = aluno.nome_completo || "";
     document.getElementById("campo_data_nascimento").value = aluno.data_nascimento || "";
@@ -619,10 +591,6 @@ class EditorMatrizHistorico {
       certidao_livro: document.getElementById("campo_certidao_livro")?.value?.trim() || null,
       certidao_folha: document.getElementById("campo_certidao_folha")?.value?.trim() || null,
       certidao_cartorio: document.getElementById("campo_certidao_cartorio")?.value?.trim() || null,
-      arquivo_estante: document.getElementById("campo_estante")?.value?.trim() || null,
-      arquivo_caixa: document.getElementById("campo_caixa")?.value?.trim() || null,
-      arquivo_pasta: document.getElementById("campo_pasta")?.value?.trim() || null,
-      arquivo_ano_referencia: document.getElementById("campo_ano_ref")?.value?.trim() || null,
       regime_ensino: this.regimeAtual,
       observacoes_historico: document.getElementById("campo_observacoes")?.value?.trim() || null,
       status_ficha: "DIGITADO"

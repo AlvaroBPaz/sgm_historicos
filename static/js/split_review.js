@@ -231,7 +231,7 @@ class SplitReviewManager {
     const valor = campoObj?.valor || "";
     const isDuvidoso = campoObj?.baixa_confianca === true;
     const classeDestaque = isDuvidoso
-      ? "bg-amber-100 border-amber-500 text-amber-950 ring-2 ring-amber-300 font-bold"
+      ? "campo-baixa-confianca bg-amber-100 border-amber-500 text-amber-950 ring-2 ring-amber-300 font-bold"
       : "bg-white border-slate-300 text-slate-800";
 
     return `
@@ -243,9 +243,9 @@ class SplitReviewManager {
   }
 
   removerAlertaAmarelo(inputEl) {
-    if (inputEl.classList.contains("bg-amber-100")) {
-      inputEl.classList.remove("bg-amber-100", "border-amber-500", "text-amber-950", "ring-2", "ring-amber-300");
-      inputEl.classList.add("bg-emerald-50", "border-emerald-400", "text-slate-900");
+    if (inputEl.classList.contains("bg-amber-100") || inputEl.classList.contains("campo-baixa-confianca")) {
+      inputEl.classList.remove("bg-amber-100", "border-amber-500", "text-amber-950", "ring-2", "ring-amber-300", "campo-baixa-confianca");
+      inputEl.classList.add("campo-validado", "bg-emerald-50", "border-emerald-400", "text-slate-900");
     }
   }
 
@@ -338,28 +338,29 @@ class SplitReviewManager {
 
     let discIdx = 0;
     mapaDisciplinas.forEach((d, nomeDisc) => {
+      const zebraClasse = (discIdx % 2 === 0) ? "linha-impar" : "linha-par";
       html += `
-        <tr class="border-b border-slate-200 hover:bg-slate-50" id="linha_split_disc_${discIdx}">
+        <tr class="linha-disciplina ${zebraClasse} border-b border-slate-200 transition-colors" id="linha_split_disc_${discIdx}">
           <td class="p-1.5 border-r border-slate-300 font-semibold text-slate-800">
-            <input type="text" id="nome_split_disc_${discIdx}" value="${nomeDisc}" class="w-full border-0 border-b border-transparent focus:border-blue-500 text-xs font-semibold">
+            <input type="text" id="nome_split_disc_${discIdx}" value="${nomeDisc}" class="input-disciplina-nome w-full bg-transparent border-0 border-b border-transparent focus:border-blue-500 text-xs font-semibold">
           </td>
           ${colunas.map(c => {
             const notaObj = d.notas[c.col] || { valor: "", duvidoso: false };
             const classeDestaque = notaObj.duvidoso
-              ? "bg-amber-100 border-amber-500 font-black text-amber-950 ring-2 ring-amber-300"
-              : "bg-white border-slate-300 text-slate-900";
+              ? "campo-baixa-confianca bg-amber-100 border-amber-500 font-black text-amber-950 ring-2 ring-amber-300"
+              : "bg-transparent border-slate-300 text-slate-900";
 
             return `
-              <td class="p-1 border-r border-slate-300">
+              <td class="p-1 border-r border-slate-300 celula-nota">
                 <input type="text" id="nota_split_disc_${discIdx}_col_${c.col}" value="${notaObj.valor}" placeholder="---"
-                  class="w-full text-center border rounded py-1 text-xs font-bold transition-colors ${classeDestaque}"
+                  class="input-nota w-full text-center border rounded py-1 text-xs font-bold transition-all ${classeDestaque}"
                   onfocus="window.splitReview.removerAlertaAmarelo(this)"
                   oninput="window.splitReview.removerAlertaAmarelo(this)">
               </td>
             `;
           }).join('')}
           <td class="p-1 text-center">
-            <button type="button" onclick="document.getElementById('linha_split_disc_${discIdx}').remove()" class="text-rose-500 hover:text-rose-700 font-bold">×</button>
+            <button type="button" onclick="document.getElementById('linha_split_disc_${discIdx}').remove()" class="btn-excluir-materia text-rose-500 hover:text-rose-700 font-bold">×</button>
           </td>
         </tr>
       `;

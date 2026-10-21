@@ -1,0 +1,561 @@
+/**
+ * SGM-Históricos — dark_mode.css
+ * Tema Escuro Oficial com Paleta Rigorosa Desktop Densa
+ * 
+ * Paleta Especificada:
+ * - Fundo principal da janela e inputs (--bg-main): #141414
+ * - Fundo de painéis laterais, cards, cabeçalhos de tabela e botões secundários (--bg-panel): #2D2D2D
+ * - Bordas de tabelas, inputs e botões (--border-color): #454545
+ * - Linhas de tabelas e grades curriculares (efeito zebrado):
+ *   - Linha ímpar (--row-odd): #1C1C1C
+ *   - Linha par (--row-even): #261324 (tom ameixa/roxo profundo)
+ * - Linha selecionada, foco ativo, botões primários e barras de progresso (--accent-purple): #84167A (hover #9B1D90) com texto #FFFFFF
+ * - Tipografia:
+ *   - Texto principal (--text-primary): #F0F0F0
+ *   - Texto secundário/labels (--text-muted): #B0B0B0
+ *   - Nomes de alunos ou itens sincronizados em destaque (--text-highlight-blue): #3B9EFF
+ * - Cores de Status e Ícones:
+ *   - Sincronizado / Sucesso: #2ECC71 (verde)
+ *   - Pendente / Campo de Baixa Confiança da IA: borda #FF8C00 e fundo #3D2200 com texto #FFD580
+ *   - Erro / Excluir: #E74C3C (vermelho)
+ */
+
+:root {
+  /* Modo Claro Padrão */
+  --bg-main: #f1f5f9;
+  --bg-panel: #ffffff;
+  --border-color: #cbd5e1;
+  --row-odd: #ffffff;
+  --row-even: #f8fafc;
+  --accent-purple: #84167A;
+  --accent-purple-hover: #9B1D90;
+  --text-primary: #0f172a;
+  --text-muted: #64748b;
+  --text-highlight-blue: #1d4ed8;
+  --status-success: #16a34a;
+  --status-pending-border: #f59e0b;
+  --status-pending-bg: #fef3c7;
+  --status-pending-text: #92400e;
+  --status-error: #dc2626;
+  --scrollbar-bg: #f1f5f9;
+  --scrollbar-thumb: #cbd5e1;
+}
+
+/* ============================================================================== */
+/* PALETA RIGOROSA — MODO NOTURNO (DARK MODE) */
+/* ============================================================================== */
+html.dark,
+html[data-theme="dark"],
+body.dark {
+  --bg-main: #141414;
+  --bg-panel: #2D2D2D;
+  --border-color: #454545;
+  --row-odd: #1C1C1C;
+  --row-even: #261324;
+  --accent-purple: #84167A;
+  --accent-purple-hover: #9B1D90;
+  --text-primary: #F0F0F0;
+  --text-muted: #B0B0B0;
+  --text-highlight-blue: #3B9EFF;
+  --status-success: #2ECC71;
+  --status-pending-border: #FF8C00;
+  --status-pending-bg: #3D2200;
+  --status-pending-text: #FFD580;
+  --status-error: #E74C3C;
+  --scrollbar-bg: #1C1C1C;
+  --scrollbar-thumb: #454545;
+}
+
+/* ============================================================================== */
+/* REGRA OBRIGATÓRIA 1: BARRAS DE ROLAGEM NATIVAS DESKTOP */
+/* ============================================================================== */
+html.dark ::-webkit-scrollbar,
+html.dark::-webkit-scrollbar,
+body.dark ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+  background-color: var(--scrollbar-bg);
+}
+
+html.dark ::-webkit-scrollbar-track,
+html.dark::-webkit-scrollbar-track,
+body.dark ::-webkit-scrollbar-track {
+  background-color: var(--scrollbar-bg);
+}
+
+html.dark ::-webkit-scrollbar-thumb,
+html.dark::-webkit-scrollbar-thumb,
+body.dark ::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  border-radius: 4px;
+  border: 2px solid var(--scrollbar-bg);
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover,
+html.dark::-webkit-scrollbar-thumb:hover,
+body.dark ::-webkit-scrollbar-thumb:hover {
+  background-color: #5a5a5a;
+}
+
+html.dark * {
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-bg);
+  scrollbar-width: thin;
+}
+
+/* ============================================================================== */
+/* FUNDO PRINCIPAL, TEXTOS E ELEMENTOS ESTRUTURAIS */
+/* ============================================================================== */
+html.dark body {
+  background-color: var(--bg-main) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark header {
+  background-color: var(--bg-panel) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Painéis de Abas */
+html.dark .bg-slate-200\/70 {
+  background-color: #1a1a1a !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark #tabAcervo,
+html.dark #tabFilaIa,
+html.dark #tabPainelSme {
+  color: var(--text-muted) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark #tabAcervo.bg-white,
+html.dark nav button.tab-ativa {
+  background-color: var(--bg-panel) !important;
+  color: var(--text-highlight-blue) !important;
+  border-color: var(--border-color) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+}
+
+html.dark nav button:hover:not(.bg-white):not(.tab-ativa) {
+  background-color: var(--bg-panel) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Cards e Contêineres */
+html.dark .bg-white,
+html.dark .bg-slate-50 {
+  background-color: var(--bg-panel) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .bg-slate-100 {
+  background-color: var(--bg-main) !important;
+}
+
+/* Bordas em geral */
+html.dark .border-slate-200,
+html.dark .border-slate-300,
+html.dark .border-slate-400,
+html.dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]),
+html.dark .divide-slate-200 > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--border-color) !important;
+}
+
+/* Tipografia */
+html.dark .text-slate-900,
+html.dark .text-slate-800 {
+  color: var(--text-primary) !important;
+}
+
+html.dark .text-slate-700,
+html.dark .text-slate-600,
+html.dark .text-slate-500,
+html.dark .text-slate-400 {
+  color: var(--text-muted) !important;
+}
+
+/* Nomes de ex-alunos ou itens sincronizados em destaque */
+html.dark .nome-aluno,
+html.dark .text-destaque-blue,
+html.dark #tabelaAlunosBody td .font-bold.text-slate-900,
+html.dark .aluno-item-destaque {
+  color: var(--text-highlight-blue) !important;
+}
+
+/* ============================================================================== */
+/* INPUTS, SELECTS E TEXTAREAS */
+/* ============================================================================== */
+html.dark input[type="text"],
+html.dark input[type="password"],
+html.dark input[type="search"],
+html.dark input[type="number"],
+html.dark select,
+html.dark textarea {
+  background-color: var(--bg-main) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: var(--text-muted) !important;
+  opacity: 0.8;
+}
+
+html.dark input:focus,
+html.dark select:focus,
+html.dark textarea:focus {
+  border-color: var(--text-highlight-blue) !important;
+  box-shadow: 0 0 0 2px rgba(59, 158, 255, 0.25) !important;
+  outline: none !important;
+}
+
+/* ============================================================================== */
+/* BOTÕES: PRIMÁRIOS, SECUNDÁRIOS E AÇÕES */
+/* ============================================================================== */
+/* Botões Primários com --accent-purple */
+html.dark #btnNovoAluno,
+html.dark #btnSalvarHistoricoNormal,
+html.dark .btn-primario-accent {
+  background-color: var(--accent-purple) !important;
+  color: #FFFFFF !important;
+  border-color: var(--accent-purple) !important;
+  box-shadow: 0 2px 6px rgba(132, 22, 122, 0.4) !important;
+}
+
+html.dark #btnNovoAluno:hover,
+html.dark #btnSalvarHistoricoNormal:hover,
+html.dark .btn-primario-accent:hover {
+  background-color: var(--accent-purple-hover) !important;
+  border-color: var(--accent-purple-hover) !important;
+}
+
+/* Botões Secundários */
+html.dark #btnCancelarEdicao,
+html.dark #btnAdicionarDisciplinaManual,
+html.dark .btn-secundario {
+  background-color: var(--bg-panel) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark #btnCancelarEdicao:hover,
+html.dark #btnAdicionarDisciplinaManual:hover,
+html.dark .btn-secundario:hover {
+  background-color: #383838 !important;
+}
+
+/* Botão Toggle Modo Noturno */
+#btnToggleTheme {
+  background-color: #f8fafc;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+#btnToggleTheme:hover {
+  background-color: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+html.dark #btnToggleTheme {
+  background-color: var(--bg-panel) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+html.dark #btnToggleTheme:hover {
+  background-color: #383838 !important;
+  border-color: var(--accent-purple) !important;
+  box-shadow: 0 0 8px rgba(132, 22, 122, 0.3) !important;
+}
+
+/* Botão Scanner no Header */
+html.dark #btnAbrirScanner {
+  background-color: #4338ca !important;
+}
+html.dark #btnAbrirScanner:hover {
+  background-color: #4f46e5 !important;
+}
+
+/* Botões na Tabela de Alunos (Editar e A4) */
+html.dark #tabelaAlunosBody button {
+  background-color: var(--bg-panel) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+html.dark #tabelaAlunosBody button:hover {
+  background-color: var(--accent-purple) !important;
+  border-color: var(--accent-purple) !important;
+  color: #FFFFFF !important;
+}
+
+/* Catálogo de Disciplinas Históricas Rápidas */
+html.dark #containerBotoesRapidos button {
+  background-color: var(--bg-main) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+html.dark #containerBotoesRapidos button:hover {
+  background-color: var(--accent-purple) !important;
+  border-color: var(--accent-purple) !important;
+  color: #FFFFFF !important;
+}
+
+/* ============================================================================== */
+/* TABELA DE ALUNOS DO ACERVO PASSIVO (ZEBRADO) */
+/* ============================================================================== */
+html.dark #tabelaAlunosBody tr:nth-child(odd) {
+  background-color: var(--row-odd) !important;
+}
+
+html.dark #tabelaAlunosBody tr:nth-child(even) {
+  background-color: var(--row-even) !important;
+}
+
+html.dark #tabelaAlunosBody tr:hover {
+  background-color: rgba(132, 22, 122, 0.22) !important;
+}
+
+/* ============================================================================== */
+/* REGRA OBRIGATÓRIA 2: PLANILHA DE LANÇAMENTO DE NOTAS */
+/* (1ª a 8ª Série / 1º ao 9º Ano / EJA) */
+/* ============================================================================== */
+html.dark #tabelaMatrizNotas,
+html.dark #tabelaSplitMatriz {
+  background-color: var(--bg-main) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark #tabelaMatrizNotas thead tr,
+html.dark #tabelaSplitMatriz thead tr {
+  background-color: var(--bg-panel) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark #tabelaMatrizNotas thead th,
+html.dark #tabelaMatrizNotas thead td,
+html.dark #tabelaSplitMatriz thead th,
+html.dark #tabelaSplitMatriz thead td {
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Título das Séries no thead */
+html.dark #tabelaMatrizNotas thead th span,
+html.dark #tabelaSplitMatriz thead th span,
+html.dark #tabelaMatrizNotas thead td.text-blue-900,
+html.dark #tabelaSplitMatriz thead td.text-blue-900 {
+  color: var(--text-highlight-blue) !important;
+}
+
+/* Cabeçalhos de Seção Curricular: Base Comum e Diversificada */
+html.dark #tabelaMatrizNotas tr.secao-cat,
+html.dark #tabelaMatrizNotas tr.bg-slate-200\/80 {
+  background-color: #242424 !important;
+  border-color: var(--border-color) !important;
+  color: #FFFFFF !important;
+}
+
+/* ZEBRADO NAS LINHAS DAS DISCIPLINAS: */
+/* Linha ímpar (--row-odd): #1C1C1C | Linha par (--row-even): #261324 */
+html.dark #tabelaMatrizNotas tbody tr.linha-disciplina:nth-of-type(odd),
+html.dark #tabelaMatrizNotas tbody tr:not(.secao-cat):not(.bg-slate-200\/80):nth-child(odd),
+html.dark #tabelaSplitMatriz tbody tr:nth-child(odd) {
+  background-color: var(--row-odd) !important;
+}
+
+html.dark #tabelaMatrizNotas tbody tr.linha-disciplina:nth-of-type(even),
+html.dark #tabelaMatrizNotas tbody tr:not(.secao-cat):not(.bg-slate-200\/80):nth-child(even),
+html.dark #tabelaSplitMatriz tbody tr:nth-child(even) {
+  background-color: var(--row-even) !important;
+}
+
+html.dark #tabelaMatrizNotas tbody tr:hover,
+html.dark #tabelaSplitMatriz tbody tr:hover {
+  background-color: rgba(132, 22, 122, 0.28) !important;
+}
+
+html.dark #tabelaMatrizNotas tbody td,
+html.dark #tabelaSplitMatriz tbody td {
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Inputs das disciplinas e notas dentro da planilha zebrada */
+html.dark #tabelaMatrizNotas tbody td input,
+html.dark #tabelaSplitMatriz tbody td input {
+  background-color: transparent !important;
+  color: var(--text-primary) !important;
+  border-color: rgba(69, 69, 69, 0.6) !important;
+}
+
+/* DESTAQUE DA CÉLULA FOCADA NA PLANILHA: */
+/* Destaque com borda #3B9EFF e fundo #84167A com texto #FFFFFF */
+html.dark #tabelaMatrizNotas input:focus,
+html.dark #tabelaMatrizNotas select:focus,
+html.dark #tabelaSplitMatriz input:focus,
+html.dark #tabelaSplitMatriz select:focus {
+  background-color: var(--accent-purple) !important;
+  border-color: var(--text-highlight-blue) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 0 0 2px var(--text-highlight-blue) !important;
+  outline: none !important;
+}
+
+html.dark #tabelaMatrizNotas td:focus-within,
+html.dark #tabelaSplitMatriz td:focus-within {
+  background-color: rgba(132, 22, 122, 0.35) !important;
+}
+
+/* ============================================================================== */
+/* CORES DE STATUS E ÍCONES */
+/* ============================================================================== */
+/* 1. Sincronizado / Sucesso: #2ECC71 (verde) */
+html.dark .status-sucesso,
+html.dark .bg-emerald-100,
+html.dark .text-emerald-800,
+html.dark .text-emerald-700 {
+  background-color: rgba(46, 204, 113, 0.18) !important;
+  color: var(--status-success) !important;
+  border-color: var(--status-success) !important;
+}
+
+html.dark #indicadorLuminosoSync,
+html.dark .indicador-sync-online {
+  background-color: var(--status-success) !important;
+  box-shadow: 0 0 10px rgba(46, 204, 113, 0.85) !important;
+}
+
+/* 2. Pendente / Campo de Baixa Confiança da IA: */
+/* borda #FF8C00 (laranja vivo) e fundo #3D2200 com texto #FFD580 */
+html.dark .campo-baixa-confianca,
+html.dark input.bg-amber-100,
+html.dark .bg-amber-100.border-amber-500,
+html.dark input.campo-duvidoso {
+  background-color: var(--status-pending-bg) !important;
+  border-color: var(--status-pending-border) !important;
+  color: var(--status-pending-text) !important;
+  box-shadow: 0 0 0 1px var(--status-pending-border) !important;
+}
+
+html.dark .bg-amber-50,
+html.dark .bg-amber-50\/70,
+html.dark .border-amber-200 {
+  background-color: #241604 !important;
+  border-color: #5c3202 !important;
+  color: var(--status-pending-text) !important;
+}
+
+html.dark .text-amber-950,
+html.dark .text-amber-900,
+html.dark .text-amber-800,
+html.dark .text-amber-700 {
+  color: var(--status-pending-text) !important;
+}
+
+/* Status Validado após clique no split */
+html.dark .campo-validado,
+html.dark input.bg-emerald-50 {
+  background-color: rgba(46, 204, 113, 0.15) !important;
+  border-color: var(--status-success) !important;
+  color: #FFFFFF !important;
+}
+
+/* 3. Erro / Excluir: #E74C3C (vermelho) */
+html.dark .text-rose-500,
+html.dark .text-rose-700,
+html.dark .btn-excluir-materia {
+  color: var(--status-error) !important;
+}
+
+html.dark .btn-excluir-materia:hover,
+html.dark .text-rose-500:hover {
+  background-color: rgba(231, 76, 60, 0.2) !important;
+  color: #ff6b6b !important;
+}
+
+/* ============================================================================== */
+/* MODAIS E TELAS DIVIDIDAS (SPLIT-SCREEN) */
+/* ============================================================================== */
+/* Fundo Backdrop */
+html.dark #modalSetupWizard,
+html.dark #modalScanner,
+html.dark #modalEdicaoMatriz {
+  background-color: rgba(0, 0, 0, 0.82) !important;
+}
+
+/* Seletor de Regime no Editor de Matriz */
+html.dark #btnRegime8,
+html.dark #btnRegime9,
+html.dark #btnRegimeEJA {
+  background-color: var(--bg-panel);
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+}
+
+html.dark #btnRegime8.bg-blue-700,
+html.dark #btnRegime9.bg-blue-700,
+html.dark #btnRegimeEJA.bg-blue-700 {
+  background-color: var(--accent-purple) !important;
+  color: #FFFFFF !important;
+  border-color: var(--accent-purple) !important;
+}
+
+/* Botão Salvar Turbo */
+html.dark #btnSalvarTurbo {
+  background-color: #92400e !important;
+  color: #FFFFFF !important;
+  border: 1px solid #d97706 !important;
+}
+html.dark #btnSalvarTurbo:hover {
+  background-color: #b45309 !important;
+}
+
+/* Tela Dividida Split Review */
+html.dark #containerSplitReview .bg-slate-50 {
+  background-color: var(--bg-main) !important;
+}
+html.dark #containerSplitReview .bg-slate-900,
+html.dark #containerSplitReview .bg-slate-950 {
+  background-color: #121212 !important;
+  border-color: var(--border-color) !important;
+}
+
+/* ============================================================================== */
+/* REGRA OBRIGATÓRIA 3: PROTEÇÃO DE IMPRESSÃO A4 */
+/* ============================================================================== */
+@media print {
+  *,
+  *::before,
+  *::after {
+    background: #FFFFFF !important;
+    color: #000000 !important;
+    border-color: #000000 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body, html {
+    background: #FFFFFF !important;
+    color: #000000 !important;
+  }
+
+  .folha-a4,
+  .folha-a4 * {
+    background: #FFFFFF !important;
+    color: #000000 !important;
+    border-color: #000000 !important;
+    box-shadow: none !important;
+  }
+
+  .nao-imprimir,
+  .barra-ferramentas,
+  #btnToggleTheme {
+    display: none !important;
+  }
+}

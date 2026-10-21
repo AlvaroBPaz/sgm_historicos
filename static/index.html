@@ -31,6 +31,28 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
+  <!-- Estilos Oficiais do Modo Noturno (Desktop Rigoroso) -->
+  <link rel="stylesheet" href="/static/css/dark_mode.css">
+
+  <!-- Inicialização Imediata Anti-FOUC (Padrão: Modo Noturno) -->
+  <script>
+    (function() {
+      try {
+        const saved = localStorage.getItem('sgm_theme');
+        if (saved === 'light') {
+          document.documentElement.classList.remove('dark');
+          document.documentElement.setAttribute('data-theme', 'light');
+        } else {
+          document.documentElement.classList.add('dark');
+          document.documentElement.setAttribute('data-theme', 'dark');
+          if (!saved) localStorage.setItem('sgm_theme', 'dark');
+        }
+      } catch (e) {
+        document.documentElement.classList.add('dark');
+      }
+    })();
+  </script>
+
   <style>
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -66,6 +88,12 @@
       <!-- STATUS DE SINCRONIZAÇÃO E AÇÕES RÁPIDAS -->
       <div class="flex items-center gap-3">
         
+        <!-- BOTÃO ALTERNÂNCIA MODO NOTURNO (DARK MODE) -->
+        <button id="btnToggleTheme" type="button" title="Alternar entre Modo Noturno e Modo Claro" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-bold transition shadow-2xs active:scale-95">
+          <span id="themeIcon">🌙</span>
+          <span id="themeText">Modo Noturno</span>
+        </button>
+
         <!-- INDICADOR LUMINOSO DE SINCRONIZAÇÃO -->
         <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 shadow-2xs">
           <div id="indicadorLuminosoSync" class="w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></div>
@@ -134,7 +162,7 @@
         <!-- CAMPO DE BUSCA MULTIFATORIAL -->
         <div class="flex-1 min-w-[280px] relative">
           <span class="absolute left-3.5 top-2.5 text-slate-400">🔍</span>
-          <input type="text" id="inputBuscaGeral" placeholder="Buscar por Nome do Ex-Aluno, CPF, RG, Termo da Certidão, Caixa..." class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm text-slate-900 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
+          <input type="text" id="inputBuscaGeral" placeholder="Buscar por Nome do Ex-Aluno, CPF, RG, Termo da Certidão..." class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm text-slate-900 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
         </div>
 
         <!-- FILTRO DE ESCOLAS -->
@@ -163,7 +191,6 @@
             <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 text-[11px] font-bold uppercase tracking-wider">
               <th class="p-3">Ex-Aluno / Identificação</th>
               <th class="p-3">Unidade Escolar / Código</th>
-              <th class="p-3">Localizador no Arquivo Morto</th>
               <th class="p-3">Regime</th>
               <th class="p-3">Status</th>
               <th class="p-3 text-right">Ações</th>
@@ -171,7 +198,7 @@
           </thead>
           <tbody id="tabelaAlunosBody" class="divide-y divide-slate-100 text-sm">
             <tr>
-              <td colspan="6" class="p-8 text-center text-slate-400">Carregando acervo municipal...</td>
+              <td colspan="5" class="p-8 text-center text-slate-400">Carregando acervo municipal...</td>
             </tr>
           </tbody>
         </table>
@@ -369,6 +396,7 @@
 
 
   <!-- SCRIPTS MODULARES OFICIAIS -->
+  <script src="/static/js/theme.js"></script>
   <script src="/static/js/editor_matriz.js"></script>
   <script src="/static/js/split_review.js"></script>
   <script src="/static/js/app.js"></script>

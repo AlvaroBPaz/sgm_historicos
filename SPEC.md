@@ -99,8 +99,6 @@ Ao iniciar sem o arquivo `./data_local/config_instalacao.json`, o sistema bloque
 - **Documentos Antigos (Todos opcionais, sem trava de obrigatoriedade):**
   - `rg_numero` (TEXT), `rg_orgao_uf` (TEXT), `cpf` (TEXT), `codigo_inep_aluno` (TEXT)
   - `certidao_tipo` (TEXT: Nascimento/Casamento), `certidao_termo` (TEXT), `certidao_livro` (TEXT), `certidao_folha` (TEXT), `certidao_cartorio` (TEXT), `certidao_municipio_uf` (TEXT)
-- **Localizador Físico no Arquivo Morto:**
-  - `arquivo_estante` (TEXT), `arquivo_caixa` (TEXT), `arquivo_pasta` (TEXT), `arquivo_ano_referencia` (TEXT)
 - **Configuração Histórica e Controle:**
   - `regime_ensino` (TEXT: `'8_ANOS'` [1ª a 8ª Série], `'9_ANOS'` [1º ao 9º Ano], `'EJA_ETAPAS'`)
   - `observacoes_historico` (TEXT - Equivalências, leis da época, observações livres)

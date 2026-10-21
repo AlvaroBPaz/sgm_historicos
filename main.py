@@ -98,6 +98,9 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+# Garante inicialização e migrações do banco de dados SQLite local
+database.init_db()
+
 # Habilita CORS total para permitir que celulares na mesma rede Wi-Fi enviem fotos
 app.add_middleware(
     CORSMiddleware,
@@ -730,7 +733,9 @@ def raiz_aplicacao():
 @app.get("/impressao/{uuid_aluno}")
 def pagina_impressao_oficial(uuid_aluno: str):
     """Serve a página de impressão A4 do histórico escolar."""
-    template_html = STATIC_DIR / "impressao_a4.html"
+    template_html = STATIC_DIR / "impressao.html"
+    if not template_html.exists():
+        template_html = STATIC_DIR / "impressao_a4.html"
     if template_html.exists():
         return FileResponse(str(template_html))
-    raise HTTPException(status_code=404, detail="Template impressao_a4.html em desenvolvimento para a Fase 4.")
+    raise HTTPException(status_code=404, detail="Template de impressão não encontrado.")

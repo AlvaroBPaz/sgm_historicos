@@ -49,9 +49,8 @@ def test_rota_raiz_e_impressao():
     r_imp = client.get("/impressao/teste-uuid-123")
     assert r_imp.status_code == 200
     assert "HISTÓRICO ESCOLAR" in r_imp.text
-    assert "tabelaMatrizA4" in r_imp.text
-    assert "qrCodeAutenticidade" in r_imp.text
-    print("   [OK] Rota /impressao/{uuid} retornou static/impressao_a4.html")
+    assert "matriz-table" in r_imp.text or "sigeduc-table" in r_imp.text
+    print("   [OK] Rota /impressao/{uuid} retornou template oficial SMEJ-Jandaíra/RN")
 
 def test_ciclo_completo_cadastro_aluno_e_integridade():
     print("\n-> Testando cadastro de aluno via API do Editor Matriz e validação HMAC...")

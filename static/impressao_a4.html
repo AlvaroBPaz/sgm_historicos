@@ -1,759 +1,543 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-PT">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Histórico Escolar Oficial — Impressão A4</title>
-  <script>
-    (function() {
-      try {
-        const saved = localStorage.getItem('sgm_theme');
-        if (saved === 'light') {
-          document.documentElement.classList.remove('dark');
-          document.documentElement.setAttribute('data-theme', 'light');
-        } else {
-          document.documentElement.classList.add('dark');
-          document.documentElement.setAttribute('data-theme', 'dark');
-          if (!saved) localStorage.setItem('sgm_theme', 'dark');
-        }
-      } catch (e) {
-        document.documentElement.classList.add('dark');
-      }
-    })();
-  </script>
-
+  <title>Histórico Escolar - SMEJ Jandaíra/RN</title>
   <style>
-    /* Configuração Estrita de Impressão A4 Retrato */
     @page {
       size: A4 portrait;
-      margin: 8mm;
+      margin: 7mm 8mm 7mm 8mm;
     }
-
     * {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-print-color-adjust: exact;
-      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
     }
-
     body {
-      font-family: 'Times New Roman', Times, 'Liberation Serif', serif, Arial;
-      color: #000;
-      background-color: #cbd5e1;
-      font-size: 9.5px;
-      line-height: 1.15;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 8pt;
+      color: #000000;
+      background-color: #525659;
+      margin: 0;
+      padding: 0 0 40px 0;
+      line-height: 1.25;
     }
-
-    /* Container da Folha A4 */
-    .folha-a4 {
+    .page-container {
       width: 210mm;
-      height: 297mm;
-      max-height: 297mm;
-      margin: 15px auto;
-      padding: 8mm;
-      background: #fff;
-      box-shadow: 0 4px 18px rgba(0,0,0,0.2);
-      position: relative;
+      min-height: 297mm;
+      padding: 10mm 12mm;
+      margin: 24px auto;
+      background: #FFFFFF;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.45);
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      overflow: hidden;
-      page-break-after: avoid;
-      page-break-inside: avoid;
     }
 
-    /* ============================================================================== */
-    /* REGRA OBRIGATÓRIA 3: PROTEÇÃO DE IMPRESSÃO A4 */
-    /* ============================================================================== */
-    @media print {
-      *,
-      *::before,
-      *::after {
-        background: #FFFFFF !important;
-        color: #000000 !important;
-        border-color: #000000 !important;
-        box-shadow: none !important;
-        text-shadow: none !important;
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-      }
+    /* CABEÇALHO SUPERIOR */
+    .header-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #000;
+      padding-bottom: 4px;
+      margin-bottom: 4px;
+    }
+    .header-logo {
+      width: 55px;
+      height: 55px;
+      object-fit: contain;
+    }
+    .header-center {
+      text-align: center;
+      flex: 1;
+      padding: 0 8px;
+    }
+    .header-center .org-title {
+      font-size: 10pt;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    .header-center .sys-subtitle {
+      font-size: 7.5pt;
+      margin-top: 2px;
+    }
+    .header-right {
+      text-align: right;
+      min-width: 115px;
+    }
+    .header-right .emitido-em {
+      font-size: 7pt;
+      margin-top: 4px;
+    }
 
-      html, body {
-        background: #FFFFFF !important;
-        color: #000000 !important;
+    /* TÍTULO PRINCIPAL E FAIXAS DE SECÇÃO */
+    .doc-main-title {
+      background-color: #BFBFBF !important;
+      border: 1px solid #000;
+      text-align: center;
+      font-weight: bold;
+      font-size: 9.5pt;
+      padding: 3px 0;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+    .section-title {
+      background-color: #D9D9D9 !important;
+      border: 1px solid #000;
+      border-bottom: none;
+      text-align: center;
+      font-weight: bold;
+      font-size: 8.5pt;
+      padding: 2px 0;
+      text-transform: uppercase;
+    }
+
+    /* TABELAS PADRÃO */
+    table.sigeduc-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 5px;
+      table-layout: fixed;
+    }
+    table.sigeduc-table th,
+    table.sigeduc-table td {
+      border: 1px solid #000;
+      padding: 3px 5px;
+      font-size: 7.5pt;
+      vertical-align: middle;
+      overflow: hidden;
+      word-wrap: break-word;
+    }
+    .label {
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    /* MATRIZ DE COMPONENTES CURRICULARES */
+    table.matriz-table th {
+      background-color: #E6E6E6 !important;
+      font-weight: bold;
+      text-align: center;
+      font-size: 7.5pt;
+    }
+    table.matriz-table td.disciplina-col {
+      text-align: left;
+      width: 28%;
+      font-weight: normal;
+    }
+    table.matriz-table td.nota-col {
+      text-align: center;
+      width: 8%;
+    }
+    table.matriz-table tr.resumo-row td {
+      font-weight: bold;
+      background-color: #F5F5F5 !important;
+    }
+
+    /* REGISTROS COMPLEMENTARES */
+    table.complementares-table th {
+      background-color: #E6E6E6 !important;
+      font-weight: bold;
+      text-align: left;
+    }
+
+    /* LEGENDA LIMPA EM LINHA */
+    .legenda-texto {
+      font-size: 6.8pt;
+      color: #000000;
+      text-align: center;
+      margin-top: 6px;
+      margin-bottom: 4px;
+      line-height: 1.35;
+    }
+
+    /* ASSINATURAS */
+    .assinaturas-wrapper {
+      margin-top: auto;
+      padding-top: 80px;
+      padding-bottom: 15mm;
+      page-break-inside: avoid;
+    }
+    .assinaturas-grid {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      text-align: center;
+    }
+    .assinatura-bloco {
+      width: 36%;
+      border-top: 1px solid #000;
+      padding-top: 3px;
+      font-size: 7.5pt;
+      font-weight: bold;
+    }
+    .data-central {
+      width: 24%;
+      text-align: center;
+      font-size: 8pt;
+      padding-bottom: 14px;
+    }
+
+    @media print {
+      body {
+        background-color: #FFFFFF !important;
         margin: 0 !important;
         padding: 0 !important;
       }
-
-      .folha-a4,
-      .folha-a4 * {
+      .page-container {
+        width: 100% !important;
+        min-height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
         background: #FFFFFF !important;
-        color: #000000 !important;
-        border-color: #000000 !important;
         box-shadow: none !important;
+        display: block !important;
       }
-
-      .folha-a4 {
-        width: 100%;
-        height: 100%;
-        max-height: 100%;
-        margin: 0;
-        padding: 0;
-        box-shadow: none;
-      }
-
-      .nao-imprimir,
-      .barra-ferramentas,
-      #btnToggleTheme {
+      .no-print {
         display: none !important;
       }
-    }
-
-    /* Scrollbars no visualizador */
-    ::-webkit-scrollbar {
-      width: 10px;
-      height: 10px;
-      background-color: #1C1C1C;
-    }
-    ::-webkit-scrollbar-thumb {
-      background-color: #454545;
-      border-radius: 4px;
-      border: 2px solid #1C1C1C;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background-color: #5a5a5a;
-    }
-
-    /* Tabelas e Bordas Oficiais Preto e Branco (1px solid #000) */
-    table.tabela-oficial {
-      width: 100%;
-      border-collapse: collapse;
-      border: 1px solid #000;
-      margin-top: 2px;
-      margin-bottom: 2px;
-    }
-
-    table.tabela-oficial th,
-    table.tabela-oficial td {
-      border: 1px solid #000;
-      padding: 1.5px 3px;
-      font-size: 8px;
-    }
-
-    table.tabela-oficial th {
-      background-color: #f1f5f9;
-      font-weight: bold;
-      text-align: center;
-      text-transform: uppercase;
-      font-size: 7.5px;
-    }
-
-    .text-center { text-align: center; }
-    .text-right { text-align: right; }
-    .text-left { text-align: left; }
-    .font-bold { font-weight: bold; }
-    .uppercase { text-transform: uppercase; }
-
-    .secao-titulo {
-      background: #e2e8f0;
-      border: 1px solid #000;
-      font-weight: bold;
-      font-size: 8.5px;
-      padding: 2px 4px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-top: 3px;
-    }
-
-    .grade-dados {
-      display: grid;
-      grid-template-columns: repeat(12, 1fr);
-      border: 1px solid #000;
-      border-top: none;
-      padding: 3px 5px;
-      gap: 1.5px 6px;
-      font-size: 8.5px;
-    }
-
-    .col-12 { grid-column: span 12; }
-    .col-8 { grid-column: span 8; }
-    .col-7 { grid-column: span 7; }
-    .col-6 { grid-column: span 6; }
-    .col-5 { grid-column: span 5; }
-    .col-4 { grid-column: span 4; }
-    .col-3 { grid-column: span 3; }
-    .col-2 { grid-column: span 2; }
-
-    .rotulo {
-      font-weight: bold;
-      font-size: 7.5px;
-      text-transform: uppercase;
-      color: #222;
-      display: inline-block;
-      margin-right: 2px;
-    }
-
-    .valor-campo {
-      font-weight: normal;
-      color: #000;
-    }
-
-    /* Linhas de Assinatura */
-    .bloco-assinaturas {
-      display: flex;
-      justify-content: space-around;
-      margin-top: 14px;
-      margin-bottom: 6px;
-    }
-
-    .linha-assinatura {
-      width: 44%;
-      text-align: center;
-      border-top: 1px solid #000;
-      padding-top: 2px;
-      font-size: 8px;
-    }
-
-    /* Barra Superior Fixa na Tela para visualização prévia */
-    .barra-ferramentas {
-      position: sticky;
-      top: 0;
-      background: #0f172a;
-      color: #fff;
-      padding: 8px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      z-index: 100;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-    }
-
-    .btn-acao {
-      padding: 6px 14px;
-      font-size: 12px;
-      font-weight: bold;
-      border-radius: 5px;
-      border: none;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      transition: all 0.15s;
-    }
-    .btn-print { background: #2563eb; color: #fff; }
-    .btn-print:hover { background: #1d4ed8; }
-    .btn-fechar { background: #475569; color: #fff; }
-    .btn-fechar:hover { background: #334155; }
-
-    /* Alerta de Violação de Integridade HMAC */
-    .alerta-hmac {
-      background: #fee2e2;
-      border: 2px solid #ef4444;
-      color: #991b1b;
-      padding: 10px;
-      border-radius: 6px;
-      margin: 10px auto;
-      max-width: 210mm;
-      font-weight: bold;
-      text-align: center;
-      font-size: 12px;
-    }
-
-    /* Adaptação de tela do visualizador no Modo Noturno */
-    html.dark body {
-      background-color: #141414;
-    }
-    html.dark .barra-ferramentas {
-      background: #2D2D2D;
-      border-bottom: 1px solid #454545;
-    }
-    html.dark .btn-fechar {
-      background: #454545;
-      color: #F0F0F0;
-    }
-    html.dark .btn-fechar:hover {
-      background: #555555;
-    }
-    html.dark .btn-print {
-      background: #84167A;
-      color: #FFFFFF;
-    }
-    html.dark .btn-print:hover {
-      background: #9B1D90;
-    }
-    html.dark #btnToggleTheme {
-      background: #2D2D2D;
-      color: #F0F0F0;
-      border: 1px solid #454545;
-    }
-    html.dark #btnToggleTheme:hover {
-      background: #3D3D3D;
-      border-color: #84167A;
+      .assinaturas-wrapper {
+        margin-top: 85px !important;
+        padding-top: 0 !important;
+        padding-bottom: 10mm !important;
+      }
     }
   </style>
 </head>
 <body>
 
-  <!-- BARRA DE FERRAMENTAS DO NAVEGADOR (NÃO IMPRESSA) -->
-  <div class="barra-ferramentas nao-imprimir">
-    <div style="display: flex; align-items: center; gap: 8px;">
-      <span style="font-size: 16px;">🏛️</span>
-      <div>
-        <div style="font-weight: bold; font-size: 13px;">SGM-Históricos — Emissão Oficial de Histórico Escolar</div>
-        <div style="font-size: 10px; color: #94a3b8;">Arquivo Passivo Municipal — Certificação Oficial A4</div>
-      </div>
-    </div>
-    <div style="display: flex; gap: 8px;">
-      <button id="btnToggleTheme" class="btn-acao btn-fechar" style="border: 1px solid #475569;">
-        <span id="themeIcon">🌙</span> <span id="themeText">Modo Noturno</span>
-      </button>
-      <button class="btn-acao btn-fechar" onclick="window.close()">✕ Fechar</button>
-      <button class="btn-acao btn-print" onclick="window.print()">🖨️ Imprimir Histórico Oficial (Ctrl + P)</button>
-    </div>
+  <div class="no-print" style="background:#2D2D2D; color:#FFF; padding:10px; text-align:right; margin-bottom:10px;">
+    <button onclick="window.print()" style="background:#84167A; color:#FFF; border:none; padding:6px 14px; cursor:pointer; font-weight:bold; border-radius:4px;">
+      🖨️ Imprimir / Guardar PDF (A4)
+    </button>
   </div>
 
-  <!-- AVISO DE VIOLAÇÃO SE FOR IDENTIFICADA ADULTERAÇÃO FORA DO PROGRAMA -->
-  <div id="avisoViolacaoHmac" class="alerta-hmac nao-imprimir" style="display: none;">
-    ⚠️ ALERTA DE SEGURANÇA: Violação de integridade detectada na assinatura HMAC-SHA256 deste registro! O arquivo SQLite foi alterado fora do programa. A impressão oficial está bloqueada.
-  </div>
+  <div class="page-container" id="pageContainer">
 
-  <!-- FOLHA OFICIAL A4 -->
-  <div class="folha-a4" id="documentoFolha">
-    
-    <div>
-      <!-- CABEÇALHO OFICIAL COM BRASÃO E IDENTIFICAÇÃO -->
-      <div style="border: 1px solid #000; padding: 4px; display: flex; align-items: center; gap: 8px;">
-        
-        <!-- BRASÃO OFICIAL (SVG VETORIAL REPUBLICANO / MUNICIPAL) -->
-        <div style="width: 48px; height: 48px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;" id="containerBrasao">
-          <svg viewBox="0 0 100 100" style="width: 46px; height: 46px; fill: none; stroke: #000; stroke-width: 2.5;">
-            <circle cx="50" cy="50" r="45" stroke-width="2"/>
-            <circle cx="50" cy="50" r="39" stroke-width="1" stroke-dasharray="2,2"/>
-            <path d="M 50 15 L 75 35 L 68 75 L 50 88 L 32 75 L 25 35 Z" fill="#f8fafc" stroke-width="1.8"/>
-            <path d="M 38 48 L 50 35 L 62 48 L 50 68 Z" fill="#000"/>
-            <path d="M 22 84 Q 50 78 78 84" stroke-width="2"/>
-            <text x="50" y="96" text-anchor="middle" font-size="7" font-weight="bold" fill="#000" font-family="Arial">BRASIL</text>
-          </svg>
-        </div>
-
-        <!-- DADOS DA MANTENEDORA E DA ESCOLA -->
-        <div style="flex: 1; text-align: center;">
-          <div style="font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.8px;">
-            PREFEITURA MUNICIPAL — SECRETARIA MUNICIPAL DE EDUCAÇÃO
-          </div>
-          <div style="font-size: 8.5px; font-weight: bold; text-transform: uppercase;">
-            SETOR DE DOCUMENTAÇÃO ESCOLAR E ARQUIVO PASSIVO HISTÓRICO
-          </div>
-          
-          <div style="font-size: 12px; font-weight: bold; text-transform: uppercase; margin-top: 2px; border-top: 1px solid #000; padding-top: 2px;" id="cabecalhoEscolaNome">
-            CARREGANDO UNIDADE ESCOLAR...
-          </div>
-          
-          <div style="font-size: 8px; color: #111;" id="cabecalhoEscolaAtos">
-            Endereço, Atos Legais de Criação, Autorização e Código INEP
-          </div>
-
-          <!-- AVISO QUANDO FOR ESCOLA EXTINTA COM ACERVO NA SME -->
-          <div id="faixaEscolaExtinta" style="display: none; background: #fef3c7; border: 1px solid #b45309; color: #78350f; font-size: 7.5px; font-weight: bold; padding: 1px 4px; margin-top: 2px;">
-            UNIDADE ESCOLAR EXTINTA / NUCLEADA — ACERVO HISTÓRICO SOB GUARDA DA SECRETARIA MUNICIPAL DE EDUCAÇÃO (SME)
-          </div>
-        </div>
-
+    <!-- CABEÇALHO -->
+    <div class="header-box">
+      <div id="containerBrasao">
+        <img id="img-brasao" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' stroke='%23000' stroke-width='2' fill='%23FFF'/><path d='M 50 15 L 75 35 L 68 75 L 50 88 L 32 75 L 25 35 Z' fill='%23F0F0F0' stroke='%23000' stroke-width='2'/><path d='M 38 48 L 50 35 L 62 48 L 50 68 Z' fill='%23000'/><text x='50' y='96' text-anchor='middle' font-size='7' font-weight='bold' fill='%23000' font-family='Arial'>JANDAÍRA/RN</text></svg>" alt="Brasão Jandaíra" class="header-logo">
       </div>
-
-      <!-- TÍTULO DO DOCUMENTO -->
-      <div style="text-align: center; margin-top: 4px; margin-bottom: 2px;">
-        <h1 style="font-size: 13px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; text-decoration: underline;">
-          HISTÓRICO ESCOLAR — ENSINO FUNDAMENTAL
-        </h1>
+      <div class="header-center">
+        <div class="org-title">SMEJ-JANDAÍRA - Secretaria de Educação de Jandaíra - RN</div>
+        <div class="sys-subtitle">Sistema Municipal de Gestão de Acervo e Escrituração Escolar</div>
       </div>
-
-      <!-- SEÇÃO 1: IDENTIFICAÇÃO CIVIL DO EX-ALUNO -->
-      <div class="secao-titulo">1. DADOS DE IDENTIFICAÇÃO DO EX-ALUNO</div>
-      <div class="grade-dados">
-        <div class="col-8">
-          <span class="rotulo">Nome Completo:</span>
-          <span class="valor-campo font-bold uppercase" id="dado_nome_completo">---</span>
-        </div>
-        <div class="col-4">
-          <span class="rotulo">Data de Nasc.:</span>
-          <span class="valor-campo" id="dado_data_nascimento">---</span>
-        </div>
-
-        <div class="col-6">
-          <span class="rotulo">Naturalidade / UF:</span>
-          <span class="valor-campo" id="dado_naturalidade">---</span>
-        </div>
-        <div class="col-6">
-          <span class="rotulo">Nacionalidade:</span>
-          <span class="valor-campo" id="dado_nacionalidade">Brasileira</span>
-        </div>
-
-        <div class="col-12">
-          <span class="rotulo">Filiação:</span>
-          <span class="valor-campo" id="dado_filiacao">---</span>
-        </div>
-
-        <div class="col-4">
-          <span class="rotulo">Identidade (RG):</span>
-          <span class="valor-campo" id="dado_rg">---</span>
-        </div>
-        <div class="col-4">
-          <span class="rotulo">CPF:</span>
-          <span class="valor-campo" id="dado_cpf">---</span>
-        </div>
-        <div class="col-4">
-          <span class="rotulo">Código INEP Aluno:</span>
-          <span class="valor-campo" id="dado_inep_aluno">---</span>
-        </div>
-
-        <div class="col-12">
-          <span class="rotulo">Certidão de Registro Civil:</span>
-          <span class="valor-campo" id="dado_certidao">---</span>
-        </div>
+      <div class="header-right">
+        <div class="emitido-em" id="header-data-emissao">Emitido em --/--/----</div>
       </div>
-
-
-      <!-- SEÇÃO 2: QUADRO DE ESTABELECIMENTOS DE ENSINO FREQUENTADOS -->
-      <div class="secao-titulo" style="margin-top: 3px;">
-        2. ESTABELECIMENTOS DE ENSINO FREQUENTADOS POR SÉRIE / ANO
-      </div>
-      <table class="tabela-oficial" id="tabelaEstabelecimentosA4">
-        <thead>
-          <tr>
-            <th style="width: 12%;">Série / Ano</th>
-            <th style="width: 8%;">Ano</th>
-            <th style="width: 44%;">Estabelecimento de Ensino</th>
-            <th style="width: 20%;">Município / UF</th>
-            <th style="width: 16%;">Situação Final</th>
-          </tr>
-        </thead>
-        <tbody id="corpoEstabelecimentosA4"></tbody>
-      </table>
-
-
-      <!-- SEÇÃO 3: PLANILHA MATRICIAL DE NOTAS / CONCEITOS E CARGAS HORÁRIAS -->
-      <div class="secao-titulo" style="margin-top: 3px;">
-        3. APROVEITAMENTO E CARGA HORÁRIA CURRICULAR (REGIME: <span id="labelRegimeEnsino">---</span>)
-      </div>
-
-      <table class="tabela-oficial" id="tabelaMatrizA4">
-        <thead id="matrizHeadA4"></thead>
-        <tbody id="matrizBodyA4"></tbody>
-        <tfoot id="matrizFootA4"></tfoot>
-      </table>
-
-
-      <!-- SEÇÃO 4: OBSERVAÇÕES HISTÓRICAS E FUNDAMENTAÇÃO LEGAL -->
-      <div class="secao-titulo" style="margin-top: 3px;">4. OBSERVAÇÕES HISTÓRICAS, EQUIVALÊNCIAS E BASE LEGAL</div>
-      <div style="border: 1px solid #000; border-top: none; padding: 2.5px 5px; min-height: 28px; font-size: 7.5px; line-height: 1.2;" id="textoObservacoesLegais">
-        Certifico que as informações acima conferem fielmente com os assentamentos do Arquivo Passivo sob a guarda desta instituição. Fundamentação legal de acordo com as Leis Federais 4.024/61, 5.692/71 ou 9.394/96 e normas do Conselho de Educação.
-      </div>
-
     </div>
 
-    <!-- RODAPÉ DE CERTIFICAÇÃO, CÓDIGO DE AUTENTICIDADE E ASSINATURAS -->
-    <div style="margin-top: 4px;">
-      
-      <div class="bloco-assinaturas">
-        <div class="linha-assinatura">
-          <div class="font-bold" id="assinaturaSecretarioNome">Secretário(a) Escolar</div>
-          <div id="assinaturaSecretarioReg">Reg. / Matrícula: ______________</div>
+    <div class="doc-main-title">HISTÓRICO ESCOLAR</div>
+
+    <!-- 1. DADOS DA ESCOLA (Sem Atos de Criação/Autorização/Reconhecimento) -->
+    <div class="section-title">DADOS DA ESCOLA</div>
+    <table class="sigeduc-table">
+      <tr>
+        <td style="width: 75%;"><span class="label">ESCOLA:</span> <span id="escola_nome">---</span></td>
+        <td style="width: 25%;"><span class="label">INEP:</span> <span id="escola_inep">---</span></td>
+      </tr>
+      <tr>
+        <td><span class="label">ENDEREÇO:</span> <span id="escola_endereco">---</span></td>
+        <td><span class="label">BAIRRO:</span> <span id="escola_bairro">---</span></td>
+      </tr>
+      <tr>
+        <td><span class="label">MUNICÍPIO:</span> <span id="escola_municipio">JANDAÍRA</span></td>
+        <td><span class="label">UF:</span> <span id="escola_uf">RN</span></td>
+      </tr>
+    </table>
+
+    <!-- 2. DADOS DO ESTUDANTE (Sem Censo Escolar e sem Profissões) -->
+    <div class="section-title">DADOS DO ESTUDANTE</div>
+    <table class="sigeduc-table">
+      <tr>
+        <td colspan="3"><span class="label">NOME CIVIL:</span> <span id="aluno_nome_civil">---</span></td>
+      </tr>
+      <tr>
+        <td><span class="label">DATA DE NASCIMENTO:</span> <span id="aluno_data_nascimento">---</span></td>
+        <td><span class="label">CPF:</span> <span id="aluno_cpf">---</span></td>
+        <td><span class="label">NATURALIDADE:</span> <span id="aluno_naturalidade">---</span></td>
+      </tr>
+      <tr>
+        <td colspan="3"><span class="label">NACIONALIDADE:</span> <span id="aluno_nacionalidade">BRASILEIRA</span></td>
+      </tr>
+      <tr>
+        <td colspan="3"><span class="label">FILIAÇÃO 1:</span> <span id="aluno_filiacao_1">---</span></td>
+      </tr>
+      <tr>
+        <td colspan="3"><span class="label">FILIAÇÃO 2:</span> <span id="aluno_filiacao_2">---</span></td>
+      </tr>
+    </table>
+
+    <!-- 3. COMPONENTES CURRICULARES -->
+    <table class="sigeduc-table matriz-table" id="tabela-matriz">
+      <thead>
+        <tr id="matriz-head-row">
+          <th style="width:28%; text-align:left;">COMPONENTES CURRICULARES</th>
+          <th>1º ANO</th>
+          <th>2º ANO</th>
+          <th>3º ANO</th>
+          <th>4º ANO</th>
+          <th>5º ANO</th>
+          <th>6º Ano</th>
+          <th>7º Ano</th>
+          <th>8º Ano</th>
+          <th>9º Ano</th>
+        </tr>
+      </thead>
+      <tbody id="matriz-body">
+        <!-- Linhas de disciplinas e resumos inseridas via JS -->
+      </tbody>
+    </table>
+
+    <!-- 4. REGISTROS COMPLEMENTARES -->
+    <div class="section-title">REGISTROS COMPLEMENTARES</div>
+    <table class="sigeduc-table complementares-table" id="tabela-complementares">
+      <thead>
+        <tr>
+          <th style="width:16%; text-align:center;">ANO/SÉRIE</th>
+          <th style="width:8%; text-align:center;">ANO</th>
+          <th style="width:50%;">ESTABELECIMENTO</th>
+          <th style="width:11%; text-align:center;">TURNO</th>
+          <th style="width:15%;">MUNICÍPIO/UF</th>
+        </tr>
+      </thead>
+      <tbody id="complementares-body">
+        <!-- Linhas inseridas via JS -->
+      </tbody>
+    </table>
+
+    <!-- 5. LEGENDA (Texto Limpo Sem Tabela) -->
+    <div class="legenda-texto">
+      <b>LEGENDA:</b> AB - Deixou de Frequentar &nbsp;|&nbsp; AP - Aprovado &nbsp;|&nbsp; APP - Aprovado com Progressão Parcial &nbsp;|&nbsp; MAT - Matriculado &nbsp;|&nbsp; RE - Reclassificação &nbsp;|&nbsp; RP - Reprovado &nbsp;|&nbsp; RPF - Repr. Frequência &nbsp;|&nbsp; TR - Transferido &nbsp;|&nbsp; NI - Não Informado
+    </div>
+
+    <!-- 6. ASSINATURAS (Sem notas de rodapé ou link de verificação) -->
+    <div class="assinaturas-wrapper">
+      <div class="assinaturas-grid">
+        <div class="assinatura-bloco">
+          <div id="assinatura-secretario-nome" style="font-weight:normal; margin-bottom:2px;"></div>
+          Responsável pela Informação
         </div>
-        <div class="linha-assinatura">
-          <div class="font-bold" id="assinaturaDiretorNome">Diretor(a) do Estabelecimento</div>
-          <div id="assinaturaDiretorReg">Reg. / Portaria: ______________</div>
+        <div class="data-central" id="assinatura-data-central">JANDAÍRA-RN, </div>
+        <div class="assinatura-bloco">
+          <div id="assinatura-diretor-nome" style="font-weight:normal; margin-bottom:2px;"></div>
+          Diretor(a)
         </div>
       </div>
-
-      <!-- FAIXA INFERIOR COM QR CODE E CHAVE DE SEGURANÇA -->
-      <div style="border-top: 1px solid #000; padding-top: 3px; display: flex; align-items: center; justify-content: space-between;">
-        
-        <div style="display: flex; align-items: center; gap: 6px;">
-          <img id="qrCodeAutenticidade" src="" alt="QR" style="width: 42px; height: 42px; border: 1px solid #000; padding: 1px;">
-          <div style="font-size: 7.5px; line-height: 1.15;">
-            <div class="font-bold uppercase">AUTENTICIDADE DE DOCUMENTO ESCOLAR</div>
-            <div>Código: <span class="font-bold font-mono" id="rodapeCodigoAutenticidade">---</span></div>
-            <div>Validação oficial: Secretaria Municipal de Educação</div>
-            <div>Data de Emissão: <span id="rodapeDataEmissao" class="font-bold"></span></div>
-          </div>
-        </div>
-
-        <div style="text-align: right; font-size: 7px; color: #333; max-width: 280px; line-height: 1.15;">
-          Documento extraído de arquivo passivo e chancelado com assinatura digital HMAC-SHA256 pelo Sistema Municipal de Acervo Passivo (SGM-Históricos). Qualquer emenda ou rasura anula a validade deste documento.
-        </div>
-
-      </div>
-
     </div>
 
   </div>
 
-  <!-- SCRIPT DE CARREGAMENTO E POPULAÇÃO DO A4 -->
   <script>
     async function carregarDadosImpressao() {
-      // Obtém o UUID da URL (/impressao/{uuid_aluno} ou ?uuid=...)
       const pathParts = window.location.pathname.split("/").filter(Boolean);
       let alunoUuid = pathParts[pathParts.length - 1];
-      if (!alunoUuid || alunoUuid === "impressao_a4.html" || alunoUuid === "impressao") {
+      if (!alunoUuid || alunoUuid === "impressao.html" || alunoUuid === "impressao_a4.html" || alunoUuid === "impressao") {
         const urlParams = new URLSearchParams(window.location.search);
         alunoUuid = urlParams.get("uuid");
       }
 
-      if (!alunoUuid) {
-        alert("Identificador do aluno não fornecido na URL.");
-        return;
-      }
+      const hoje = new Date();
+      const dataFormatada = hoje.toLocaleDateString("pt-BR");
+      const meses = [
+        "janeiro", "fevereiro", "março", "abril", "maio", "junho",
+        "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"
+      ];
+      const dataPorExtenso = `${hoje.getDate()} de ${meses[hoje.getMonth()]} de ${hoje.getFullYear()}`;
+
+      document.getElementById("header-data-emissao").textContent = `Emitido em ${dataFormatada}`;
+      document.getElementById("assinatura-data-central").textContent = `JANDAÍRA-RN, ${dataPorExtenso}`;
+
+      if (!alunoUuid) return;
 
       try {
         const res = await fetch(`/api/alunos/${alunoUuid}/historico-completo`);
-        if (!res.ok) throw new Error("Não foi possível carregar os dados deste histórico escolar.");
+        if (!res.ok) throw new Error("Erro ao carregar os dados do histórico.");
 
         const dados = await res.json();
-        const aluno = dados.aluno;
+        const aluno = dados.aluno || {};
+        const escola = dados.escola || {};
         const vidaEscolar = dados.vida_escolar || [];
-        const notas = dados.notas_curriculares || [];
-        const integridade = dados.integridade;
+        const notasCurriculares = dados.notas_curriculares || [];
 
-        // Se houver adulteração fora do programa, bloqueia e alerta
-        if (integridade && !integridade.integro) {
-          document.getElementById("avisoViolacaoHmac").style.display = "block";
-          document.getElementById("documentoFolha").style.opacity = "0.25";
-          alert("⚠️ ALERTA DE SEGURANÇA: Violação de integridade detectada! O registro foi adulterado fora do programa.");
-          return;
+        // 1. DADOS DA ESCOLA
+        document.getElementById("escola_nome").textContent = escola.nome_oficial || "ESCOLA MUNICIPAL";
+        document.getElementById("escola_inep").textContent = escola.codigo_inep || "---";
+        document.getElementById("escola_endereco").textContent = escola.endereco || "---";
+        document.getElementById("escola_bairro").textContent = escola.bairro || "Centro";
+        document.getElementById("escola_municipio").textContent = escola.municipio || "JANDAÍRA";
+        document.getElementById("escola_uf").textContent = escola.uf || "RN";
+
+        if (escola.brasao_base64) {
+          document.getElementById("img-brasao").src = escola.brasao_base64;
         }
 
-        // Popula Cabeçalho da Escola
-        await carregarCabecalhoEscola(aluno.escola_id);
+        if (escola.secretario_nome) {
+          document.getElementById("assinatura-secretario-nome").textContent = escola.secretario_nome;
+        }
+        if (escola.diretor_nome) {
+          document.getElementById("assinatura-diretor-nome").textContent = escola.diretor_nome;
+        }
 
-        // Popula Dados Civis
-        document.getElementById("dado_nome_completo").textContent = aluno.nome_completo || "---";
-        document.getElementById("dado_data_nascimento").textContent = aluno.data_nascimento || "---";
-        document.getElementById("dado_naturalidade").textContent = `${aluno.naturalidade_municipio || '---'} / ${aluno.naturalidade_uf || '---'}`;
-        document.getElementById("dado_nacionalidade").textContent = aluno.nacionalidade || "Brasileira";
-        
-        const pais = [aluno.filiacao_1, aluno.filiacao_2].filter(Boolean).join(" e ");
-        document.getElementById("dado_filiacao").textContent = pais || "Não declarada";
+        // 2. DADOS DO ESTUDANTE
+        document.getElementById("aluno_nome_civil").textContent = aluno.nome_completo || aluno.nome_civil || "---";
+        document.getElementById("aluno_data_nascimento").textContent = aluno.data_nascimento || "---";
+        document.getElementById("aluno_cpf").textContent = aluno.cpf || "---";
 
-        document.getElementById("dado_rg").textContent = aluno.rg_numero ? `${aluno.rg_numero} ${aluno.rg_orgao_uf || ''}` : "---";
-        document.getElementById("dado_cpf").textContent = aluno.cpf || "---";
-        document.getElementById("dado_inep_aluno").textContent = aluno.codigo_inep_aluno || "---";
+        const natMun = aluno.naturalidade_municipio || "";
+        const natUf = aluno.naturalidade_uf || "";
+        document.getElementById("aluno_naturalidade").textContent = natMun ? (natMun + (natUf ? " - " + natUf : "")) : (natUf || "---");
 
-        // Certidão antiga
-        const certidaoPartes = [
-          aluno.certidao_tipo ? `Tipo: ${aluno.certidao_tipo}` : '',
-          aluno.certidao_termo ? `Termo nº ${aluno.certidao_termo}` : '',
-          aluno.certidao_livro ? `Livro ${aluno.certidao_livro}` : '',
-          aluno.certidao_folha ? `Folha ${aluno.certidao_folha}` : '',
-          aluno.certidao_cartorio ? `Cartório: ${aluno.certidao_cartorio}` : '',
-          aluno.certidao_municipio_uf ? `Comarca: ${aluno.certidao_municipio_uf}` : ''
-        ].filter(Boolean).join(", ");
-        document.getElementById("dado_certidao").textContent = certidaoPartes || "Certidão civil apresentada no ato de matrícula do arquivo passivo.";
+        document.getElementById("aluno_nacionalidade").textContent = (aluno.nacionalidade || "BRASILEIRA").toUpperCase();
+        document.getElementById("aluno_filiacao_1").textContent = aluno.filiacao_1 || "---";
+        document.getElementById("aluno_filiacao_2").textContent = aluno.filiacao_2 || "---";
 
-        // Regime e número de colunas
-        let descRegime = "Ensino Fundamental de 8 Anos (1ª a 8ª Série)";
-        let numColunas = 8;
-        if (aluno.regime_ensino === "9_ANOS") {
-          descRegime = "Ensino Fundamental de 9 Anos (1º ao 9º Ano)";
-          numColunas = 9;
+        // 3. COMPONENTES CURRICULARES
+        let colunasSeries = [
+          { col: 1, label: "1º ANO" },
+          { col: 2, label: "2º ANO" },
+          { col: 3, label: "3º ANO" },
+          { col: 4, label: "4º ANO" },
+          { col: 5, label: "5º ANO" },
+          { col: 6, label: "6º Ano" },
+          { col: 7, label: "7º Ano" },
+          { col: 8, label: "8º Ano" },
+          { col: 9, label: "9º Ano" }
+        ];
+
+        if (aluno.regime_ensino === "8_ANOS") {
+          colunasSeries = [
+            { col: 1, label: "1ª SÉRIE" },
+            { col: 2, label: "2ª SÉRIE" },
+            { col: 3, label: "3ª SÉRIE" },
+            { col: 4, label: "4ª SÉRIE" },
+            { col: 5, label: "5ª SÉRIE" },
+            { col: 6, label: "6ª SÉRIE" },
+            { col: 7, label: "7ª SÉRIE" },
+            { col: 8, label: "8ª SÉRIE" }
+          ];
         } else if (aluno.regime_ensino === "EJA_ETAPAS") {
-          descRegime = "Educação de Jovens e Adultos (EJA - Etapas I a IV)";
-          numColunas = 4;
-        }
-        document.getElementById("labelRegimeEnsino").textContent = descRegime;
-
-        // Renderiza Quadro de Estabelecimentos Frequentados
-        renderizarQuadroEstabelecimentos(aluno.regime_ensino, numColunas, vidaEscolar);
-
-        // Renderiza Matriz Curricular A4
-        renderizarMatrizCurricularA4(aluno.regime_ensino, numColunas, vidaEscolar, notas);
-
-        // Observações
-        if (aluno.observacoes_historico) {
-          document.getElementById("textoObservacoesLegais").textContent = aluno.observacoes_historico;
+          colunasSeries = [
+            { col: 1, label: "ETAPA I" },
+            { col: 2, label: "ETAPA II" },
+            { col: 3, label: "ETAPA III" },
+            { col: 4, label: "ETAPA IV" }
+          ];
         }
 
-        // Rodapé de Autenticidade
-        const codAutenticidade = aluno.codigo_autenticidade || "VER-2026-X001";
-        document.getElementById("rodapeCodigoAutenticidade").textContent = codAutenticidade;
-        document.getElementById("rodapeDataEmissao").textContent = new Date().toLocaleDateString("pt-BR");
+        // Atualiza cabeçalho da tabela se diferente de 9
+        const headRow = document.getElementById("matriz-head-row");
+        const larguraNota = (72 / colunasSeries.length).toFixed(1) + "%";
+        let headHtml = `<th style="width:28%; text-align:left;">COMPONENTES CURRICULARES</th>`;
+        colunasSeries.forEach(c => {
+          headHtml += `<th style="width:${larguraNota};">${c.label}</th>`;
+        });
+        headRow.innerHTML = headHtml;
 
-        // QR Code gerado pelo backend
-        document.getElementById("qrCodeAutenticidade").src = `/api/scan/qrcode?conteudo=${encodeURIComponent("AUTENTICIDADE SGM: " + codAutenticidade + " | EX-ALUNO: " + aluno.nome_completo)}`;
-
-      } catch (e) {
-        alert(`Erro ao renderizar folha: ${e.message}`);
-      }
-    }
-
-    async function carregarCabecalhoEscola(escolaId) {
-      try {
-        const res = await fetch(`/api/escolas/${escolaId}`);
-        if (res.ok) {
-          const esc = await res.json();
-          document.getElementById("cabecalhoEscolaNome").textContent = esc.nome_oficial;
-          
-          const atos = [
-            esc.endereco,
-            esc.municipio_uf,
-            esc.codigo_inep ? `INEP: ${esc.codigo_inep}` : '',
-            esc.ato_criacao ? `Ato de Criação: ${esc.ato_criacao}` : '',
-            esc.ato_autorizacao ? `Autorização: ${esc.ato_autorizacao}` : ''
-          ].filter(Boolean).join(" — ");
-          document.getElementById("cabecalhoEscolaAtos").textContent = atos;
-
-          // Se escola extinta
-          if (esc.extinta) {
-            document.getElementById("faixaEscolaExtinta").style.display = "block";
-            document.getElementById("assinaturaDiretorNome").textContent = "Responsável pelo Arquivo Passivo / SME";
-            document.getElementById("assinaturaDiretorReg").textContent = "Portaria SME Municipal";
-            document.getElementById("assinaturaSecretarioNome").textContent = "Secretário(a) Municipal de Educação";
-            document.getElementById("assinaturaSecretarioReg").textContent = "Decreto de Designação SME";
-          } else {
-            if (esc.diretor_nome) document.getElementById("assinaturaDiretorNome").textContent = esc.diretor_nome;
-            if (esc.diretor_registro) document.getElementById("assinaturaDiretorReg").textContent = esc.diretor_registro;
-            if (esc.secretario_nome) document.getElementById("assinaturaSecretarioNome").textContent = esc.secretario_nome;
-            if (esc.secretario_registro) document.getElementById("assinaturaSecretarioReg").textContent = esc.secretario_registro;
+        // Agrupa notas por disciplina
+        const mapaDisciplinas = new Map();
+        notasCurriculares.forEach(n => {
+          const nomeDisc = (n.disciplina_nome || "").trim();
+          if (!nomeDisc) return;
+          if (!mapaDisciplinas.has(nomeDisc)) {
+            mapaDisciplinas.set(nomeDisc, {});
           }
-        }
-      } catch (e) {}
-    }
-
-    function renderizarQuadroEstabelecimentos(regime, numCols, vidaEscolar) {
-      const tbody = document.getElementById("corpoEstabelecimentosA4");
-      let html = "";
-      for (let c = 1; c <= numCols; c++) {
-        let label = `${c}ª Série`;
-        if (regime === "9_ANOS") label = `${c}º Ano`;
-        if (regime === "EJA_ETAPAS") label = `${c}ª Etapa`;
-
-        const v = vidaEscolar.find(item => item.ordem_coluna === c) || {};
-        const isNaoCursado = v.resultado_final === "Não Cursado";
-        
-        html += `
-          <tr>
-            <td class="font-bold text-center">${v.label_serie || label}</td>
-            <td class="text-center font-mono">${isNaoCursado ? '---' : (v.ano_letivo || '---')}</td>
-            <td>${isNaoCursado ? '---' : (v.escola_nome || '---')}</td>
-            <td>${isNaoCursado ? '---' : (v.escola_municipio_uf || '---')}</td>
-            <td class="text-center font-bold uppercase">${v.resultado_final || '---'}</td>
-          </tr>
-        `;
-      }
-      tbody.innerHTML = html;
-    }
-
-    function renderizarMatrizCurricularA4(regime, numCols, vidaEscolar, notas) {
-      const thead = document.getElementById("matrizHeadA4");
-      const tbody = document.getElementById("matrizBodyA4");
-      const tfoot = document.getElementById("matrizFootA4");
-
-      // Mapeia as colunas de série
-      const colunas = [];
-      for (let c = 1; c <= numCols; c++) {
-        let label = `${c}ª Série`;
-        if (regime === "9_ANOS") label = `${c}º Ano`;
-        if (regime === "EJA_ETAPAS") label = `${c}ª Etapa`;
-
-        const v = vidaEscolar.find(item => item.ordem_coluna === c) || {};
-        const naoCursado = v.resultado_final === "Não Cursado";
-        colunas.push({
-          col: c,
-          label: v.label_serie || label,
-          ano: naoCursado ? "---" : (v.ano_letivo || "---"),
-          resultado: v.resultado_final || "---",
-          nao_cursado: naoCursado
+          mapaDisciplinas.get(nomeDisc)[n.ordem_coluna] = n.nota_ou_conceito || "---";
         });
-      }
 
-      // Linhas do Cabeçalho da Matriz
-      thead.innerHTML = `
-        <tr>
-          <th rowspan="2" style="width: 28%; text-align: left; vertical-align: middle;">DISCIPLINAS / COMPONENTES CURRICULARES</th>
-          <th colspan="${numCols}">SÉRIES / ANOS DE ESTUDO</th>
-        </tr>
-        <tr>
-          ${colunas.map(c => `<th style="width: ${72/numCols}%;">${c.label}</th>`).join('')}
-        </tr>
-      `;
+        const tbodyMatriz = document.getElementById("matriz-body");
+        tbodyMatriz.innerHTML = "";
 
-      // Agrupa disciplinas por categoria (Base Comum vs Diversificada)
-      const baseComum = new Map();
-      const diversificada = new Map();
+        // Renderiza linhas de disciplinas
+        mapaDisciplinas.forEach((notas, nome) => {
+          let tr = `<tr><td class="disciplina-col">${nome}</td>`;
+          colunasSeries.forEach(c => {
+            const val = notas[c.col] || "---";
+            tr += `<td class="nota-col">${val}</td>`;
+          });
+          tr += `</tr>`;
+          tbodyMatriz.insertAdjacentHTML("beforeend", tr);
+        });
 
-      notas.forEach(n => {
-        const nome = n.disciplina_nome.trim();
-        const mapa = n.categoria === "DIVERSIFICADA" ? diversificada : baseComum;
-        if (!mapa.has(nome)) {
-          mapa.set(nome, {});
+        // Mapeia vida escolar por coluna
+        const mapaVida = new Map();
+        vidaEscolar.forEach(v => {
+          mapaVida.set(v.ordem_coluna, v);
+        });
+
+        // Função auxiliar para normalizar resultado
+        function formatarResultado(res) {
+          if (!res) return "---";
+          const u = res.toUpperCase();
+          if (u.includes("APROV")) return "AP";
+          if (u.includes("REPROV")) return "RP";
+          if (u.includes("MATRIC")) return "MAT";
+          if (u.includes("TRANSF")) return "TR";
+          if (u.includes("RECLASS")) return "RE";
+          if (u.includes("DEIXOU")) return "AB";
+          return res;
         }
-        mapa.get(nome)[n.ordem_coluna] = n.nota_ou_conceito || "---";
-      });
 
-      let bodyHtml = "";
+        // Linhas de Resumo
+        const resumoDefs = [
+          { nome: "DIAS LETIVOS", obter: (v) => v ? (v.dias_letivos || "200") : "---" },
+          { nome: "CARGA HORÁRIA", obter: (v) => v ? (v.carga_horaria_total || "800") : "---" },
+          { nome: "FREQUÊNCIA %", obter: (v) => v ? (v.frequencia_percentual || "---") : "---" },
+          { nome: "RESULTADO FINAL", obter: (v) => v ? formatarResultado(v.resultado_final) : "---" }
+        ];
 
-      // Base Nacional Comum
-      if (baseComum.size > 0) {
-        bodyHtml += `
-          <tr style="background: #f8fafc;">
-            <td colspan="${numCols + 1}" class="font-bold uppercase" style="font-size: 7.5px; padding: 1.5px 3px;">
-              BASE NACIONAL COMUM
-            </td>
-          </tr>
-        `;
-        baseComum.forEach((notasCol, nomeDisc) => {
-          bodyHtml += `
+        resumoDefs.forEach(r => {
+          let tr = `<tr class="resumo-row"><td class="disciplina-col">${r.nome}</td>`;
+          colunasSeries.forEach(c => {
+            const v = mapaVida.get(c.col);
+            const valor = r.obter(v);
+            tr += `<td class="nota-col">${valor}</td>`;
+          });
+          tr += `</tr>`;
+          tbodyMatriz.insertAdjacentHTML("beforeend", tr);
+        });
+
+        // 4. REGISTROS COMPLEMENTARES
+        const tbodyComp = document.getElementById("complementares-body");
+        tbodyComp.innerHTML = "";
+
+        let registrosExibidos = 0;
+        vidaEscolar.forEach(reg => {
+          if (!reg.ano_letivo && !reg.escola_nome) return;
+          registrosExibidos++;
+          const tr = `
             <tr>
-              <td class="font-bold" style="padding-left: 6px;">${nomeDisc}</td>
-              ${colunas.map(c => {
-                let valor = notasCol[c.col] || "---";
-                if (c.nao_cursado || !valor.trim()) valor = "---";
-                return `<td class="text-center font-bold font-mono">${valor}</td>`;
-              }).join('')}
+              <td style="text-align:center;">${reg.label_serie || '---'}</td>
+              <td style="text-align:center;">${reg.ano_letivo || '---'}</td>
+              <td>${reg.escola_nome || escola.nome_oficial || '---'}</td>
+              <td style="text-align:center;">${reg.turno || 'DIURNO'}</td>
+              <td>${reg.escola_municipio_uf || (escola.municipio_uf || 'Jandaíra - RN')}</td>
             </tr>
           `;
+          tbodyComp.insertAdjacentHTML("beforeend", tr);
         });
-      }
 
-      // Parte Diversificada
-      if (diversificada.size > 0) {
-        bodyHtml += `
-          <tr style="background: #f8fafc;">
-            <td colspan="${numCols + 1}" class="font-bold uppercase" style="font-size: 7.5px; padding: 1.5px 3px;">
-              PARTE DIVERSIFICADA
-            </td>
-          </tr>
-        `;
-        diversificada.forEach((notasCol, nomeDisc) => {
-          bodyHtml += `
+        // Preenche com linhas em branco estruturadas caso tenha poucos registros
+        while (registrosExibidos < 3) {
+          registrosExibidos++;
+          tbodyComp.insertAdjacentHTML("beforeend", `
             <tr>
-              <td class="font-bold" style="padding-left: 6px;">${nomeDisc}</td>
-              ${colunas.map(c => {
-                let valor = notasCol[c.col] || "---";
-                if (c.nao_cursado || !valor.trim()) valor = "---";
-                return `<td class="text-center font-bold font-mono">${valor}</td>`;
-              }).join('')}
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
             </tr>
-          `;
-        });
+          `);
+        }
+
+      } catch (err) {
+        console.error("Erro ao carregar dados:", err);
       }
-
-      tbody.innerHTML = bodyHtml;
-
-      // Rodapé da Tabela: Linha de Resultado Final
-      tfoot.innerHTML = `
-        <tr style="background: #f1f5f9;">
-          <td class="font-bold uppercase" style="padding: 2px 3px;">SITUAÇÃO FINAL:</td>
-          ${colunas.map(c => `
-            <td class="text-center font-bold uppercase" style="font-size: 7.5px;">${c.resultado}</td>
-          `).join('')}
-        </tr>
-      `;
     }
 
     document.addEventListener("DOMContentLoaded", carregarDadosImpressao);
   </script>
-  <script src="/static/js/theme.js"></script>
 </body>
 </html>

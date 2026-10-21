@@ -29,7 +29,16 @@ if %ERRORLEVEL% NEQ 0 (
     )
 )
 
-REM 3. Inicia o aplicativo desktop nativo
+REM 3. Carrega chave de API do Gemini a partir do .env caso exista
+if exist .env (
+    for /f "usebackq tokens=1,* delims==" %%G in (".env") do (
+        if "%%G"=="GEMINI_API_KEY" (
+            if "%GEMINI_API_KEY%"=="" set "GEMINI_API_KEY=%%H"
+        )
+    )
+)
+
+REM 4. Inicia o aplicativo desktop nativo
 echo [INFO] Iniciando sistema desktop...
 python app_window.py
 

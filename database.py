@@ -83,9 +83,10 @@ CREATE TABLE IF NOT EXISTS escolas (
     nome_oficial TEXT NOT NULL,
     codigo_inep TEXT,
     endereco TEXT,
-    municipio_uf TEXT,
-    ato_criacao TEXT,
-    ato_autorizacao TEXT,
+    bairro TEXT,
+    municipio TEXT DEFAULT 'JANDAÍRA',
+    uf TEXT DEFAULT 'RN',
+    municipio_uf TEXT DEFAULT 'Jandaíra - RN',
     diretor_nome TEXT,
     diretor_registro TEXT,
     secretario_nome TEXT,
@@ -102,27 +103,23 @@ CREATE TABLE IF NOT EXISTS alunos (
     uuid TEXT PRIMARY KEY,
     escola_id INTEGER NOT NULL,
     nome_completo TEXT NOT NULL,
+    matricula TEXT,
     data_nascimento TEXT,
     naturalidade_municipio TEXT,
     naturalidade_uf TEXT,
-    nacionalidade TEXT DEFAULT 'Brasileira',
+    nacionalidade TEXT DEFAULT 'BRASILEIRA',
     filiacao_1 TEXT,
     filiacao_2 TEXT,
+    cpf TEXT,
     rg_numero TEXT,
     rg_orgao_uf TEXT,
-    cpf TEXT,
-    codigo_inep_aluno TEXT,
     certidao_tipo TEXT,
     certidao_termo TEXT,
     certidao_livro TEXT,
     certidao_folha TEXT,
     certidao_cartorio TEXT,
     certidao_municipio_uf TEXT,
-    arquivo_estante TEXT,
-    arquivo_caixa TEXT,
-    arquivo_pasta TEXT,
-    arquivo_ano_referencia TEXT,
-    regime_ensino TEXT DEFAULT '8_ANOS',
+    regime_ensino TEXT DEFAULT '9_ANOS',
     observacoes_historico TEXT,
     status_ficha TEXT DEFAULT 'RASCUNHO_IA',
     codigo_autenticidade TEXT UNIQUE,
@@ -216,130 +213,138 @@ CREATE INDEX IF NOT EXISTS idx_auditoria_escola ON auditoria_logs(escola_id);
 ESCOLAS_INICIAIS = [
     {
         "id": 1,
-        "nome_oficial": "Escola Municipal Monteiro Lobato",
-        "codigo_inep": "29001001",
-        "endereco": "Rua das Flores, 100 - Centro",
-        "municipio_uf": "Município Sede - BA",
-        "ato_criacao": "Decreto Municipal nº 102/1982",
-        "ato_autorizacao": "Portaria CEE nº 450/1983",
-        "diretor_nome": "Maria Helena de Castro",
-        "diretor_registro": "DIR-0492/BA",
-        "secretario_nome": "Carlos Alberto Santos",
-        "secretario_registro": "SEC-1082/BA",
+        "nome_oficial": "Escola Municipal de Ensino Fundamental de Jandaíra",
+        "codigo_inep": "24001001",
+        "endereco": "Rua Principal, 100",
+        "bairro": "Centro",
+        "municipio": "JANDAÍRA",
+        "uf": "RN",
+        "municipio_uf": "Jandaíra - RN",
+        "diretor_nome": "Diretor(a) Escolar",
+        "diretor_registro": "DIR-001/RN",
+        "secretario_nome": "Responsável pela Informação",
+        "secretario_registro": "SEC-001/RN",
         "extinta": 0,
         "observacao_acervo_extinta": None,
         "drive_particao": "DRIVE_A"
     },
     {
         "id": 2,
-        "nome_oficial": "Escola Municipal Castro Alves",
-        "codigo_inep": "29001002",
-        "endereco": "Avenida Brasil, 250 - Bairro Novo",
-        "municipio_uf": "Município Sede - BA",
-        "ato_criacao": "Lei Municipal nº 345/1975",
-        "ato_autorizacao": "Resolução CME nº 012/1976",
-        "diretor_nome": "Ana Paula Rodrigues",
-        "diretor_registro": "DIR-0511/BA",
-        "secretario_nome": "Renata Souza Lima",
-        "secretario_registro": "SEC-1105/BA",
+        "nome_oficial": "Escola Municipal Monteiro Lobato",
+        "codigo_inep": "24001002",
+        "endereco": "Avenida Central, 250",
+        "bairro": "Alto da Colina",
+        "municipio": "JANDAÍRA",
+        "uf": "RN",
+        "municipio_uf": "Jandaíra - RN",
+        "diretor_nome": "Diretor(a) Escolar",
+        "diretor_registro": "DIR-002/RN",
+        "secretario_nome": "Responsável pela Informação",
+        "secretario_registro": "SEC-002/RN",
         "extinta": 0,
         "observacao_acervo_extinta": None,
         "drive_particao": "DRIVE_A"
     },
     {
         "id": 3,
-        "nome_oficial": "Escola Municipal Rui Barbosa",
-        "codigo_inep": "29001003",
-        "endereco": "Praça da Matriz, s/n - Centro Histórico",
-        "municipio_uf": "Município Sede - BA",
-        "ato_criacao": "Decreto Municipal nº 088/1968",
-        "ato_autorizacao": "Portaria SEC nº 123/1970",
-        "diretor_nome": "Joaquim Silveira Bueno",
-        "diretor_registro": "DIR-0389/BA",
-        "secretario_nome": "Luciana Mendes Prado",
-        "secretario_registro": "SEC-0988/BA",
+        "nome_oficial": "Escola Municipal Professora Maria de Lourdes",
+        "codigo_inep": "24001003",
+        "endereco": "Rua do Saber, 45",
+        "bairro": "Belo Horizonte",
+        "municipio": "JANDAÍRA",
+        "uf": "RN",
+        "municipio_uf": "Jandaíra - RN",
+        "diretor_nome": "Diretor(a) Escolar",
+        "diretor_registro": "DIR-003/RN",
+        "secretario_nome": "Responsável pela Informação",
+        "secretario_registro": "SEC-003/RN",
         "extinta": 0,
         "observacao_acervo_extinta": None,
         "drive_particao": "DRIVE_A"
     },
     {
         "id": 4,
-        "nome_oficial": "Escola Municipal Santos Dumont",
-        "codigo_inep": "29001004",
-        "endereco": "Rua dos Bandeirantes, 412 - Aeroporto",
-        "municipio_uf": "Município Sede - BA",
-        "ato_criacao": "Decreto Municipal nº 214/1988",
-        "ato_autorizacao": "Portaria CEE nº 512/1989",
-        "diretor_nome": "Patrícia Viana Correia",
-        "diretor_registro": "DIR-0622/BA",
-        "secretario_nome": "Juliana Ferreira Mota",
-        "secretario_registro": "SEC-1219/BA",
+        "nome_oficial": "Escola Municipal Rural São José",
+        "codigo_inep": "24001004",
+        "endereco": "Comunidade São José, s/n",
+        "bairro": "Zona Rural",
+        "municipio": "JANDAÍRA",
+        "uf": "RN",
+        "municipio_uf": "Jandaíra - RN",
+        "diretor_nome": "Diretor(a) Escolar",
+        "diretor_registro": "DIR-004/RN",
+        "secretario_nome": "Responsável pela Informação",
+        "secretario_registro": "SEC-004/RN",
         "extinta": 0,
         "observacao_acervo_extinta": None,
         "drive_particao": "DRIVE_A"
     },
     {
         "id": 5,
-        "nome_oficial": "Escola Municipal Princesa Isabel",
-        "codigo_inep": "29001005",
-        "endereco": "Avenida Sete de Setembro, 89 - Liberdade",
-        "municipio_uf": "Município Sede - BA",
-        "ato_criacao": "Lei Municipal nº 499/1991",
-        "ato_autorizacao": "Resolução CME nº 045/1992",
-        "diretor_nome": "Sandra Maria Albuquerque",
-        "diretor_registro": "DIR-0701/BA",
-        "secretario_nome": "Marcos Vinicius Dias",
-        "secretario_registro": "SEC-1304/BA",
+        "nome_oficial": "Escola Municipal Santa Luzia",
+        "codigo_inep": "24001005",
+        "endereco": "Assentamento Santa Luzia, s/n",
+        "bairro": "Zona Rural",
+        "municipio": "JANDAÍRA",
+        "uf": "RN",
+        "municipio_uf": "Jandaíra - RN",
+        "diretor_nome": "Diretor(a) Escolar",
+        "diretor_registro": "DIR-005/RN",
+        "secretario_nome": "Responsável pela Informação",
+        "secretario_registro": "SEC-005/RN",
         "extinta": 0,
         "observacao_acervo_extinta": None,
         "drive_particao": "DRIVE_B"
     },
     {
         "id": 6,
-        "nome_oficial": "Escola Municipal Tiradentes",
-        "codigo_inep": "29001006",
-        "endereco": "Rua Minas Gerais, 301 - Bela Vista",
-        "municipio_uf": "Município Sede - BA",
-        "ato_criacao": "Decreto Municipal nº 140/1980",
-        "ato_autorizacao": "Portaria CEE nº 310/1981",
-        "diretor_nome": "Fernando de Oliveira Cruz",
-        "diretor_registro": "DIR-0455/BA",
-        "secretario_nome": "Beatriz Ramos Fontes",
-        "secretario_registro": "SEC-1044/BA",
+        "nome_oficial": "Escola Municipal Padre João Maria",
+        "codigo_inep": "24001006",
+        "endereco": "Rua da Paz, 78",
+        "bairro": "Centro",
+        "municipio": "JANDAÍRA",
+        "uf": "RN",
+        "municipio_uf": "Jandaíra - RN",
+        "diretor_nome": "Diretor(a) Escolar",
+        "diretor_registro": "DIR-006/RN",
+        "secretario_nome": "Responsável pela Informação",
+        "secretario_registro": "SEC-006/RN",
         "extinta": 0,
         "observacao_acervo_extinta": None,
         "drive_particao": "DRIVE_B"
     },
     {
         "id": 7,
-        "nome_oficial": "Escola Municipal Machado de Assis",
-        "codigo_inep": "29001007",
-        "endereco": "Rua Rui Barbosa, 150 - Vila Esperança",
-        "municipio_uf": "Município Sede - BA",
-        "ato_criacao": "Lei Municipal nº 580/1995",
-        "ato_autorizacao": "Portaria CEE nº 620/1996",
-        "diretor_nome": "Geraldo Magela Pires",
-        "diretor_registro": "DIR-0780/BA",
-        "secretario_nome": "Aline Costa Carvalho",
-        "secretario_registro": "SEC-1412/BA",
-        "extinta": 0,
-        "observacao_acervo_extinta": None,
+        "nome_oficial": "Escola Municipal Boa Vista (Extinta)",
+        "codigo_inep": "24001007",
+        "endereco": "Comunidade Boa Vista",
+        "bairro": "Zona Rural",
+        "municipio": "JANDAÍRA",
+        "uf": "RN",
+        "municipio_uf": "Jandaíra - RN",
+        "diretor_nome": "Responsável SME",
+        "diretor_registro": "DIR-SME/RN",
+        "secretario_nome": "Responsável pela Informação",
+        "secretario_registro": "SEC-SME/RN",
+        "extinta": 1,
+        "observacao_acervo_extinta": "Acervo sob custódia da SMEJ-Jandaíra/RN.",
         "drive_particao": "DRIVE_B"
     },
     {
         "id": 8,
-        "nome_oficial": "Escola Municipal Cecília Meireles",
-        "codigo_inep": "29001008",
-        "endereco": "Alameda dos Poetas, 75 - Jardim das Rosas",
-        "municipio_uf": "Município Sede - BA",
-        "ato_criacao": "Decreto Municipal nº 305/1999",
-        "ato_autorizacao": "Portaria CEE nº 710/2000",
-        "diretor_nome": "Vera Lúcia Guimarães",
-        "diretor_registro": "DIR-0820/BA",
-        "secretario_nome": "Cláudia Regina Barros",
-        "secretario_registro": "SEC-1490/BA",
-        "extinta": 0,
-        "observacao_acervo_extinta": None,
+        "nome_oficial": "Escola Reunida Rural Tubibal (Extinta)",
+        "codigo_inep": "24001008",
+        "endereco": "Comunidade Tubibal",
+        "bairro": "Zona Rural",
+        "municipio": "JANDAÍRA",
+        "uf": "RN",
+        "municipio_uf": "Jandaíra - RN",
+        "diretor_nome": "Responsável SME",
+        "diretor_registro": "DIR-SME/RN",
+        "secretario_nome": "Responsável pela Informação",
+        "secretario_registro": "SEC-SME/RN",
+        "extinta": 1,
+        "observacao_acervo_extinta": "Acervo sob custódia e escrituração da SMEJ-Jandaíra/RN.",
         "drive_particao": "DRIVE_B"
     }
 ]
@@ -363,31 +368,47 @@ def init_db(caminho_db: Optional[Union[str, Path]] = None) -> Path:
         
         # 2. Criação dos Índices
         conn.executescript(INDICES_SQL)
+
+        # 3. Migração segura de colunas novas se a tabela já existia
+        colunas_escolas = [c["name"] for c in conn.execute("PRAGMA table_info(escolas)").fetchall()]
+        if "bairro" not in colunas_escolas:
+            conn.execute("ALTER TABLE escolas ADD COLUMN bairro TEXT")
+        if "municipio" not in colunas_escolas:
+            conn.execute("ALTER TABLE escolas ADD COLUMN municipio TEXT DEFAULT 'JANDAÍRA'")
+        if "uf" not in colunas_escolas:
+            conn.execute("ALTER TABLE escolas ADD COLUMN uf TEXT DEFAULT 'RN'")
+
+        colunas_alunos = [c["name"] for c in conn.execute("PRAGMA table_info(alunos)").fetchall()]
+        if "matricula" not in colunas_alunos:
+            conn.execute("ALTER TABLE alunos ADD COLUMN matricula TEXT")
         
-        # 3. Pré-cadastro das 8 Escolas Municipais Oficiais
+        # 4. Pré-cadastro e atualização das Escolas Municipais Oficiais
         for esc in ESCOLAS_INICIAIS:
             conn.execute(
                 """
                 INSERT OR IGNORE INTO escolas (
-                    id, nome_oficial, codigo_inep, endereco, municipio_uf,
-                    ato_criacao, ato_autorizacao, diretor_nome, diretor_registro,
-                    secretario_nome, secretario_registro, extinta,
+                    id, nome_oficial, codigo_inep, endereco, bairro, municipio, uf, municipio_uf,
+                    diretor_nome, diretor_registro, secretario_nome, secretario_registro, extinta,
                     observacao_acervo_extinta, drive_particao, brasao_base64
                 ) VALUES (
-                    :id, :nome_oficial, :codigo_inep, :endereco, :municipio_uf,
-                    :ato_criacao, :ato_autorizacao, :diretor_nome, :diretor_registro,
-                    :secretario_nome, :secretario_registro, :extinta,
+                    :id, :nome_oficial, :codigo_inep, :endereco, :bairro, :municipio, :uf, :municipio_uf,
+                    :diretor_nome, :diretor_registro, :secretario_nome, :secretario_registro, :extinta,
                     :observacao_acervo_extinta, :drive_particao, NULL
                 )
                 """,
                 esc
             )
-            # Atualiza caso já exista, preservando personalizações
+            # Atualiza dados institucionais limpos (bairro, município, uf, endereço)
             conn.execute(
                 """
                 UPDATE escolas SET
                     nome_oficial = :nome_oficial,
                     codigo_inep = :codigo_inep,
+                    endereco = :endereco,
+                    bairro = :bairro,
+                    municipio = :municipio,
+                    uf = :uf,
+                    municipio_uf = :municipio_uf,
                     drive_particao = :drive_particao
                 WHERE id = :id AND extinta = 0
                 """,
@@ -539,9 +560,10 @@ def cadastrar_escola_extinta(
             "nome_oficial": dados["nome_oficial"],
             "codigo_inep": dados.get("codigo_inep", ""),
             "endereco": dados.get("endereco", ""),
-            "municipio_uf": dados.get("municipio_uf", "Município Sede - BA"),
-            "ato_criacao": dados.get("ato_criacao", ""),
-            "ato_autorizacao": dados.get("ato_autorizacao", ""),
+            "bairro": dados.get("bairro", "Zona Rural"),
+            "municipio": dados.get("municipio", "JANDAÍRA"),
+            "uf": dados.get("uf", "RN"),
+            "municipio_uf": dados.get("municipio_uf", "Jandaíra - RN"),
             "diretor_nome": dados.get("diretor_nome", ""),
             "diretor_registro": dados.get("diretor_registro", ""),
             "secretario_nome": dados.get("secretario_nome", ""),
@@ -555,14 +577,12 @@ def cadastrar_escola_extinta(
         conn.execute(
             """
             INSERT INTO escolas (
-                id, nome_oficial, codigo_inep, endereco, municipio_uf,
-                ato_criacao, ato_autorizacao, diretor_nome, diretor_registro,
-                secretario_nome, secretario_registro, extinta,
+                id, nome_oficial, codigo_inep, endereco, bairro, municipio, uf, municipio_uf,
+                diretor_nome, diretor_registro, secretario_nome, secretario_registro, extinta,
                 observacao_acervo_extinta, drive_particao, brasao_base64
             ) VALUES (
-                :id, :nome_oficial, :codigo_inep, :endereco, :municipio_uf,
-                :ato_criacao, :ato_autorizacao, :diretor_nome, :diretor_registro,
-                :secretario_nome, :secretario_registro, :extinta,
+                :id, :nome_oficial, :codigo_inep, :endereco, :bairro, :municipio, :uf, :municipio_uf,
+                :diretor_nome, :diretor_registro, :secretario_nome, :secretario_registro, :extinta,
                 :observacao_acervo_extinta, :drive_particao, :brasao_base64
             )
             """,
@@ -576,10 +596,10 @@ def atualizar_escola(
     dados: Dict[str, Any],
     caminho_db: Optional[Union[str, Path]] = None
 ) -> Optional[Dict[str, Any]]:
-    """Atualiza atos regulatórios, diretores e endereço de uma escola."""
+    """Atualiza diretores, endereço e dados institucionais de uma escola."""
     campos_permitidos = [
-        "nome_oficial", "codigo_inep", "endereco", "municipio_uf",
-        "ato_criacao", "ato_autorizacao", "diretor_nome", "diretor_registro",
+        "nome_oficial", "codigo_inep", "endereco", "bairro", "municipio", "uf",
+        "municipio_uf", "diretor_nome", "diretor_registro",
         "secretario_nome", "secretario_registro", "brasao_base64",
         "observacao_acervo_extinta"
     ]
@@ -605,12 +625,11 @@ def atualizar_escola(
 # ==============================================================================
 
 CAMPOS_TABELA_ALUNOS = [
-    "uuid", "escola_id", "nome_completo", "data_nascimento",
+    "uuid", "escola_id", "nome_completo", "matricula", "data_nascimento",
     "naturalidade_municipio", "naturalidade_uf", "nacionalidade",
     "filiacao_1", "filiacao_2", "rg_numero", "rg_orgao_uf", "cpf",
-    "codigo_inep_aluno", "certidao_tipo", "certidao_termo", "certidao_livro",
+    "certidao_tipo", "certidao_termo", "certidao_livro",
     "certidao_folha", "certidao_cartorio", "certidao_municipio_uf",
-    "arquivo_estante", "arquivo_caixa", "arquivo_pasta", "arquivo_ano_referencia",
     "regime_ensino", "observacoes_historico", "status_ficha",
     "codigo_autenticidade", "paginas_webp_json", "assinatura_hmac",
     "atualizado_em", "sincronizado"

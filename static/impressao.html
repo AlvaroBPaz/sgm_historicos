@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8">
+  <title>Histórico Escolar - SMEJ Jandaíra/RN</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 7mm 8mm 7mm 8mm;
+    }
+    * {
+      box-sizing: border-box;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 8pt;
+      color: #000000;
+      background-color: #525659;
+      margin: 0;
+      padding: 0 0 40px 0;
+      line-height: 1.25;
+    }
+    .page-container {
+      width: 210mm;
+      min-height: 297mm;
+      padding: 10mm 12mm;
+      margin: 24px auto;
+      background: #FFFFFF;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.45);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* CABEÇALHO SUPERIOR */
+    .header-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #000;
+      padding-bottom: 4px;
+      margin-bottom: 4px;
+    }
+    .header-logo {
+      width: 55px;
+      height: 55px;
+      object-fit: contain;
+    }
+    .header-center {
+      text-align: center;
+      flex: 1;
+      padding: 0 8px;
+    }
+    .header-center .org-title {
+      font-size: 10pt;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    .header-center .sys-subtitle {
+      font-size: 7.5pt;
+      margin-top: 2px;
+    }
+    .header-right {
+      text-align: right;
+      min-width: 115px;
+    }
+    .header-right .emitido-em {
+      font-size: 7pt;
+      margin-top: 4px;
+    }
+
+    /* TÍTULO PRINCIPAL E FAIXAS DE SECÇÃO */
+    .doc-main-title {
+      background-color: #BFBFBF !important;
+      border: 1px solid #000;
+      text-align: center;
+      font-weight: bold;
+      font-size: 9.5pt;
+      padding: 3px 0;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+    .section-title {
+      background-color: #D9D9D9 !important;
+      border: 1px solid #000;
+      border-bottom: none;
+      text-align: center;
+      font-weight: bold;
+      font-size: 8.5pt;
+      padding: 2px 0;
+      text-transform: uppercase;
+    }
+
+    /* TABELAS PADRÃO */
+    table.sigeduc-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 5px;
+      table-layout: fixed;
+    }
+    table.sigeduc-table th,
+    table.sigeduc-table td {
+      border: 1px solid #000;
+      padding: 3px 5px;
+      font-size: 7.5pt;
+      vertical-align: middle;
+      overflow: hidden;
+      word-wrap: break-word;
+    }
+    .label {
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    /* MATRIZ DE COMPONENTES CURRICULARES */
+    table.matriz-table th {
+      background-color: #E6E6E6 !important;
+      font-weight: bold;
+      text-align: center;
+      font-size: 7.5pt;
+    }
+    table.matriz-table td.disciplina-col {
+      text-align: left;
+      width: 28%;
+      font-weight: normal;
+    }
+    table.matriz-table td.nota-col {
+      text-align: center;
+      width: 8%;
+    }
+    table.matriz-table tr.resumo-row td {
+      font-weight: bold;
+      background-color: #F5F5F5 !important;
+    }
+
+    /* REGISTROS COMPLEMENTARES */
+    table.complementares-table th {
+      background-color: #E6E6E6 !important;
+      font-weight: bold;
+      text-align: left;
+    }
+
+    /* LEGENDA LIMPA EM LINHA */
+    .legenda-texto {
+      font-size: 6.8pt;
+      color: #000000;
+      text-align: center;
+      margin-top: 6px;
+      margin-bottom: 4px;
+      line-height: 1.35;
+    }
+
+    /* ASSINATURAS */
+    .assinaturas-wrapper {
+      margin-top: auto;
+      padding-top: 80px;
+      padding-bottom: 15mm;
+      page-break-inside: avoid;
+    }
+    .assinaturas-grid {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      text-align: center;
+    }
+    .assinatura-bloco {
+      width: 36%;
+      border-top: 1px solid #000;
+      padding-top: 3px;
+      font-size: 7.5pt;
+      font-weight: bold;
+    }
+    .data-central {
+      width: 24%;
+      text-align: center;
+      font-size: 8pt;
+      padding-bottom: 14px;
+    }
+
+    @media print {
+      body {
+        background-color: #FFFFFF !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      .page-container {
+        width: 100% !important;
+        min-height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #FFFFFF !important;
+        box-shadow: none !important;
+        display: block !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .assinaturas-wrapper {
+        margin-top: 85px !important;
+        padding-top: 0 !important;
+        padding-bottom: 10mm !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="no-print" style="background:#2D2D2D; color:#FFF; padding:10px; text-align:right; margin-bottom:10px;">
+    <button onclick="window.print()" style="background:#84167A; color:#FFF; border:none; padding:6px 14px; cursor:pointer; font-weight:bold; border-radius:4px;">
+      🖨️ Imprimir / Guardar PDF (A4)
+    </button>
+  </div>
+
+  <div class="page-container" id="pageContainer">
+
+    <!-- CABEÇALHO -->
+    <div class="header-box">
+      <div id="containerBrasao">
+        <img id="img-brasao" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' stroke='%23000' stroke-width='2' fill='%23FFF'/><path d='M 50 15 L 75 35 L 68 75 L 50 88 L 32 75 L 25 35 Z' fill='%23F0F0F0' stroke='%23000' stroke-width='2'/><path d='M 38 48 L 50 35 L 62 48 L 50 68 Z' fill='%23000'/><text x='50' y='96' text-anchor='middle' font-size='7' font-weight='bold' fill='%23000' font-family='Arial'>JANDAÍRA/RN</text></svg>" alt="Brasão Jandaíra" class="header-logo">
+      </div>
+      <div class="header-center">
+        <div class="org-title">SMEJ-JANDAÍRA - Secretaria de Educação de Jandaíra - RN</div>
+        <div class="sys-subtitle">Sistema Municipal de Gestão de Acervo e Escrituração Escolar</div>
+      </div>
+      <div class="header-right">
+        <div class="emitido-em" id="header-data-emissao">Emitido em --/--/----</div>
+      </div>
+    </div>
+
+    <div class="doc-main-title">HISTÓRICO ESCOLAR</div>
+
+    <!-- 1. DADOS DA ESCOLA (Sem Atos de Criação/Autorização/Reconhecimento) -->
+    <div class="section-title">DADOS DA ESCOLA</div>
+    <table class="sigeduc-table">
+      <tr>
+        <td style="width: 75%;"><span class="label">ESCOLA:</span> <span id="escola_nome">---</span></td>
+        <td style="width: 25%;"><span class="label">INEP:</span> <span id="escola_inep">---</span></td>
+      </tr>
+      <tr>
+        <td><span class="label">ENDEREÇO:</span> <span id="escola_endereco">---</span></td>
+        <td><span class="label">BAIRRO:</span> <span id="escola_bairro">---</span></td>
+      </tr>
+      <tr>
+        <td><span class="label">MUNICÍPIO:</span> <span id="escola_municipio">JANDAÍRA</span></td>
+        <td><span class="label">UF:</span> <span id="escola_uf">RN</span></td>
+      </tr>
+    </table>
+
+    <!-- 2. DADOS DO ESTUDANTE (Sem Censo Escolar e sem Profissões) -->
+    <div class="section-title">DADOS DO ESTUDANTE</div>
+    <table class="sigeduc-table">
+      <tr>
+        <td colspan="3"><span class="label">NOME CIVIL:</span> <span id="aluno_nome_civil">---</span></td>
+      </tr>
+      <tr>
+        <td><span class="label">DATA DE NASCIMENTO:</span> <span id="aluno_data_nascimento">---</span></td>
+        <td><span class="label">CPF:</span> <span id="aluno_cpf">---</span></td>
+        <td><span class="label">NATURALIDADE:</span> <span id="aluno_naturalidade">---</span></td>
+      </tr>
+      <tr>
+        <td colspan="3"><span class="label">NACIONALIDADE:</span> <span id="aluno_nacionalidade">BRASILEIRA</span></td>
+      </tr>
+      <tr>
+        <td colspan="3"><span class="label">FILIAÇÃO 1:</span> <span id="aluno_filiacao_1">---</span></td>
+      </tr>
+      <tr>
+        <td colspan="3"><span class="label">FILIAÇÃO 2:</span> <span id="aluno_filiacao_2">---</span></td>
+      </tr>
+    </table>
+
+    <!-- 3. COMPONENTES CURRICULARES -->
+    <table class="sigeduc-table matriz-table" id="tabela-matriz">
+      <thead>
+        <tr id="matriz-head-row">
+          <th style="width:28%; text-align:left;">COMPONENTES CURRICULARES</th>
+          <th>1º ANO</th>
+          <th>2º ANO</th>
+          <th>3º ANO</th>
+          <th>4º ANO</th>
+          <th>5º ANO</th>
+          <th>6º Ano</th>
+          <th>7º Ano</th>
+          <th>8º Ano</th>
+          <th>9º Ano</th>
+        </tr>
+      </thead>
+      <tbody id="matriz-body">
+        <!-- Linhas de disciplinas e resumos inseridas via JS -->
+      </tbody>
+    </table>
+
+    <!-- 4. REGISTROS COMPLEMENTARES -->
+    <div class="section-title">REGISTROS COMPLEMENTARES</div>
+    <table class="sigeduc-table complementares-table" id="tabela-complementares">
+      <thead>
+        <tr>
+          <th style="width:16%; text-align:center;">ANO/SÉRIE</th>
+          <th style="width:8%; text-align:center;">ANO</th>
+          <th style="width:50%;">ESTABELECIMENTO</th>
+          <th style="width:11%; text-align:center;">TURNO</th>
+          <th style="width:15%;">MUNICÍPIO/UF</th>
+        </tr>
+      </thead>
+      <tbody id="complementares-body">
+        <!-- Linhas inseridas via JS -->
+      </tbody>
+    </table>
+
+    <!-- 5. LEGENDA (Texto Limpo Sem Tabela) -->
+    <div class="legenda-texto">
+      <b>LEGENDA:</b> AB - Deixou de Frequentar &nbsp;|&nbsp; AP - Aprovado &nbsp;|&nbsp; APP - Aprovado com Progressão Parcial &nbsp;|&nbsp; MAT - Matriculado &nbsp;|&nbsp; RE - Reclassificação &nbsp;|&nbsp; RP - Reprovado &nbsp;|&nbsp; RPF - Repr. Frequência &nbsp;|&nbsp; TR - Transferido &nbsp;|&nbsp; NI - Não Informado
+    </div>
+
+    <!-- 6. ASSINATURAS (Sem notas de rodapé ou link de verificação) -->
+    <div class="assinaturas-wrapper">
+      <div class="assinaturas-grid">
+        <div class="assinatura-bloco">
+          <div id="assinatura-secretario-nome" style="font-weight:normal; margin-bottom:2px;"></div>
+          Responsável pela Informação
+        </div>
+        <div class="data-central" id="assinatura-data-central">JANDAÍRA-RN, </div>
+        <div class="assinatura-bloco">
+          <div id="assinatura-diretor-nome" style="font-weight:normal; margin-bottom:2px;"></div>
+          Diretor(a)
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    async function carregarDadosImpressao() {
+      const pathParts = window.location.pathname.split("/").filter(Boolean);
+      let alunoUuid = pathParts[pathParts.length - 1];
+      if (!alunoUuid || alunoUuid === "impressao.html" || alunoUuid === "impressao_a4.html" || alunoUuid === "impressao") {
+        const urlParams = new URLSearchParams(window.location.search);
+        alunoUuid = urlParams.get("uuid");
+      }
+
+      const hoje = new Date();
+      const dataFormatada = hoje.toLocaleDateString("pt-BR");
+      const meses = [
+        "janeiro", "fevereiro", "março", "abril", "maio", "junho",
+        "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"
+      ];
+      const dataPorExtenso = `${hoje.getDate()} de ${meses[hoje.getMonth()]} de ${hoje.getFullYear()}`;
+
+      document.getElementById("header-data-emissao").textContent = `Emitido em ${dataFormatada}`;
+      document.getElementById("assinatura-data-central").textContent = `JANDAÍRA-RN, ${dataPorExtenso}`;
+
+      if (!alunoUuid) return;
+
+      try {
+        const res = await fetch(`/api/alunos/${alunoUuid}/historico-completo`);
+        if (!res.ok) throw new Error("Erro ao carregar os dados do histórico.");
+
+        const dados = await res.json();
+        const aluno = dados.aluno || {};
+        const escola = dados.escola || {};
+        const vidaEscolar = dados.vida_escolar || [];
+        const notasCurriculares = dados.notas_curriculares || [];
+
+        // 1. DADOS DA ESCOLA
+        document.getElementById("escola_nome").textContent = escola.nome_oficial || "ESCOLA MUNICIPAL";
+        document.getElementById("escola_inep").textContent = escola.codigo_inep || "---";
+        document.getElementById("escola_endereco").textContent = escola.endereco || "---";
+        document.getElementById("escola_bairro").textContent = escola.bairro || "Centro";
+        document.getElementById("escola_municipio").textContent = escola.municipio || "JANDAÍRA";
+        document.getElementById("escola_uf").textContent = escola.uf || "RN";
+
+        if (escola.brasao_base64) {
+          document.getElementById("img-brasao").src = escola.brasao_base64;
+        }
+
+        if (escola.secretario_nome) {
+          document.getElementById("assinatura-secretario-nome").textContent = escola.secretario_nome;
+        }
+        if (escola.diretor_nome) {
+          document.getElementById("assinatura-diretor-nome").textContent = escola.diretor_nome;
+        }
+
+        // 2. DADOS DO ESTUDANTE
+        document.getElementById("aluno_nome_civil").textContent = aluno.nome_completo || aluno.nome_civil || "---";
+        document.getElementById("aluno_data_nascimento").textContent = aluno.data_nascimento || "---";
+        document.getElementById("aluno_cpf").textContent = aluno.cpf || "---";
+
+        const natMun = aluno.naturalidade_municipio || "";
+        const natUf = aluno.naturalidade_uf || "";
+        document.getElementById("aluno_naturalidade").textContent = natMun ? (natMun + (natUf ? " - " + natUf : "")) : (natUf || "---");
+
+        document.getElementById("aluno_nacionalidade").textContent = (aluno.nacionalidade || "BRASILEIRA").toUpperCase();
+        document.getElementById("aluno_filiacao_1").textContent = aluno.filiacao_1 || "---";
+        document.getElementById("aluno_filiacao_2").textContent = aluno.filiacao_2 || "---";
+
+        // 3. COMPONENTES CURRICULARES
+        let colunasSeries = [
+          { col: 1, label: "1º ANO" },
+          { col: 2, label: "2º ANO" },
+          { col: 3, label: "3º ANO" },
+          { col: 4, label: "4º ANO" },
+          { col: 5, label: "5º ANO" },
+          { col: 6, label: "6º Ano" },
+          { col: 7, label: "7º Ano" },
+          { col: 8, label: "8º Ano" },
+          { col: 9, label: "9º Ano" }
+        ];
+
+        if (aluno.regime_ensino === "8_ANOS") {
+          colunasSeries = [
+            { col: 1, label: "1ª SÉRIE" },
+            { col: 2, label: "2ª SÉRIE" },
+            { col: 3, label: "3ª SÉRIE" },
+            { col: 4, label: "4ª SÉRIE" },
+            { col: 5, label: "5ª SÉRIE" },
+            { col: 6, label: "6ª SÉRIE" },
+            { col: 7, label: "7ª SÉRIE" },
+            { col: 8, label: "8ª SÉRIE" }
+          ];
+        } else if (aluno.regime_ensino === "EJA_ETAPAS") {
+          colunasSeries = [
+            { col: 1, label: "ETAPA I" },
+            { col: 2, label: "ETAPA II" },
+            { col: 3, label: "ETAPA III" },
+            { col: 4, label: "ETAPA IV" }
+          ];
+        }
+
+        // Atualiza cabeçalho da tabela se diferente de 9
+        const headRow = document.getElementById("matriz-head-row");
+        const larguraNota = (72 / colunasSeries.length).toFixed(1) + "%";
+        let headHtml = `<th style="width:28%; text-align:left;">COMPONENTES CURRICULARES</th>`;
+        colunasSeries.forEach(c => {
+          headHtml += `<th style="width:${larguraNota};">${c.label}</th>`;
+        });
+        headRow.innerHTML = headHtml;
+
+        // Agrupa notas por disciplina
+        const mapaDisciplinas = new Map();
+        notasCurriculares.forEach(n => {
+          const nomeDisc = (n.disciplina_nome || "").trim();
+          if (!nomeDisc) return;
+          if (!mapaDisciplinas.has(nomeDisc)) {
+            mapaDisciplinas.set(nomeDisc, {});
+          }
+          mapaDisciplinas.get(nomeDisc)[n.ordem_coluna] = n.nota_ou_conceito || "---";
+        });
+
+        const tbodyMatriz = document.getElementById("matriz-body");
+        tbodyMatriz.innerHTML = "";
+
+        // Renderiza linhas de disciplinas
+        mapaDisciplinas.forEach((notas, nome) => {
+          let tr = `<tr><td class="disciplina-col">${nome}</td>`;
+          colunasSeries.forEach(c => {
+            const val = notas[c.col] || "---";
+            tr += `<td class="nota-col">${val}</td>`;
+          });
+          tr += `</tr>`;
+          tbodyMatriz.insertAdjacentHTML("beforeend", tr);
+        });
+
+        // Mapeia vida escolar por coluna
+        const mapaVida = new Map();
+        vidaEscolar.forEach(v => {
+          mapaVida.set(v.ordem_coluna, v);
+        });
+
+        // Função auxiliar para normalizar resultado
+        function formatarResultado(res) {
+          if (!res) return "---";
+          const u = res.toUpperCase();
+          if (u.includes("APROV")) return "AP";
+          if (u.includes("REPROV")) return "RP";
+          if (u.includes("MATRIC")) return "MAT";
+          if (u.includes("TRANSF")) return "TR";
+          if (u.includes("RECLASS")) return "RE";
+          if (u.includes("DEIXOU")) return "AB";
+          return res;
+        }
+
+        // Linhas de Resumo
+        const resumoDefs = [
+          { nome: "DIAS LETIVOS", obter: (v) => v ? (v.dias_letivos || "200") : "---" },
+          { nome: "CARGA HORÁRIA", obter: (v) => v ? (v.carga_horaria_total || "800") : "---" },
+          { nome: "FREQUÊNCIA %", obter: (v) => v ? (v.frequencia_percentual || "---") : "---" },
+          { nome: "RESULTADO FINAL", obter: (v) => v ? formatarResultado(v.resultado_final) : "---" }
+        ];
+
+        resumoDefs.forEach(r => {
+          let tr = `<tr class="resumo-row"><td class="disciplina-col">${r.nome}</td>`;
+          colunasSeries.forEach(c => {
+            const v = mapaVida.get(c.col);
+            const valor = r.obter(v);
+            tr += `<td class="nota-col">${valor}</td>`;
+          });
+          tr += `</tr>`;
+          tbodyMatriz.insertAdjacentHTML("beforeend", tr);
+        });
+
+        // 4. REGISTROS COMPLEMENTARES
+        const tbodyComp = document.getElementById("complementares-body");
+        tbodyComp.innerHTML = "";
+
+        let registrosExibidos = 0;
+        vidaEscolar.forEach(reg => {
+          if (!reg.ano_letivo && !reg.escola_nome) return;
+          registrosExibidos++;
+          const tr = `
+            <tr>
+              <td style="text-align:center;">${reg.label_serie || '---'}</td>
+              <td style="text-align:center;">${reg.ano_letivo || '---'}</td>
+              <td>${reg.escola_nome || escola.nome_oficial || '---'}</td>
+              <td style="text-align:center;">${reg.turno || 'DIURNO'}</td>
+              <td>${reg.escola_municipio_uf || (escola.municipio_uf || 'Jandaíra - RN')}</td>
+            </tr>
+          `;
+          tbodyComp.insertAdjacentHTML("beforeend", tr);
+        });
+
+        // Preenche com linhas em branco estruturadas caso tenha poucos registros
+        while (registrosExibidos < 3) {
+          registrosExibidos++;
+          tbodyComp.insertAdjacentHTML("beforeend", `
+            <tr>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+            </tr>
+          `);
+        }
+
+      } catch (err) {
+        console.error("Erro ao carregar dados:", err);
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", carregarDadosImpressao);
+  </script>
+</body>
+</html>

@@ -241,14 +241,20 @@ assert duracao >= 4.5, "Rate limiter deveria garantir espaçamento mínimo de ~5
 database.atualizar_status_ocr(sessao_id, "PENDENTE_IA", caminho_db=teste_db_path)
 
 # Garante que teste não dependa de chave de API externa
-old_key = os.environ.pop("GEMINI_API_KEY", None)
+old_key = os.environ.get("GEMINI_API_KEY")
+os.environ["GEMINI_API_KEY"] = ""
 res_sem_chave = ocr_queue_worker.processar_sessao_ocr(sessao_id, caminho_db=teste_db_path)
 print(f"Processamento sem Chave API: Status={res_sem_chave.get('status')} | {res_sem_chave.get('mensagem')}")
 assert res_sem_chave["status"] == "PENDENTE_IA"
 sessao_pos = database.obter_sessao_ocr(sessao_id, caminho_db=teste_db_path)
 assert sessao_pos["status"] == "PENDENTE_IA", "Sessão deve permanecer em PENDENTE_IA sem quebrar"
-if old_key:
+if old_key is not None:
     os.environ["GEMINI_API_KEY"] = old_key
+else:
+    os.environ.pop("GEMINI_API_KEY", None)
+
+# Marca a sessão de teste como CONCLUIDO para liberar a fila antes do teste da thread
+database.atualizar_status_ocr(sessao_id, "CONCLUIDO", caminho_db=teste_db_path)
 
 # 3.4 Teste da Thread de Fila Assíncrona em Background
 worker_thread = ocr_queue_worker.iniciar_worker_ocr(caminho_db=teste_db_path)

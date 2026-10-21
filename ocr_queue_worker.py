@@ -34,8 +34,8 @@ import database
 
 logger = logging.getLogger("sgm_historicos.ocr_worker")
 
-# Modelo oficial especificado no SPEC.md
-MODELO_GEMINI = "gemini-2.5-flash"
+# Modelo oficial do Gemini para visão multimodal e transcrição de documentos
+MODELO_GEMINI = "gemini-3.8-flash"
 
 # Limite estrito: 12 chamadas por minuto = 1 chamada a cada 5 segundos
 INTERVALO_MINIMO_REQUISICAO_SEGUNDOS = 5.0
@@ -178,8 +178,38 @@ class GeminiClientWorker:
         self._ultima_requisicao_ts: float = 0.0
 
     def obter_api_key(self) -> Optional[str]:
-        """Recupera a chave de API do Gemini em variáveis de ambiente ou arquivo local."""
-        return os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+        """Recupera a chave de API do Gemini em variáveis de ambiente, .env ou arquivo de configuração local."""
+        if "GEMINI_API_KEY" in os.environ and not os.environ["GEMINI_API_KEY"]:
+            return None
+
+        chave = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+        if chave:
+            return chave.strip()
+
+        # 1. Tenta carregar do .env local
+        env_file = Path(__file__).resolve().parent / ".env"
+        if env_file.exists():
+            try:
+                for linha in env_file.read_text(encoding="utf-8").splitlines():
+                    linha = linha.strip()
+                    if linha.startswith("GEMINI_API_KEY="):
+                        return linha.split("=", 1)[1].strip().strip('"').strip("'")
+            except Exception:
+                pass
+
+        # 2. Tenta carregar de data_local/config_instalacao.json
+        cfg_file = Path(__file__).resolve().parent / "data_local" / "config_instalacao.json"
+        if cfg_file.exists():
+            try:
+                import json
+                dados_cfg = json.loads(cfg_file.read_text(encoding="utf-8"))
+                if dados_cfg.get("gemini_api_key"):
+                    return dados_cfg["gemini_api_key"].strip()
+            except Exception:
+                pass
+
+        # 3. Se não encontrada em nenhuma fonte
+        return None
 
     def _esperar_taxa_limite(self) -> None:
         """Garante o espaçamento mínimo de 5 segundos entre requisições (máx 12/min)."""
@@ -245,12 +275,15 @@ class GeminiClientWorker:
         # Execução com controle de taxa e retry exponencial
         max_tentativas = MAX_TENTATIVAS_IA
         atraso_backoff = 5.0
+        modelos_candidatos = [MODELO_GEMINI, "gemini-flash-latest", "gemini-2.5-flash-lite"]
+        modelo_idx = 0
 
         for tentativa in range(1, max_tentativas + 1):
             try:
                 self._esperar_taxa_limite()
+                modelo_atual = modelos_candidatos[min(modelo_idx, len(modelos_candidatos) - 1)]
                 resposta = client.models.generate_content(
-                    model=MODELO_GEMINI,
+                    model=modelo_atual,
                     contents=conteudos,
                     config=config
                 )
@@ -265,8 +298,11 @@ class GeminiClientWorker:
             except Exception as exc:
                 erro_str = str(exc)
                 logger.warning(
-                    f"Tentativa {tentativa}/{max_tentativas} falhou para o Gemini: {erro_str}"
+                    f"Tentativa {tentativa}/{max_tentativas} falhou para o Gemini ({modelos_candidatos[min(modelo_idx, len(modelos_candidatos) - 1)]}): {erro_str}"
                 )
+
+                if "404" in erro_str or "NOT_FOUND" in erro_str:
+                    modelo_idx += 1
 
                 # Se atingiu o limite de tentativas, propaga a exceção
                 if tentativa == max_tentativas:
@@ -422,7 +458,7 @@ class OcrQueueWorkerThread(threading.Thread):
                 resultado = processar_proximo_pendente(caminho_db=self.caminho_db)
                 if resultado and resultado.get("sucesso"):
                     # Se processou um com sucesso, pausa pelo intervalo mínimo antes de checar outro
-                    time.sleep(INTERVALO_MINIMO_REQUISICAO_SEGUNDOS)
+                    self.stop_event.wait(INTERVALO_MINIMO_REQUISICAO_SEGUNDOS)
                 else:
                     # Se não havia itens ou falhou, aguarda o intervalo de varredura
                     self.stop_event.wait(self.intervalo)
@@ -455,5 +491,5 @@ def parar_worker_ocr() -> None:
     global _worker_instancia
     if _worker_instancia is not None and _worker_instancia.is_alive():
         _worker_instancia.parar()
-        _worker_instancia.join(timeout=5.0)
+        _worker_instancia.join(timeout=10.0)
         _worker_instancia = None

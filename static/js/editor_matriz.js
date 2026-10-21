@@ -182,43 +182,46 @@ class EditorMatrizHistorico {
 
         <div class="p-5 sm:p-6 space-y-6">
 
-          <!-- SEÇÃO 1: DADOS CIVIS DO EX-ALUNO -->
+          <!-- SEÇÃO 1: DADOS DO ESTUDANTE (MODELO LIMPO SMEJ-JANDAÍRA/RN) -->
           <div>
             <h3 class="text-xs font-bold text-slate-600 uppercase tracking-wider mb-3 flex items-center gap-2">
-              <span>👤</span> Dados Civis e Filiação
+              <span>👤</span> Dados do Estudante
             </h3>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-sm">
-              <div class="sm:col-span-2">
-                <label class="block text-xs font-semibold text-slate-800 mb-1">Nome Completo do Ex-Aluno *</label>
-                <input type="text" id="campo_nome_completo" required placeholder="Digite o nome completo do aluno" class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-base font-medium focus:ring-2 focus:ring-blue-500 text-slate-900">
+              <div class="sm:col-span-3">
+                <label class="block text-xs font-semibold text-slate-800 mb-1">Nome Civil do Estudante *</label>
+                <input type="text" id="campo_nome_completo" required placeholder="Nome completo civil do estudante" class="w-full bg-white border border-slate-300 rounded px-3 py-2 text-base font-medium focus:ring-2 focus:ring-blue-500 text-slate-900">
               </div>
+
               <div>
                 <label class="block text-xs font-medium text-slate-700 mb-1">Data de Nascimento</label>
-                <input type="text" id="campo_data_nascimento" placeholder="DD/MM/AAAA" class="w-full bg-white border border-slate-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500">
+                <input type="text" id="campo_data_nascimento" placeholder="DD/MM/AAAA" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1.5 focus:ring-2 focus:ring-blue-500">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-slate-700 mb-1">CPF</label>
+                <input type="text" id="campo_cpf" placeholder="000.000.000-00" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1.5 focus:ring-2 focus:ring-blue-500">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-slate-700 mb-1">Naturalidade (Município / UF)</label>
+                <div class="flex gap-1.5">
+                  <input type="text" id="campo_naturalidade_municipio" placeholder="Município" class="w-3/4 bg-white border border-slate-300 rounded px-2.5 py-1.5">
+                  <input type="text" id="campo_naturalidade_uf" placeholder="UF" maxlength="2" class="w-1/4 bg-white border border-slate-300 rounded px-2 py-1.5 uppercase text-center">
+                </div>
               </div>
 
-              <div>
-                <label class="block text-xs font-medium text-slate-700 mb-1">Naturalidade (Município)</label>
-                <input type="text" id="campo_naturalidade_municipio" placeholder="Município de nascimento" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1.5">
-              </div>
-              <div>
-                <label class="block text-xs font-medium text-slate-700 mb-1">UF de Naturalidade</label>
-                <input type="text" id="campo_naturalidade_uf" placeholder="Ex: BA" maxlength="2" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1.5 uppercase">
-              </div>
-              <div>
+              <div class="sm:col-span-3">
                 <label class="block text-xs font-medium text-slate-700 mb-1">Nacionalidade</label>
-                <input type="text" id="campo_nacionalidade" value="Brasileira" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1.5">
+                <input type="text" id="campo_nacionalidade" value="BRASILEIRA" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1.5">
               </div>
 
-              <div class="sm:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                <div>
-                  <label class="block text-xs font-medium text-slate-700 mb-1">Nome da Mãe / Filiação 1</label>
-                  <input type="text" id="campo_filiacao_1" placeholder="Nome completo da mãe" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1.5">
-                </div>
-                <div>
-                  <label class="block text-xs font-medium text-slate-700 mb-1">Nome do Pai / Filiação 2</label>
-                  <input type="text" id="campo_filiacao_2" placeholder="Nome completo do pai (opcional)" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1.5">
-                </div>
+              <div class="sm:col-span-3">
+                <label class="block text-xs font-medium text-slate-700 mb-1">Filiação 1 (Nome da Mãe)</label>
+                <input type="text" id="campo_filiacao_1" placeholder="Nome completo da filiação 1" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1.5">
+              </div>
+
+              <div class="sm:col-span-3">
+                <label class="block text-xs font-medium text-slate-700 mb-1">Filiação 2 (Nome do Pai)</label>
+                <input type="text" id="campo_filiacao_2" placeholder="Nome completo da filiação 2" class="w-full bg-white border border-slate-300 rounded px-2.5 py-1.5">
               </div>
             </div>
           </div>
@@ -515,19 +518,19 @@ class EditorMatrizHistorico {
 
     document.getElementById("campo_nome_completo").value = aluno.nome_completo || "";
     document.getElementById("campo_data_nascimento").value = aluno.data_nascimento || "";
+    document.getElementById("campo_cpf").value = aluno.cpf || "";
     document.getElementById("campo_naturalidade_municipio").value = aluno.naturalidade_municipio || "";
     document.getElementById("campo_naturalidade_uf").value = aluno.naturalidade_uf || "";
-    document.getElementById("campo_nacionalidade").value = aluno.nacionalidade || "Brasileira";
+    document.getElementById("campo_nacionalidade").value = aluno.nacionalidade || "BRASILEIRA";
     document.getElementById("campo_filiacao_1").value = aluno.filiacao_1 || "";
     document.getElementById("campo_filiacao_2").value = aluno.filiacao_2 || "";
 
-    document.getElementById("campo_certidao_tipo").value = aluno.certidao_tipo || "Nascimento";
-    document.getElementById("campo_certidao_termo").value = aluno.certidao_termo || "";
-    document.getElementById("campo_certidao_livro").value = aluno.certidao_livro || "";
-    document.getElementById("campo_certidao_folha").value = aluno.certidao_folha || "";
-    document.getElementById("campo_rg_numero").value = aluno.rg_numero || "";
-    document.getElementById("campo_certidao_cartorio").value = aluno.certidao_cartorio || "";
-    document.getElementById("campo_cpf").value = aluno.cpf || "";
+    if (document.getElementById("campo_certidao_tipo")) document.getElementById("campo_certidao_tipo").value = aluno.certidao_tipo || "Nascimento";
+    if (document.getElementById("campo_certidao_termo")) document.getElementById("campo_certidao_termo").value = aluno.certidao_termo || "";
+    if (document.getElementById("campo_certidao_livro")) document.getElementById("campo_certidao_livro").value = aluno.certidao_livro || "";
+    if (document.getElementById("campo_certidao_folha")) document.getElementById("campo_certidao_folha").value = aluno.certidao_folha || "";
+    if (document.getElementById("campo_rg_numero")) document.getElementById("campo_rg_numero").value = aluno.rg_numero || "";
+    if (document.getElementById("campo_certidao_cartorio")) document.getElementById("campo_certidao_cartorio").value = aluno.certidao_cartorio || "";
 
     document.getElementById("campo_observacoes").value = aluno.observacoes_historico || "";
 
@@ -569,7 +572,7 @@ class EditorMatrizHistorico {
   coletarPayloadDados() {
     const nomeCompleto = document.getElementById("campo_nome_completo")?.value?.trim();
     if (!nomeCompleto) {
-      alert("Por favor, preencha o Nome Completo do ex-aluno.");
+      alert("Por favor, preencha o Nome Completo do estudante.");
       document.getElementById("campo_nome_completo")?.focus();
       return null;
     }
@@ -579,13 +582,13 @@ class EditorMatrizHistorico {
       escola_id: window.configManagerAtual?.escola_id || 1,
       nome_completo: nomeCompleto,
       data_nascimento: document.getElementById("campo_data_nascimento")?.value?.trim() || null,
+      cpf: document.getElementById("campo_cpf")?.value?.trim() || null,
       naturalidade_municipio: document.getElementById("campo_naturalidade_municipio")?.value?.trim() || null,
       naturalidade_uf: document.getElementById("campo_naturalidade_uf")?.value?.trim()?.toUpperCase() || null,
-      nacionalidade: document.getElementById("campo_nacionalidade")?.value?.trim() || "Brasileira",
+      nacionalidade: document.getElementById("campo_nacionalidade")?.value?.trim() || "BRASILEIRA",
       filiacao_1: document.getElementById("campo_filiacao_1")?.value?.trim() || null,
       filiacao_2: document.getElementById("campo_filiacao_2")?.value?.trim() || null,
       rg_numero: document.getElementById("campo_rg_numero")?.value?.trim() || null,
-      cpf: document.getElementById("campo_cpf")?.value?.trim() || null,
       certidao_tipo: document.getElementById("campo_certidao_tipo")?.value || "Nascimento",
       certidao_termo: document.getElementById("campo_certidao_termo")?.value?.trim() || null,
       certidao_livro: document.getElementById("campo_certidao_livro")?.value?.trim() || null,
@@ -664,11 +667,11 @@ class EditorMatrizHistorico {
         document.getElementById("campo_data_nascimento").value = "";
         document.getElementById("campo_filiacao_1").value = "";
         document.getElementById("campo_filiacao_2").value = "";
-        document.getElementById("campo_rg_numero").value = "";
         document.getElementById("campo_cpf").value = "";
-        document.getElementById("campo_certidao_termo").value = "";
-        document.getElementById("campo_certidao_livro").value = "";
-        document.getElementById("campo_certidao_folha").value = "";
+        if (document.getElementById("campo_rg_numero")) document.getElementById("campo_rg_numero").value = "";
+        if (document.getElementById("campo_certidao_termo")) document.getElementById("campo_certidao_termo").value = "";
+        if (document.getElementById("campo_certidao_livro")) document.getElementById("campo_certidao_livro").value = "";
+        if (document.getElementById("campo_certidao_folha")) document.getElementById("campo_certidao_folha").value = "";
 
         // Limpa inputs de notas
         this.disciplinas.forEach(d => {

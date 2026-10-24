@@ -13,6 +13,15 @@ from pathlib import Path
 from starlette.testclient import TestClient
 
 import database
+TEST_DB_PATH = Path("./data_local/teste_acervo_fase3.db")
+if TEST_DB_PATH.exists():
+    try:
+        TEST_DB_PATH.unlink()
+    except Exception:
+        pass
+database.DB_PATH = TEST_DB_PATH
+database.init_db(TEST_DB_PATH)
+
 import config_manager
 import drive_router
 import sync_worker
@@ -169,7 +178,9 @@ print("✓ POST /api/scan/.../upload-pagina -> Porteiro rejeitou com HTTP 422 e 
 res = client.post(f"/api/scan/{sessao_id}/finalizar")
 assert res.status_code == 200
 assert res.json()["status"] == "PENDENTE_IA"
-print(f"✓ POST /api/scan/{sessao_id}/finalizar -> Envelope movido para PENDENTE_IA!")
+# Descarta a sessão de teste para não poluir a fila do worker
+client.delete(f"/api/ocr/sessao/{sessao_id}")
+print(f"✓ POST /api/scan/{sessao_id}/finalizar -> Envelope movido para PENDENTE_IA (e limpo com sucesso)!")
 
 # 3.10 Salvar Histórico Completo com Assinatura HMAC
 aluno_teste = {
@@ -239,6 +250,13 @@ stats = res.json()
 assert stats["total_alunos_passivo"] >= 1
 assert stats["total_lacrados_homologados"] >= 1
 print(f"✓ GET /api/estatisticas/painel -> Total de {stats['total_alunos_passivo']} alunos no acervo ({stats['total_lacrados_homologados']} lacrados).")
+
+# Limpeza do banco de teste temporário
+if TEST_DB_PATH.exists():
+    try:
+        TEST_DB_PATH.unlink()
+    except Exception:
+        pass
 
 print("\n=======================================================")
 print(" TODOS OS TESTES DA FASE 3 PASSARAM COM 100% DE SUCESSO!")

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="dark" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,8 +9,13 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
+      darkMode: 'class',
       theme: {
         extend: {
+          fontFamily: {
+            sans: ['Fira Sans', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+            mono: ['Fira Code', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace']
+          },
           colors: {
             brand: {
               50: '#eff6ff',
@@ -19,6 +24,10 @@
               700: '#1d4ed8',
               800: '#1e40af',
               900: '#1e3a8a',
+            },
+            purpleSgm: {
+              DEFAULT: '#84167A',
+              hover: '#9B1D90'
             }
           }
         }
@@ -26,15 +35,15 @@
     }
   </script>
 
-  <!-- Google Fonts: Inter -->
+  <!-- Google Fonts Pareadas: Fira Sans (UI/Corpo) + Fira Code (Dados Técnicos / Notas / HMAC) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Fira+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 
-  <!-- Estilos Oficiais do Modo Noturno (Desktop Rigoroso) -->
+  <!-- Estilos Oficiais do Design System (Tokens 3 Camadas / Densidade 8/10) -->
   <link rel="stylesheet" href="/static/css/dark_mode.css">
 
-  <!-- Inicialização Imediata Anti-FOUC (Padrão: Modo Noturno) -->
+  <!-- Inicialização Imediata Anti-FOUC (Padrão Oficial: Modo Noturno Desktop) -->
   <script>
     (function() {
       try {
@@ -52,71 +61,89 @@
       }
     })();
   </script>
-
-  <style>
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    }
-  </style>
 </head>
-<body class="bg-slate-100 text-slate-900 min-h-screen flex flex-col antialiased">
+<body class="min-h-screen flex flex-col antialiased selection:bg-blue-600 selection:text-white">
 
   <!-- ============================================================================== -->
-  <!-- BARRA SUPERIOR PRINCIPAL (HEADER) -->
+  <!-- BARRA SUPERIOR PRINCIPAL (APP BAR DESKTOP NATIVA) -->
   <!-- ============================================================================== -->
-  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-4">
+  <header class="sticky top-0 z-40 border-b shadow-sm select-none">
+    <div class="max-w-[1560px] mx-auto px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3">
       
-      <!-- IDENTIDADE E UNIDADE ESCOLAR ATIVA -->
+      <!-- IDENTIDADE INSTITUCIONAL E PERFIL ATIVO -->
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-900 to-blue-700 text-white flex items-center justify-center font-black text-xl shadow-md">
-          🏛️
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-900 to-indigo-800 dark:from-[#84167A] dark:to-[#4a0b44] text-white flex items-center justify-center shadow-md shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="3" x2="21" y1="22" y2="22"/><line x1="6" x2="6" y1="18" y2="11"/><line x1="10" x2="10" y1="18" y2="11"/><line x1="14" x2="14" y1="18" y2="11"/><line x1="18" x2="18" y1="18" y2="11"/><polygon points="12 2 20 7 4 7"/>
+          </svg>
         </div>
         <div>
           <div class="flex items-center gap-2">
-            <h1 class="font-extrabold text-base text-slate-900 tracking-tight">SGM-Históricos</h1>
-            <span id="headerBadgePerfil" class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-blue-100 text-blue-900">
+            <h1 class="font-extrabold text-sm sm:text-base tracking-tight leading-none">SGM-Históricos</h1>
+            <span id="headerBadgePerfil" class="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-blue-100 text-blue-900 dark:bg-blue-950/70 dark:text-blue-300">
               UNIDADE ESCOLAR
             </span>
           </div>
-          <p id="headerNomeEscola" class="text-xs font-semibold text-slate-500">
+          <p id="headerNomeEscola" class="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1 truncate max-w-xs sm:max-w-md">
             Carregando unidade configurada...
           </p>
         </div>
       </div>
 
-      <!-- STATUS DE SINCRONIZAÇÃO E AÇÕES RÁPIDAS -->
-      <div class="flex items-center gap-3">
+      <!-- STATUS DE SINCRONIZAÇÃO HÍBRIDA E AÇÕES RÁPIDAS -->
+      <div class="flex items-center flex-wrap gap-2">
         
-        <!-- BOTÃO ALTERNÂNCIA MODO NOTURNO (DARK MODE) -->
-        <button id="btnToggleTheme" type="button" title="Alternar entre Modo Noturno e Modo Claro" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-bold transition shadow-2xs active:scale-95">
-          <span id="themeIcon">🌙</span>
-          <span id="themeText">Modo Noturno</span>
+        <!-- VERIFICADOR PÚBLICO / HMAC -->
+        <button id="btnAbrirVerificadorHmac" type="button" title="Consultar autenticidade de qualquer código VER-2026-XXXX" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-[#454545] text-xs font-bold bg-white dark:bg-[#2D2D2D] hover:bg-slate-50 dark:hover:bg-[#383838] shadow-2xs">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-500" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
+          <span class="hidden md:inline">Verificador HMAC</span>
         </button>
 
-        <!-- INDICADOR LUMINOSO DE SINCRONIZAÇÃO -->
-        <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 shadow-2xs">
-          <div id="indicadorLuminosoSync" class="w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></div>
-          <span id="txtStatusSync" class="text-xs font-bold text-slate-700">Nuvem Sincronizada</span>
-          <button id="btnSincronizarManual" title="Sincronizar agora com a Nuvem" class="ml-1 text-[11px] font-bold text-blue-700 hover:text-blue-900 hover:underline">
-            Sincronizar
+        <!-- CONFIGURAÇÃO DA MÁQUINA (RESET / MODO CAMALEÃO) -->
+        <button id="btnAbrirConfigMaquina" type="button" title="Configurações locais da máquina, rede e reset" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-[#454545] text-xs font-bold bg-white dark:bg-[#2D2D2D] hover:bg-slate-50 dark:hover:bg-[#383838] shadow-2xs">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-500 dark:text-slate-400" aria-hidden="true"><line x1="4" x2="4" y1="21" y2="14"/><line x1="4" x2="4" y1="10" y2="3"/><line x1="12" x2="12" y1="21" y2="12"/><line x1="12" x2="12" y1="8" y2="3"/><line x1="20" x2="20" y1="21" y2="16"/><line x1="20" x2="20" y1="12" y2="3"/><line x1="1" x2="7" y1="14" y2="14"/><line x1="9" x2="15" y1="8" y2="8"/><line x1="17" x2="23" y1="16" y2="16"/></svg>
+          <span class="hidden md:inline">Máquina</span>
+        </button>
+
+        <!-- ALTERNÂNCIA MODO NOTURNO (DARK / LIGHT COM SVG) -->
+        <button id="btnToggleTheme" type="button" title="Alternar entre Modo Noturno e Modo Claro" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-[#454545] text-xs font-bold bg-white dark:bg-[#2D2D2D] hover:bg-slate-50 dark:hover:bg-[#383838] shadow-2xs">
+          <span id="themeIcon" class="flex items-center justify-center"></span>
+          <span id="themeText" class="hidden lg:inline">Modo Noturno</span>
+        </button>
+
+        <!-- ALTERNAR TELA CHEIA (FULLSCREEN / F11) -->
+        <button id="btnToggleFullscreen" type="button" title="Alternar Tela Cheia (F11)" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-[#454545] text-xs font-bold bg-white dark:bg-[#2D2D2D] hover:bg-slate-50 dark:hover:bg-[#383838] shadow-2xs">
+          <svg id="iconFullscreen" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-500 dark:text-slate-400" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+          <span class="hidden xl:inline">Tela Cheia</span>
+        </button>
+
+        <!-- INDICADOR LUMINOSO DE SINCRONIZAÇÃO HÍBRIDA -->
+        <div class="flex items-center gap-2 bg-slate-50 dark:bg-[#1E1E1E] border border-slate-200 dark:border-[#454545] rounded-lg px-2.5 py-1.5 shadow-2xs">
+          <div id="indicadorLuminosoSync" class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(46,204,113,0.9)] animate-pulse"></div>
+          <span id="txtStatusSync" class="text-xs font-semibold text-slate-700 dark:text-slate-300">Nuvem OK</span>
+          <button id="btnSincronizarManual" title="Sincronizar agora com a Nuvem Supabase" class="flex items-center gap-1 text-[11px] font-bold text-blue-700 dark:text-blue-400 hover:underline ml-1">
+            <svg id="iconSyncSpinner" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg>
+            <span>Sync</span>
           </button>
         </div>
 
-        <!-- FILA DE REVISÃO IA (CONTADOR) -->
-        <button id="btnIrParaFilaIa" onclick="window.appMain.trocarAbaPrincipal('filaIa')" class="flex items-center gap-2 bg-slate-50 hover:bg-amber-50 border border-slate-200 hover:border-amber-300 rounded-lg px-3 py-1.5 transition shadow-2xs">
-          <span class="text-xs font-bold text-slate-700">Fila de Revisão IA</span>
-          <span id="badgeFilaIaCount" class="bg-slate-700 text-slate-300 px-2 py-0.5 rounded-full text-xs font-bold">0</span>
+        <!-- FILA DE TRANSCRIÇÃO IA (CONTADOR) -->
+        <button id="btnIrParaFilaIa" onclick="window.appMain.trocarAbaPrincipal('filaIa')" class="flex items-center gap-1.5 bg-slate-50 dark:bg-[#1E1E1E] hover:bg-amber-50 dark:hover:bg-amber-950/40 border border-slate-200 dark:border-[#454545] rounded-lg px-2.5 py-1.5 shadow-2xs">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-500" aria-hidden="true"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+          <span class="text-xs font-bold">Fila IA</span>
+          <span id="badgeFilaIaCount" class="font-mono bg-slate-700 text-slate-200 px-1.5 py-0.2 rounded-full text-[11px] font-bold">0</span>
         </button>
 
-        <!-- BOTÃO ESCANEAR DOCUMENTO (QR CODE / USB) -->
-        <button id="btnAbrirScanner" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3.5 py-2 rounded-lg shadow-sm flex items-center gap-2 transition active:scale-95">
-          <span>📸</span> Escanear Documento
+        <!-- BOTÃO ESCANEAR DOCUMENTO (QR CODE / USB WIA) -->
+        <button id="btnAbrirScanner" class="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-700 dark:hover:bg-indigo-800 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-sm flex items-center gap-1.5 active:scale-95">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+          <span>Escanear</span>
         </button>
 
         <!-- BOTÃO NOVO ALUNO (DIGITAÇÃO TURBO) -->
-        <button id="btnNovoAluno" class="bg-blue-700 hover:bg-blue-800 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-sm flex items-center gap-2 transition active:scale-95">
-          <span>➕</span> Novo Aluno (Digitação)
+        <button id="btnNovoAluno" class="bg-blue-700 hover:bg-blue-800 dark:bg-[#84167A] dark:hover:bg-[#9B1D90] text-white text-xs font-bold px-3.5 py-1.5 rounded-lg shadow-sm flex items-center gap-1.5 active:scale-95">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+          <span>Novo Aluno</span>
         </button>
 
       </div>
@@ -125,23 +152,30 @@
 
 
   <!-- ============================================================================== -->
-  <!-- NAVEGAÇÃO DE ABAS PRINCIPAIS -->
+  <!-- NAVEGAÇÃO DE ABAS PRINCIPAIS (DENSIDADE 8/10) -->
   <!-- ============================================================================== -->
-  <div class="bg-slate-200/70 border-b border-slate-300">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-2 flex items-center justify-between">
-      <nav class="flex items-center gap-1.5">
-        <button id="tabAcervo" class="px-4 py-2 font-bold text-xs rounded-lg transition-colors bg-white shadow-xs text-blue-900 border border-slate-200">
-          📁 Acervo de Ex-Alunos (Arquivo Passivo)
+  <div class="bg-slate-200/70 dark:bg-[#1A1A1A] border-b border-slate-300 dark:border-[#454545]">
+    <div class="max-w-[1560px] mx-auto px-4 sm:px-6 py-1.5 flex flex-wrap items-center justify-between gap-2">
+      <nav class="flex items-center gap-1.5 flex-wrap">
+        <button id="tabAcervo" class="px-3 py-1.5 font-bold text-xs rounded-lg transition-colors bg-white dark:bg-[#2D2D2D] shadow-2xs text-blue-900 dark:text-[#3B9EFF] border border-slate-300 dark:border-[#454545] flex items-center gap-1.5">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
+          <span>Acervo de Ex-Alunos (Passivo)</span>
         </button>
-        <button id="tabFilaIa" class="px-4 py-2 font-bold text-xs rounded-lg transition-colors text-slate-600 hover:bg-slate-100 flex items-center gap-1.5">
-          🤖 Fila de Revisão IA (Split-Screen)
+        <button id="tabFilaIa" class="px-3 py-1.5 font-bold text-xs rounded-lg transition-colors text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-[#262626] flex items-center gap-1.5">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+          <span>Fila de Revisão IA</span>
         </button>
-        <button id="tabPainelSme" class="px-4 py-2 font-bold text-xs rounded-lg transition-colors text-slate-600 hover:bg-slate-100 hidden">
-          🏢 Painel Geral da Secretaria (SME)
+        <button id="tabPainelSme" class="px-3 py-1.5 font-bold text-xs rounded-lg transition-colors text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-[#262626] flex items-center gap-1.5 hidden">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" x2="21" y1="22" y2="22"/><line x1="6" x2="6" y1="18" y2="11"/><line x1="10" x2="10" y1="18" y2="11"/><line x1="14" x2="14" y1="18" y2="11"/><line x1="18" x2="18" y1="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg>
+          <span>Painel Geral da Secretaria (SME)</span>
+        </button>
+        <button id="tabAuditoria" class="px-3 py-1.5 font-bold text-xs rounded-lg transition-colors text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-[#262626] flex items-center gap-1.5">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+          <span>Trilha de Auditoria</span>
         </button>
       </nav>
       
-      <div id="totalAlunosEncontrados" class="text-xs font-semibold text-slate-500">
+      <div id="totalAlunosEncontrados" class="text-xs font-semibold text-slate-500 dark:text-slate-400 font-mono">
         Carregando registros...
       </div>
     </div>
@@ -149,32 +183,37 @@
 
 
   <!-- ============================================================================== -->
-  <!-- CONTEÚDO PRINCIPAL (SPA) -->
+  <!-- CONTEÚDO PRINCIPAL (SPA DESKTOP) -->
   <!-- ============================================================================== -->
-  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
+  <main class="flex-1 max-w-[1560px] w-full mx-auto p-3 sm:p-5 space-y-4">
 
-    <!-- SEÇÃO 1: ACERVO DE EX-ALUNOS (BUSCA E LISTAGEM) -->
-    <section id="secaoAcervo" class="space-y-4">
+    <!-- SEÇÃO 1: ACERVO DE EX-ALUNOS (BUSCA, TABELA E PAGINAÇÃO) -->
+    <section id="secaoAcervo" class="space-y-3">
       
       <!-- BARRA DE FILTROS E BUSCA EM TEMPO REAL -->
-      <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-wrap items-center gap-3">
+      <div class="bg-white dark:bg-[#2D2D2D] p-3 rounded-xl border border-slate-200 dark:border-[#454545] shadow-2xs flex flex-wrap items-center gap-3">
         
         <!-- CAMPO DE BUSCA MULTIFATORIAL -->
         <div class="flex-1 min-w-[280px] relative">
-          <span class="absolute left-3.5 top-2.5 text-slate-400">🔍</span>
-          <input type="text" id="inputBuscaGeral" placeholder="Buscar por Nome do Ex-Aluno, CPF, RG, Termo da Certidão..." class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm text-slate-900 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
+          <span class="absolute left-3 top-2.5 text-slate-400 dark:text-slate-500">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          </span>
+          <input type="text" id="inputBuscaGeral" placeholder="Buscar por Nome do Ex-Aluno, CPF, RG, Termo de Certidão..." class="w-full pl-9 pr-8 py-1.5 bg-slate-50 dark:bg-[#141414] border border-slate-300 dark:border-[#454545] rounded-lg text-xs font-medium focus:ring-2 focus:ring-blue-500 dark:focus:ring-[#84167A] focus:outline-none transition">
+          <button id="btnLimparBusca" type="button" title="Limpar busca" class="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
         </div>
 
         <!-- FILTRO DE ESCOLAS -->
         <div class="w-64">
-          <select id="filtroEscola" class="w-full bg-slate-50 border border-slate-300 rounded-lg py-2 px-3 text-xs font-medium text-slate-800 focus:bg-white focus:ring-2 focus:ring-blue-500">
+          <select id="filtroEscola" class="w-full bg-slate-50 dark:bg-[#141414] border border-slate-300 dark:border-[#454545] rounded-lg py-1.5 px-2.5 text-xs font-medium focus:ring-2 focus:ring-blue-500">
             <option value="">Todas as Escolas Municipais</option>
           </select>
         </div>
 
         <!-- FILTRO DE STATUS DA FICHA -->
         <div class="w-48">
-          <select id="filtroStatus" class="w-full bg-slate-50 border border-slate-300 rounded-lg py-2 px-3 text-xs font-medium text-slate-800 focus:bg-white focus:ring-2 focus:ring-blue-500">
+          <select id="filtroStatus" class="w-full bg-slate-50 dark:bg-[#141414] border border-slate-300 dark:border-[#454545] rounded-lg py-1.5 px-2.5 text-xs font-medium focus:ring-2 focus:ring-blue-500">
             <option value="">Todos os Status</option>
             <option value="DIGITADO">Digitados</option>
             <option value="LACRADO_HOMOLOGADO">Homologados / Lacrados</option>
@@ -184,75 +223,223 @@
 
       </div>
 
-      <!-- TABELA DE RESULTADOS DO ACERVO PASSIVO -->
-      <div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
-        <table class="w-full text-left border-collapse">
-          <thead>
-            <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 text-[11px] font-bold uppercase tracking-wider">
-              <th class="p-3">Ex-Aluno / Identificação</th>
-              <th class="p-3">Unidade Escolar / Código</th>
-              <th class="p-3">Regime</th>
-              <th class="p-3">Status</th>
-              <th class="p-3 text-right">Ações</th>
-            </tr>
-          </thead>
-          <tbody id="tabelaAlunosBody" class="divide-y divide-slate-100 text-sm">
-            <tr>
-              <td colspan="5" class="p-8 text-center text-slate-400">Carregando acervo municipal...</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <!-- TABELA DE RESULTADOS DO ACERVO PASSIVO (DENSIDADE 8/10) -->
+      <div class="bg-white dark:bg-[#2D2D2D] rounded-xl border border-slate-200 dark:border-[#454545] shadow-2xs overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-50 dark:bg-[#1F1F1F] border-b border-slate-200 dark:border-[#454545] text-slate-600 dark:text-slate-400 text-[11px] font-bold uppercase tracking-wider">
+                <th class="py-2.5 px-3.5">Ex-Aluno / Identificação Civil</th>
+                <th class="py-2.5 px-3.5">Unidade Escolar / Código Autenticidade</th>
+                <th class="py-2.5 px-3.5">Regime</th>
+                <th class="py-2.5 px-3.5">Status Oficial</th>
+                <th class="py-2.5 px-3.5 text-right">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tabelaAlunosBody" class="divide-y divide-slate-100 dark:divide-[#383838] text-xs">
+              <tr>
+                <td colspan="5" class="p-8 text-center text-slate-400 dark:text-slate-500">Carregando acervo municipal...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-    </section>
+        <!-- RODAPÉ DA TABELA: PAGINAÇÃO COMPLETA -->
+        <div class="bg-slate-50 dark:bg-[#1F1F1F] border-t border-slate-200 dark:border-[#454545] px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div class="flex items-center gap-2">
+            <span class="text-slate-500 dark:text-slate-400">Linhas por página:</span>
+            <select id="seletorLimitePorPagina" class="bg-white dark:bg-[#141414] border border-slate-300 dark:border-[#454545] rounded px-2 py-1 text-xs font-medium">
+              <option value="10">10</option>
+              <option value="25" selected>25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </div>
 
+          <div id="indicadorPaginacaoInfo" class="font-mono text-slate-500 dark:text-slate-400">
+            Exibindo 0–0 de 0 registros
+          </div>
 
-    <!-- SEÇÃO 2: FILA DE REVISÃO IA (SPLIT-SCREEN) -->
-    <section id="secaoFilaIa" class="hidden space-y-4">
-      <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <span class="text-2xl">🤖</span>
-          <div>
-            <h3 class="font-bold text-amber-950 text-sm">Fila de Digitalização e Transcrição por Inteligência Artificial</h3>
-            <p class="text-xs text-amber-800">
-              O modelo Gemini 2.5 Flash lê fichas datilografadas ou manuscritas. A IA atua exclusivamente como rascunho: você confere folha por folha na Tela Dividida antes de homologar.
-            </p>
+          <div class="flex items-center gap-1">
+            <button id="btnPagPrimeira" type="button" title="Primeira página" class="p-1.5 rounded border border-slate-300 dark:border-[#454545] hover:bg-slate-100 dark:hover:bg-[#2D2D2D] disabled:opacity-40 disabled:cursor-not-allowed">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m11 17-5-5 5-5"/><path d="m18 17-5-5 5-5"/></svg>
+            </button>
+            <button id="btnPagAnterior" type="button" title="Página anterior" class="p-1.5 rounded border border-slate-300 dark:border-[#454545] hover:bg-slate-100 dark:hover:bg-[#2D2D2D] disabled:opacity-40 disabled:cursor-not-allowed">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+            </button>
+            <span id="txtPaginaAtual" class="px-2 font-mono font-bold text-xs">1</span>
+            <button id="btnPagProxima" type="button" title="Próxima página" class="p-1.5 rounded border border-slate-300 dark:border-[#454545] hover:bg-slate-100 dark:hover:bg-[#2D2D2D] disabled:opacity-40 disabled:cursor-not-allowed">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+            <button id="btnPagUltima" type="button" title="Última página" class="p-1.5 rounded border border-slate-300 dark:border-[#454545] hover:bg-slate-100 dark:hover:bg-[#2D2D2D] disabled:opacity-40 disabled:cursor-not-allowed">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 17 5-5-5-5"/><path d="m13 17 5-5-5-5"/></svg>
+            </button>
           </div>
         </div>
       </div>
 
-      <!-- GRID DE CARDS PRONTOS PARA CONFERÊNCIA -->
+    </section>
+
+
+    <!-- SEÇÃO 2: FILA DE REVISÃO IA (PIPELINE VISÍVEL COM 4 CONTADORES) -->
+    <section id="secaoFilaIa" class="hidden space-y-4">
+      
+      <!-- BARRA DE RESUMO DO PIPELINE OCR -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <!-- CONTADOR 1: PROCESSANDO / NA FILA -->
+        <div class="bg-white dark:bg-[#2D2D2D] p-3 rounded-xl border border-blue-200 dark:border-blue-900/50 shadow-2xs flex items-center justify-between">
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 block">Processando / Na Fila</span>
+            <div id="countOcrProcessando" class="text-2xl font-black font-mono mt-0.5">0</div>
+          </div>
+          <div class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+            <svg id="iconOcrProcessando" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+          </div>
+        </div>
+
+        <!-- CONTADOR 2: PRONTOS PARA CONFERÊNCIA -->
+        <div class="bg-white dark:bg-[#2D2D2D] p-3 rounded-xl border border-amber-200 dark:border-amber-900/50 shadow-2xs flex items-center justify-between">
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400 block">Prontos p/ Revisão</span>
+            <div id="countOcrProntos" class="text-2xl font-black font-mono mt-0.5 text-amber-600 dark:text-amber-400">0</div>
+          </div>
+          <div class="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          </div>
+        </div>
+
+        <!-- CONTADOR 3: FALHAS DE API -->
+        <div class="bg-white dark:bg-[#2D2D2D] p-3 rounded-xl border border-orange-200 dark:border-orange-900/50 shadow-2xs flex items-center justify-between">
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-orange-600 dark:text-orange-400 block">Falha de API</span>
+            <div id="countOcrErrosApi" class="text-2xl font-black font-mono mt-0.5 text-orange-600 dark:text-orange-400">0</div>
+          </div>
+          <div class="w-8 h-8 rounded-lg bg-orange-50 dark:bg-orange-950/60 text-orange-600 dark:text-orange-400 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg>
+          </div>
+        </div>
+
+        <!-- CONTADOR 4: REJEITADOS PELO PORTEIRO / IA -->
+        <div class="bg-white dark:bg-[#2D2D2D] p-3 rounded-xl border border-rose-200 dark:border-rose-900/50 shadow-2xs flex items-center justify-between">
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400 block">Rejeitados / Ilegíveis</span>
+            <div id="countOcrRejeitados" class="text-2xl font-black font-mono mt-0.5 text-rose-600 dark:text-rose-400">0</div>
+          </div>
+          <div class="w-8 h-8 rounded-lg bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="15" x2="9" y1="9" y2="15"/><line x1="9" x2="15" y1="9" y2="15"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- GRID DE CARDS EM TEMPO REAL -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="containerCardsFilaIa"></div>
     </section>
 
 
-    <!-- SEÇÃO 3: PAINEL DA SECRETARIA (SME) -->
-    <section id="secaoSme" class="hidden space-y-6">
+    <!-- SEÇÃO 3: PAINEL GERAL DA SECRETARIA (SME) -->
+    <section id="secaoSme" class="hidden space-y-4">
       
-      <!-- CARDS DE TOTAIS -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
-          <span class="text-xs font-bold text-slate-500 uppercase">Total de Ex-Alunos Catalogados</span>
-          <div class="text-3xl font-black text-slate-900 mt-1" id="smeTotalAlunos">0</div>
+      <!-- 4 KPI CARDS EXECUTIVOS DA SECRETARIA -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div class="bg-white dark:bg-[#2D2D2D] p-4 rounded-xl border border-slate-200 dark:border-[#454545] shadow-2xs">
+          <span class="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Total Catalogado</span>
+          <div class="text-3xl font-black font-mono mt-1" id="smeTotalAlunos">0</div>
+          <span class="text-[11px] text-slate-400 dark:text-slate-500">Históricos no SQLite Municipal</span>
         </div>
-        <div class="bg-white p-5 rounded-xl border border-emerald-200 shadow-xs">
-          <span class="text-xs font-bold text-emerald-700 uppercase">Fichas Homologadas / Lacradas</span>
-          <div class="text-3xl font-black text-emerald-800 mt-1" id="smeTotalHomologados">0</div>
+        <div class="bg-white dark:bg-[#2D2D2D] p-4 rounded-xl border border-emerald-200 dark:border-emerald-900/50 shadow-2xs">
+          <span class="text-[11px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">Homologados / Lacrados</span>
+          <div class="text-3xl font-black font-mono text-emerald-700 dark:text-emerald-400 mt-1" id="smeTotalHomologados">0</div>
+          <span id="smeTaxaHomologados" class="text-[11px] font-semibold text-emerald-600 dark:text-emerald-500 font-mono">0% do acervo</span>
         </div>
-        <div class="bg-white p-5 rounded-xl border border-amber-200 shadow-xs">
-          <span class="text-xs font-bold text-amber-700 uppercase">Rascunhos de Digitalização IA</span>
-          <div class="text-3xl font-black text-amber-800 mt-1" id="smeTotalRascunhos">0</div>
+        <div class="bg-white dark:bg-[#2D2D2D] p-4 rounded-xl border border-blue-200 dark:border-blue-900/50 shadow-2xs">
+          <span class="text-[11px] font-bold text-blue-700 dark:text-blue-400 uppercase tracking-wider">Digitados</span>
+          <div class="text-3xl font-black font-mono text-blue-700 dark:text-blue-400 mt-1" id="smeTotalDigitados">0</div>
+          <span class="text-[11px] text-slate-400 dark:text-slate-500">Em conferência / editáveis</span>
+        </div>
+        <div class="bg-white dark:bg-[#2D2D2D] p-4 rounded-xl border border-amber-200 dark:border-amber-900/50 shadow-2xs">
+          <span class="text-[11px] font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider">Rascunhos / Fila IA</span>
+          <div class="text-3xl font-black font-mono text-amber-700 dark:text-amber-400 mt-1" id="smeTotalRascunhos">0</div>
+          <span class="text-[11px] text-slate-400 dark:text-slate-500">OCR Gemini 2.5 Flash</span>
         </div>
       </div>
 
-      <!-- DISTRIBUIÇÃO PELAS 8 ESCOLAS E PARTICIONAMENTO DRIVE -->
-      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
-        <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4">
-          Cofre de Imagens (Multi-Drive 30 GB) e Produção por Escola
+      <!-- MONITOR MULTI-DRIVE 30 GB E OUTBOX NUVEM -->
+      <div class="bg-white dark:bg-[#2D2D2D] p-4 rounded-xl border border-slate-200 dark:border-[#454545] shadow-2xs flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h3 class="text-xs font-bold uppercase tracking-wider flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600" aria-hidden="true"><rect width="20" height="8" x="2" y="2" rx="2" ry="2"/><rect width="20" height="8" x="2" y="14" rx="2" ry="2"/><line x1="6" x2="6.01" y1="6" y2="6"/><line x1="6" x2="6.01" y1="18" y2="18"/></svg>
+            <span>Infraestrutura Multi-Drive 30 GB & Sincronização Supabase</span>
+          </h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            Particionamento de cofre em 2 contas gratuitas de 15 GB com criptografia Fernet ponta a ponta.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2 flex-wrap">
+          <button id="btnGerarBackupCriptografado" type="button" class="bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><line x1="12" x2="12" y1="8" y2="14"/><line x1="9" x2="15" y1="11" y2="11"/></svg>
+            <span>Gerar Backup (.db.enc)</span>
+          </button>
+          <button id="btnAbrirCadastroEscolaExtinta" type="button" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+            <span>Cadastrar Escola Extinta</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- CARDS DE PRODUÇÃO POR UNIDADE ESCOLAR -->
+      <div class="bg-white dark:bg-[#2D2D2D] p-4 rounded-xl border border-slate-200 dark:border-[#454545] shadow-2xs">
+        <h3 class="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider mb-3">
+          Produção por Escola Municipal e Partição Google Drive
         </h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3" id="smeGridEscolas"></div>
       </div>
 
+    </section>
+
+
+    <!-- SEÇÃO 4: TRILHA DE AUDITORIA IMUTÁVEL (MÓDULO 8) -->
+    <section id="secaoAuditoria" class="hidden space-y-3">
+      <div class="bg-white dark:bg-[#2D2D2D] p-3 rounded-xl border border-slate-200 dark:border-[#454545] shadow-2xs flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h3 class="text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
+            <span>Trilha de Auditoria Imutável (SQLite Logs)</span>
+          </h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Rastreabilidade completa de todas as gravações, ativações e alterações no acervo municipal.</p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <select id="filtroAuditoriaEscola" class="bg-slate-50 dark:bg-[#141414] border border-slate-300 dark:border-[#454545] rounded-lg py-1.5 px-2.5 text-xs font-medium">
+            <option value="">Todas as Escolas</option>
+          </select>
+          <button id="btnRecarregarAuditoria" type="button" class="bg-slate-100 hover:bg-slate-200 dark:bg-[#383838] dark:hover:bg-[#454545] px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            <span>Atualizar</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-[#2D2D2D] rounded-xl border border-slate-200 dark:border-[#454545] shadow-2xs overflow-hidden">
+        <div class="overflow-x-auto max-h-[600px]">
+          <table class="w-full text-left border-collapse">
+            <thead class="sticky top-0 bg-slate-50 dark:bg-[#1F1F1F] z-10 border-b border-slate-200 dark:border-[#454545] text-slate-600 dark:text-slate-400 text-[11px] font-bold uppercase">
+              <tr>
+                <th class="py-2.5 px-3">Data/Hora UTC</th>
+                <th class="py-2.5 px-3">Operador</th>
+                <th class="py-2.5 px-3">Ação Executada</th>
+                <th class="py-2.5 px-3">Escola / UUID</th>
+                <th class="py-2.5 px-3">Detalhes JSON</th>
+              </tr>
+            </thead>
+            <tbody id="tabelaAuditoriaBody" class="divide-y divide-slate-100 dark:divide-[#383838] text-xs font-mono">
+              <tr>
+                <td colspan="5" class="p-8 text-center text-slate-400">Carregando logs de auditoria...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </section>
 
   </main>
@@ -261,54 +448,61 @@
   <!-- ============================================================================== -->
   <!-- MODAL DE ATIVAÇÃO: SETUP WIZARD (MODO CAMALEÃO - PRIMEIRO USO) -->
   <!-- ============================================================================== -->
-  <div id="modalSetupWizard" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden">
+  <div id="modalSetupWizard" class="sgm-modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="sgm-modal-card max-w-xl">
       
-      <div class="bg-gradient-to-r from-blue-900 to-indigo-900 text-white p-6 text-center">
-        <div class="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-3">
-          🏛️
+      <div class="bg-gradient-to-r from-blue-900 to-indigo-900 dark:from-[#84167A] dark:to-[#4a0b44] text-white p-5 text-center">
+        <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mx-auto mb-2 text-white">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" x2="21" y1="22" y2="22"/><line x1="6" x2="6" y1="18" y2="11"/><line x1="10" x2="10" y1="18" y2="11"/><line x1="14" x2="14" y1="18" y2="11"/><line x1="18" x2="18" y1="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg>
         </div>
-        <h2 class="text-xl font-black">Assistente de Ativação da Máquina</h2>
-        <p class="text-xs text-blue-200 mt-1">SGM-Históricos — Sistema Municipal de Acervo Passivo</p>
+        <h2 class="text-lg font-black tracking-tight">Assistente de Ativação da Máquina</h2>
+        <p class="text-xs text-blue-200 dark:text-purple-200 mt-0.5">SGM-Históricos — Sistema Municipal de Acervo Passivo</p>
       </div>
 
-      <div class="p-6 space-y-5">
-        <p class="text-xs text-slate-600 text-center">
-          Defina o perfil de operação deste computador. Esta configuração vinculará a máquina a uma escola ou à Secretaria de Educação.
+      <div class="p-5 space-y-4">
+        <p class="text-xs text-slate-600 dark:text-slate-400 text-center leading-relaxed">
+          Defina o perfil operacional deste computador. Esta configuração vinculará a máquina a uma escola municipal específica ou à Secretaria Municipal de Educação.
         </p>
 
         <!-- OPÇÃO A: UNIDADE ESCOLAR -->
-        <div class="border border-slate-300 rounded-xl p-4 hover:border-blue-500 transition-colors bg-slate-50/50">
-          <div class="flex items-center gap-2 mb-2 font-bold text-sm text-slate-900">
-            <span>🏫</span> Opção A: Instalar como Unidade Escolar
+        <div class="border border-slate-300 dark:border-[#454545] rounded-xl p-4 bg-slate-50/70 dark:bg-[#1E1E1E]">
+          <div class="flex items-center gap-2 mb-1.5 font-bold text-xs text-slate-900 dark:text-slate-100">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600" aria-hidden="true"><path d="m4 6 8-4 8 4"/><path d="m18 10 4 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-8l4-2"/><path d="M14 22v-4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v4"/></svg>
+            <span>Opção A: Instalar como Unidade Escolar</span>
           </div>
-          <p class="text-[11px] text-slate-500 mb-3">
-            Permite cadastrar e editar exclusivamente os alunos da sua escola municipal.
+          <p class="text-[11px] text-slate-500 dark:text-slate-400 mb-3 leading-relaxed">
+            Permite cadastrar, digitalizar e editar ex-alunos da sua escola. Visualização de outras escolas em modo somente leitura.
           </p>
           
           <div class="space-y-2 text-xs">
-            <select id="wizardEscolaSelect" class="w-full bg-white border border-slate-300 rounded-lg p-2 font-medium"></select>
-            <input type="text" id="wizardCodigoAtivacao" placeholder="Código de Ativação da Escola (ex: ESC01-2026)" class="w-full bg-white border border-slate-300 rounded-lg p-2 uppercase font-mono">
-            <input type="text" id="wizardOperadorEscola" placeholder="Nome do(a) Secretário(a) Escolar" class="w-full bg-white border border-slate-300 rounded-lg p-2">
-            <button type="button" onclick="window.appMain.ativarPerfilEscola()" class="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 rounded-lg transition">
+            <select id="wizardEscolaSelect" class="w-full bg-white dark:bg-[#141414] border border-slate-300 dark:border-[#454545] rounded-lg p-2 font-medium"></select>
+            <input type="text" id="wizardCodigoAtivacao" placeholder="Código de Ativação (ex: ESC01-2026)" class="w-full bg-white dark:bg-[#141414] border border-slate-300 dark:border-[#454545] rounded-lg p-2 uppercase font-mono">
+            <input type="text" id="wizardOperadorEscola" placeholder="Nome do(a) Secretário(a) Escolar" class="w-full bg-white dark:bg-[#141414] border border-slate-300 dark:border-[#454545] rounded-lg p-2">
+            <button type="button" onclick="window.appMain.ativarPerfilEscola()" class="w-full bg-blue-700 hover:bg-blue-800 dark:bg-[#84167A] dark:hover:bg-[#9B1D90] text-white font-bold py-2 rounded-lg transition shadow-sm">
               Ativar como Unidade Escolar
             </button>
           </div>
         </div>
 
         <!-- OPÇÃO B: SECRETARIA MUNICIPAL DE EDUCAÇÃO (SME) -->
-        <div class="border border-amber-300 rounded-xl p-4 hover:border-amber-500 transition-colors bg-amber-50/30">
-          <div class="flex items-center gap-2 mb-2 font-bold text-sm text-amber-950">
-            <span>🏢</span> Opção B: Instalar como Secretaria de Educação (SME)
+        <div class="border border-amber-300 dark:border-amber-800/60 rounded-xl p-4 bg-amber-50/40 dark:bg-amber-950/20">
+          <div class="flex items-center gap-2 mb-1.5 font-bold text-xs text-amber-950 dark:text-amber-300">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-600" aria-hidden="true"><line x1="3" x2="21" y1="22" y2="22"/><line x1="6" x2="6" y1="18" y2="11"/><line x1="10" x2="10" y1="18" y2="11"/><line x1="14" x2="14" y1="18" y2="11"/><line x1="18" x2="18" y1="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg>
+            <span>Opção B: Instalar como Secretaria de Educação (SME)</span>
           </div>
-          <p class="text-[11px] text-slate-500 mb-3">
-            Desbloqueia gestão global das 8 escolas, acervo de escolas extintas e ambos os Drives.
+          <p class="text-[11px] text-slate-500 dark:text-slate-400 mb-3 leading-relaxed">
+            Acesso global irrestrito às 8 escolas, acervo de escolas extintas, ambos os Drives e auditoria.
           </p>
 
           <div class="space-y-2 text-xs">
-            <input type="password" id="wizardSenhaMestra" placeholder="Senha Mestra da Secretaria (Padrão: SME@Admin2026)" class="w-full bg-white border border-slate-300 rounded-lg p-2">
-            <input type="text" id="wizardOperadorSme" placeholder="Nome do Administrador da SME" class="w-full bg-white border border-slate-300 rounded-lg p-2">
-            <button type="button" onclick="window.appMain.ativarPerfilSme()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 rounded-lg transition">
+            <div class="relative">
+              <input type="password" id="wizardSenhaMestra" placeholder="Senha Mestra da Secretaria (Padrão: SME@Admin2026)" class="w-full bg-white dark:bg-[#141414] border border-slate-300 dark:border-[#454545] rounded-lg p-2 pr-9 font-mono">
+              <button type="button" onclick="window.appMain.toggleMostrarSenha('wizardSenhaMestra')" class="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <input type="text" id="wizardOperadorSme" placeholder="Nome do Administrador da SME" class="w-full bg-white dark:bg-[#141414] border border-slate-300 dark:border-[#454545] rounded-lg p-2">
+            <button type="button" onclick="window.appMain.ativarPerfilSme()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 rounded-lg transition shadow-sm">
               Ativar como Secretaria (SME)
             </button>
           </div>
@@ -320,65 +514,83 @@
 
 
   <!-- ============================================================================== -->
-  <!-- MODAL DE ESCANEAMENTO SEM FIO (QR CODE + USB SCANNER) -->
+  <!-- MODAL DE ESCANEAMENTO SEM FIO (QR CODE + USB SCANNER WIA) -->
   <!-- ============================================================================== -->
-  <div id="modalScanner" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl border border-slate-200 overflow-hidden">
+  <div id="modalScanner" class="sgm-modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="sgm-modal-card max-w-2xl">
       
-      <div class="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between">
-        <div class="flex items-center gap-2 font-bold text-sm">
-          <span>📸</span> Escaneamento de Histórico Escolar Antigo
+      <div class="bg-slate-900 border-b border-slate-800 text-white px-5 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-2 font-bold text-xs tracking-wide">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-400" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+          <span>Digitalização de Histórico Escolar (Arquivo Passivo)</span>
         </div>
-        <button id="btnFecharModalScan" class="text-slate-400 hover:text-white font-bold text-lg">×</button>
+        <button id="btnFecharModalScan" class="text-slate-400 hover:text-white p-1 rounded">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
       </div>
 
-      <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <div class="p-5 grid grid-cols-1 sm:grid-cols-2 gap-5">
         
         <!-- LADO ESQUERDO: QR CODE MOBILE -->
-        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center flex flex-col items-center justify-between">
+        <div class="bg-slate-50 dark:bg-[#1E1E1E] p-4 rounded-xl border border-slate-200 dark:border-[#454545] text-center flex flex-col items-center justify-between">
           <div>
-            <span class="text-xs font-black text-blue-900 uppercase tracking-wide block mb-1">Scanner Sem Fio via Celular</span>
-            <p class="text-[11px] text-slate-500 mb-3">Aponte a câmera do celular para o QR Code abaixo para abrir o scanner em alta resolução:</p>
+            <span class="text-xs font-black text-blue-900 dark:text-blue-400 uppercase tracking-wide block mb-1">Scanner Sem Fio via Celular</span>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 mb-2 leading-relaxed">
+              Aponte a câmera do celular para o QR Code abaixo para digitalizar sem fio em alta resolução:
+            </p>
             
-            <div class="bg-white p-2.5 rounded-xl border border-slate-300 shadow-xs inline-block mb-2">
-              <img id="imgQrCodeScanner" src="" alt="QR Code" class="w-44 h-44 object-contain">
+            <div class="bg-white p-2 rounded-xl border border-slate-300 dark:border-[#454545] shadow-2xs inline-block mb-2">
+              <img id="imgQrCodeScanner" src="" alt="QR Code" class="w-40 h-40 object-contain">
             </div>
 
-            <div class="text-[11px] text-slate-500 font-mono break-all px-2">
-              <a id="linkMobileUrl" href="#" target="_blank" class="text-blue-700 hover:underline"></a>
+            <div class="flex items-center justify-center gap-1.5 text-[11px] font-mono break-all px-2">
+              <a id="linkMobileUrl" href="#" target="_blank" class="text-blue-700 dark:text-blue-400 hover:underline"></a>
+              <button id="btnCopiarLinkScan" type="button" title="Copiar link" class="p-1 rounded hover:bg-slate-200 dark:hover:bg-[#383838]">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+              </button>
             </div>
           </div>
 
           <div class="text-[10px] text-slate-400 font-mono mt-2" id="scanSessaoIdBadge"></div>
         </div>
 
-        <!-- LADO DIREITO: SCANNER USB DO PC E PÁGINAS RECEBIDAS -->
-        <div class="flex flex-col justify-between space-y-4">
+        <!-- LADO DIREITO: SCANNER USB DO PC E GALERIA DO ENVELOPE -->
+        <div class="flex flex-col justify-between space-y-3">
           <div>
-            <span class="text-xs font-bold text-slate-800 uppercase tracking-wide block mb-2">Ou Escanear / Enviar do Computador</span>
+            <span class="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wide block mb-2">
+              Captura Local no Computador
+            </span>
             
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <button id="btnAcionarScannerWia" type="button" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs py-2.5 rounded-lg flex items-center justify-center gap-1.5 transition">
-                <span>🖨️</span> Scanner USB (WIA)
+            <div class="grid grid-cols-2 gap-2">
+              <button id="btnAcionarScannerWia" type="button" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs py-2 rounded-lg flex items-center justify-center gap-1.5 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+                <span>Scanner USB (WIA)</span>
               </button>
-              <button id="btnUploadArquivoPc" type="button" class="w-full bg-indigo-700 hover:bg-indigo-800 text-white font-bold text-xs py-2.5 rounded-lg flex items-center justify-center gap-1.5 transition">
-                <span>📁</span> Foto / PDF do PC
+              <button id="btnUploadArquivoPc" type="button" class="w-full bg-indigo-700 hover:bg-indigo-800 text-white font-bold text-xs py-2 rounded-lg flex items-center justify-center gap-1.5 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>
+                <span>Foto / PDF do PC</span>
               </button>
               <input type="file" id="inputArquivoPcUpload" accept="image/*,.pdf" class="hidden">
             </div>
+
+            <!-- ZONA DE DRAG AND DROP -->
+            <div id="dropZoneScanPc" class="mt-2 border-2 border-dashed border-slate-300 dark:border-[#454545] rounded-lg p-2.5 text-center text-slate-500 hover:border-blue-500 transition cursor-pointer">
+              <span class="text-[11px] block">Ou arraste arquivos JPG/PNG/PDF aqui</span>
+            </div>
           </div>
 
-          <!-- MINIATURAS DAS PÁGINAS QUE O CELULAR VAI ENVIANDO EM TEMPO REAL -->
-          <div class="flex-1 bg-slate-50 p-3 rounded-xl border border-slate-200">
-            <span class="text-[11px] font-bold text-slate-700 block mb-2">Páginas Recebidas deste Aluno:</span>
-            <div id="scanPaginasRecebidasGrid" class="grid grid-cols-3 gap-2 overflow-y-auto max-h-44">
-              <p class="text-xs text-slate-400 col-span-3 text-center py-4">Aguardando fotos do celular...</p>
+          <!-- MINIATURAS DAS PÁGINAS DO ENVELOPE -->
+          <div class="flex-1 bg-slate-50 dark:bg-[#1E1E1E] p-2.5 rounded-xl border border-slate-200 dark:border-[#454545]">
+            <span class="text-[11px] font-bold text-slate-700 dark:text-slate-300 block mb-1.5">Páginas Recebidas deste Aluno:</span>
+            <div id="scanPaginasRecebidasGrid" class="grid grid-cols-3 gap-2 overflow-y-auto max-h-36">
+              <p class="text-xs text-slate-400 col-span-3 text-center py-4">Aguardando fotos do celular ou PC...</p>
             </div>
           </div>
 
           <!-- BOTÃO FINALIZAR ENVELOPE -->
-          <button id="btnScanFinalizarIa" type="button" disabled class="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 text-white font-bold text-xs py-2.5 rounded-lg transition flex items-center justify-center gap-2">
-            <span>✓</span> Concluir Envelope e Enviar para IA
+          <button id="btnScanFinalizarIa" type="button" disabled class="w-full bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 text-white font-bold text-xs py-2.5 rounded-lg transition flex items-center justify-center gap-1.5 shadow-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Concluir Envelope e Enviar para IA</span>
           </button>
         </div>
 
@@ -388,24 +600,209 @@
 
 
   <!-- ============================================================================== -->
-  <!-- MODAL DE REJEIÇÃO VISUAL DE FOTO (OPENCV E IA - BLOQUEIO RIGOROSO) -->
+  <!-- MODAL DE REJEIÇÃO VISUAL DE FOTO (BLOQUEIO RIGOROSO OPENCV) -->
   <!-- ============================================================================== -->
-  <div id="modalRejeicaoFotoPc" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-    <div class="bg-red-50 border-2 border-red-500 rounded-2xl max-w-md w-full p-6 text-center shadow-2xl">
-      <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center text-3xl font-black mx-auto mb-4 border border-red-200">
-        ⛔
+  <div id="modalRejeicaoFotoPc" class="sgm-modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="sgm-modal-card max-w-md bg-red-50 dark:bg-[#251010] border-red-500 p-5 text-center">
+      <div class="w-12 h-12 bg-red-100 dark:bg-red-950/70 text-red-600 rounded-full flex items-center justify-center mx-auto mb-3">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="15" x2="9" y1="9" y2="15"/><line x1="9" x2="15" y1="9" y2="15"/></svg>
       </div>
-      <h3 class="text-lg font-black text-red-900 mb-2 uppercase tracking-wide">Foto Reprovada pelo Controle de Qualidade</h3>
-      <p id="txtMotivoRejeicaoPc" class="text-xs sm:text-sm text-red-800 leading-relaxed font-semibold mb-6 bg-white p-3.5 rounded-xl border border-red-200 text-left">
+      <h3 class="text-base font-black text-red-900 dark:text-red-300 mb-1.5 uppercase tracking-wide">Foto Reprovada pelo Controle de Qualidade</h3>
+      <p id="txtMotivoRejeicaoPc" class="text-xs text-red-800 dark:text-red-200 leading-relaxed font-semibold mb-4 bg-white dark:bg-[#141414] p-3 rounded-lg border border-red-200 dark:border-red-900 text-left">
         Foto embaçada ou documento não reconhecido.
       </p>
-      <div class="flex flex-col gap-2 justify-center">
-        <button id="btnTirarOutraFotoPc" type="button" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold text-xs py-3 px-4 rounded-xl shadow-md transition flex items-center justify-center gap-2">
-          <span>📸</span> Tirar Outra Foto / Enviar Nova Imagem
+      <div class="flex flex-col gap-2">
+        <button id="btnTirarOutraFotoPc" type="button" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold text-xs py-2.5 px-4 rounded-lg shadow-sm transition flex items-center justify-center gap-1.5">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+          <span>Tirar Outra Foto / Enviar Nova Imagem</span>
         </button>
-        <button id="btnForcarAceiteFotoPc" type="button" class="w-full bg-white hover:bg-red-50 text-red-700 border border-red-300 font-bold text-xs py-2.5 px-4 rounded-xl shadow-sm transition flex items-center justify-center gap-2">
-          <span>⚠️</span> Usar Esta Imagem Mesmo Assim (Forçar)
+        <button id="btnForcarAceiteFotoPc" type="button" class="w-full bg-white dark:bg-[#2D2D2D] hover:bg-red-50 dark:hover:bg-red-950/30 text-red-700 dark:text-red-300 border border-red-300 dark:border-red-800 font-bold text-xs py-2 px-4 rounded-lg transition flex items-center justify-center gap-1.5">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
+          <span>Usar Esta Imagem Mesmo Assim (Forçar Aceite)</span>
         </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ============================================================================== -->
+  <!-- MODAL DE CONFIGURAÇÃO DA MÁQUINA & RESET COM SENHA MESTRA (MÓDULO 1) -->
+  <!-- ============================================================================== -->
+  <div id="modalConfigMaquina" class="sgm-modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="sgm-modal-card max-w-md p-5 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-[#454545] pb-3">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" x2="4" y1="21" y2="14"/><line x1="4" x2="4" y1="10" y2="3"/><line x1="12" x2="12" y1="21" y2="12"/><line x1="12" x2="12" y1="8" y2="3"/><line x1="20" x2="20" y1="21" y2="16"/><line x1="20" x2="20" y1="12" y2="3"/><line x1="1" x2="7" y1="14" y2="14"/><line x1="9" x2="15" y1="8" y2="8"/><line x1="17" x2="23" y1="16" y2="16"/></svg>
+          </div>
+          <h3 class="font-bold text-sm">Configuração da Máquina Local</h3>
+        </div>
+        <button id="btnFecharConfigMaquina" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="space-y-2 text-xs">
+        <div class="flex justify-between py-1 border-b border-slate-100 dark:border-[#383838]">
+          <span class="text-slate-500">IP da Rede Local (Wi-Fi / Cabo):</span>
+          <span id="cfgInfoIpLocal" class="font-mono font-bold">127.0.0.1:8000</span>
+        </div>
+        <div class="flex justify-between py-1 border-b border-slate-100 dark:border-[#383838]">
+          <span class="text-slate-500">Perfil Ativo:</span>
+          <span id="cfgInfoPerfil" class="font-bold">UNIDADE ESCOLAR</span>
+        </div>
+        <div class="flex justify-between py-1 border-b border-slate-100 dark:border-[#383838]">
+          <span class="text-slate-500">Unidade Vinculada:</span>
+          <span id="cfgInfoEscola" class="font-semibold text-right max-w-[220px] truncate">---</span>
+        </div>
+        <div class="flex justify-between py-1 border-b border-slate-100 dark:border-[#383838]">
+          <span class="text-slate-500">Partição Google Drive:</span>
+          <span id="cfgInfoDrive" class="font-mono font-bold text-blue-600 dark:text-blue-400">DRIVE_A</span>
+        </div>
+        <div class="flex justify-between py-1">
+          <span class="text-slate-500">Operador:</span>
+          <span id="cfgInfoOperador" class="font-semibold">Secretaria</span>
+        </div>
+      </div>
+
+      <!-- ÁREA DE RESET DA MÁQUINA -->
+      <div class="bg-rose-50/60 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/40 rounded-xl p-3.5 space-y-2.5">
+        <div class="flex items-center gap-1.5 text-xs font-bold text-rose-800 dark:text-rose-300">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
+          <span>Reconfigurar / Resetar Máquina</span>
+        </div>
+        <p class="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
+          Para restaurar a máquina ao modo virgem e reabrir o assistente, digite a Senha Mestra da Secretaria (SME):
+        </p>
+        <div class="relative">
+          <input type="password" id="inputResetSenhaMestra" placeholder="Senha Mestra (SME@Admin2026)" class="w-full bg-white dark:bg-[#141414] border border-slate-300 dark:border-[#454545] rounded-lg px-2.5 py-1.5 pr-8 text-xs font-mono">
+          <button type="button" onclick="window.appMain.toggleMostrarSenha('inputResetSenhaMestra')" class="absolute right-2 top-2 text-slate-400">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <button id="btnExecutarResetMaquina" type="button" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs py-2 rounded-lg transition">
+          Confirmar e Resetar Perfil da Máquina
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ============================================================================== -->
+  <!-- MODAL VERIFICADOR DE AUTENTICIDADE E INTEGRIDADE HMAC (MÓDULO 6) -->
+  <!-- ============================================================================== -->
+  <div id="modalVerificadorHmac" class="sgm-modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="sgm-modal-card max-w-lg p-5 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-[#454545] pb-3">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
+          </div>
+          <div>
+            <h3 class="font-bold text-sm">Verificador de Autenticidade HMAC-SHA256</h3>
+            <p class="text-[11px] text-slate-500">Validação criptográfica de históricos escolares emitidos</p>
+          </div>
+        </div>
+        <button id="btnFecharVerificadorHmac" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="flex gap-2">
+        <input type="text" id="inputCodigoVerificadorHmac" placeholder="Ex: VER-2026-WLTH" class="flex-1 bg-slate-50 dark:bg-[#141414] border border-slate-300 dark:border-[#454545] rounded-lg px-3 py-2 text-xs font-mono font-bold uppercase">
+        <button id="btnConsultarCodigoHmac" type="button" class="bg-blue-700 hover:bg-blue-800 dark:bg-[#84167A] dark:hover:bg-[#9B1D90] text-white text-xs font-bold px-4 py-2 rounded-lg transition">
+          Verificar
+        </button>
+      </div>
+
+      <!-- RESULTADO DA VERIFICAÇÃO -->
+      <div id="resultadoVerificadorHmac" class="hidden p-4 rounded-xl border space-y-2 text-xs"></div>
+    </div>
+  </div>
+
+
+  <!-- ============================================================================== -->
+  <!-- MODAL DE DESBLOQUEIO DE FICHA LACRADA (REQUER SENHA MESTRA E MOTIVO) -->
+  <!-- ============================================================================== -->
+  <div id="modalDesbloquearFicha" class="sgm-modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="sgm-modal-card max-w-md p-5 space-y-4">
+      <div class="flex items-center gap-2 border-b border-slate-200 dark:border-[#454545] pb-3">
+        <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 dark:bg-amber-950/60 flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>
+        </div>
+        <div>
+          <h3 class="font-bold text-sm">Desbloquear Ficha Homologada</h3>
+          <p class="text-[11px] text-slate-500">Ação auditada. Requer autorização da Secretaria (SME).</p>
+        </div>
+      </div>
+
+      <div class="space-y-2.5 text-xs">
+        <div>
+          <label class="block font-semibold mb-1">Aluno Alvo:</label>
+          <div id="txtDesbloquearAlunoNome" class="font-bold text-blue-900 dark:text-blue-300 bg-slate-50 dark:bg-[#1E1E1E] p-2 rounded border border-slate-200 dark:border-[#454545]"></div>
+        </div>
+        <div>
+          <label class="block font-semibold mb-1">Senha Mestra da Secretaria *</label>
+          <input type="password" id="inputDesbloquearSenha" placeholder="SME@Admin2026" class="w-full bg-slate-50 dark:bg-[#141414] border border-slate-300 dark:border-[#454545] rounded-lg p-2 font-mono">
+        </div>
+        <div>
+          <label class="block font-semibold mb-1">Justificativa da Edição Extraordinária *</label>
+          <textarea id="inputDesbloquearMotivo" rows="2" placeholder="Ex: Retificação de nota de História após localização de pasta física antiga..." class="w-full bg-slate-50 dark:bg-[#141414] border border-slate-300 dark:border-[#454545] rounded-lg p-2"></textarea>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-200 dark:border-[#454545]">
+        <button id="btnCancelarDesbloqueio" type="button" class="px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-300 dark:border-slate-600">Cancelar</button>
+        <button id="btnConfirmarDesbloqueio" type="button" class="px-4 py-1.5 rounded-lg text-xs font-bold bg-amber-600 hover:bg-amber-700 text-white">Desbloquear Ficha</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ============================================================================== -->
+  <!-- MODAL DE CADASTRO DE ESCOLA EXTINTA / NUCLEADA (SME) -->
+  <!-- ============================================================================== -->
+  <div id="modalCadastrarEscolaExtinta" class="sgm-modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="sgm-modal-card max-w-lg p-5 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-[#454545] pb-3">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 dark:bg-amber-950/60 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 6 8-4 8 4"/><path d="m18 10 4 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-8l4-2"/></svg>
+          </div>
+          <div>
+            <h3 class="font-bold text-sm">Cadastrar Escola Rural Extinta / Nucleada</h3>
+            <p class="text-[11px] text-slate-500">Acervo recolhido e sob custódia da Secretaria (SME)</p>
+          </div>
+        </div>
+        <button id="btnFecharCadEscolaExtinta" class="text-slate-400 hover:text-slate-600">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="space-y-2.5 text-xs">
+        <div>
+          <label class="block font-semibold mb-1">Nome Oficial da Escola Extinta *</label>
+          <input type="text" id="cadExtintaNome" placeholder="Ex: Escola Municipal Rural Fazenda Velha" class="w-full bg-slate-50 dark:bg-[#141414] border border-slate-300 dark:border-[#454545] rounded-lg p-2">
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block font-semibold mb-1">Código INEP (se houver)</label>
+            <input type="text" id="cadExtintaInep" placeholder="Opcional" class="w-full bg-slate-50 dark:bg-[#141414] border border-slate-300 dark:border-[#454545] rounded-lg p-2 font-mono">
+          </div>
+          <div>
+            <label class="block font-semibold mb-1">Localização do Arquivo Físico</label>
+            <input type="text" id="cadExtintaLocal" placeholder="Ex: Arquivo Geral SME - Sala 3" class="w-full bg-slate-50 dark:bg-[#141414] border border-slate-300 dark:border-[#454545] rounded-lg p-2">
+          </div>
+        </div>
+        <div>
+          <label class="block font-semibold mb-1">Ato de Criação / Extinção / Portaria</label>
+          <input type="text" id="cadExtintaAto" placeholder="Ex: Portaria de Extinção nº 45/1998" class="w-full bg-slate-50 dark:bg-[#141414] border border-slate-300 dark:border-[#454545] rounded-lg p-2">
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-200 dark:border-[#454545]">
+        <button id="btnCancelarCadEscolaExtinta" type="button" class="px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-300 dark:border-slate-600">Cancelar</button>
+        <button id="btnSalvarEscolaExtinta" type="button" class="px-4 py-1.5 rounded-lg text-xs font-bold bg-amber-600 hover:bg-amber-700 text-white">Cadastrar Escola</button>
       </div>
     </div>
   </div>
@@ -414,7 +811,7 @@
   <!-- ============================================================================== -->
   <!-- CONTAINER DO MODAL DE EDIÇÃO MATRICIAL (CONTROLADO POR editor_matriz.js) -->
   <!-- ============================================================================== -->
-  <div id="modalEdicaoMatriz" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 overflow-y-auto hidden">
+  <div id="modalEdicaoMatriz" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 overflow-y-auto hidden">
     <div class="max-w-5xl w-full my-auto" id="containerEditorMatriz"></div>
   </div>
 
@@ -426,27 +823,29 @@
 
 
   <!-- ============================================================================== -->
-  <!-- MODAL DE PRÉ-VISUALIZAÇÃO E IMPRESSÃO A4 EMBUTIDA (COERENTE COM TEMA CLARO E ESCURO) -->
+  <!-- MODAL DE PRÉ-VISUALIZAÇÃO E IMPRESSÃO A4 EMBUTIDA -->
   <!-- ============================================================================== -->
   <div id="modalImpressaoEmbutida" class="fixed inset-0 z-50 bg-slate-900/40 dark:bg-black/85 backdrop-blur-sm flex flex-col hidden overflow-hidden select-none transition-colors">
     
     <!-- BARRA SUPERIOR DE AÇÕES -->
-    <header id="headerImpressaoModal" class="bg-white dark:bg-[#1e1e1e] border-b border-slate-200 dark:border-[#383838] px-4 py-2.5 flex items-center justify-between shrink-0 shadow-sm dark:shadow-md transition-colors">
+    <header class="bg-white dark:bg-[#1e1e1e] border-b border-slate-200 dark:border-[#383838] px-4 py-2.5 flex items-center justify-between shrink-0 shadow-sm transition-colors">
       <div class="flex items-center gap-3">
-        <span class="bg-blue-600 dark:bg-[#84167A] text-white text-[11px] font-black px-2.5 py-0.5 rounded tracking-wide uppercase">
-          IMPRESSÃO OFICIAL
+        <span class="bg-blue-600 dark:bg-[#84167A] text-white text-[10px] font-black px-2 py-0.5 rounded tracking-wider uppercase">
+          IMPRESSÃO OFICIAL A4
         </span>
-        <h2 class="text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2" id="tituloImpressaoModal">
-          <span>📜</span> Histórico Escolar Oficial — Pré-visualização A4
+        <h2 class="text-xs sm:text-sm font-bold flex items-center gap-2" id="tituloImpressaoModal">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+          <span>Histórico Escolar Oficial — Pré-visualização</span>
         </h2>
       </div>
 
       <div class="flex items-center gap-2">
-        <button id="btnImprimirIframe" type="button" class="text-xs font-bold px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 dark:bg-[#84167A] dark:hover:bg-[#9B1D90] text-white shadow-sm flex items-center gap-1.5 transition active:scale-95">
-          <span>🖨️</span> Imprimir / Salvar em PDF
+        <button id="btnImprimirIframe" type="button" class="text-xs font-bold px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 dark:bg-[#84167A] dark:hover:bg-[#9B1D90] text-white shadow-sm flex items-center gap-1.5 transition active:scale-95">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+          <span>Imprimir / Salvar em PDF</span>
         </button>
         <button id="btnFecharImpressaoModal" type="button" class="text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
-          ✕ Fechar
+          Fechar
         </button>
       </div>
     </header>
@@ -457,6 +856,9 @@
     </div>
   </div>
 
+
+  <!-- CONTAINER DE TOASTS FLUTUANTES -->
+  <div id="sgmToastContainer"></div>
 
   <!-- SCRIPTS MODULARES OFICIAIS -->
   <script src="/static/js/theme.js"></script>

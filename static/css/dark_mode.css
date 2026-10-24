@@ -1,626 +1,698 @@
 /**
  * SGM-Históricos — dark_mode.css
- * Tema Escuro Oficial com Paleta Rigorosa Desktop Densa
+ * Design System UI/UX Pro Max (Data-Dense Dashboard - Densidade 8/10)
  * 
- * Paleta Especificada:
- * - Fundo principal da janela e inputs (--bg-main): #141414
- * - Fundo de painéis laterais, cards, cabeçalhos de tabela e botões secundários (--bg-panel): #2D2D2D
- * - Bordas de tabelas, inputs e botões (--border-color): #454545
- * - Linhas de tabelas e grades curriculares (efeito zebrado):
- *   - Linha ímpar (--row-odd): #1C1C1C
- *   - Linha par (--row-even): #261324 (tom ameixa/roxo profundo)
- * - Linha selecionada, foco ativo, botões primários e barras de progresso (--accent-purple): #84167A (hover #9B1D90) com texto #FFFFFF
- * - Tipografia:
- *   - Texto principal (--text-primary): #F0F0F0
- *   - Texto secundário/labels (--text-muted): #B0B0B0
- *   - Nomes de alunos ou itens sincronizados em destaque (--text-highlight-blue): #3B9EFF
- * - Cores de Status e Ícones:
- *   - Sincronizado / Sucesso: #2ECC71 (verde)
- *   - Pendente / Campo de Baixa Confiança da IA: borda #FF8C00 e fundo #3D2200 com texto #FFD580
- *   - Erro / Excluir: #E74C3C (vermelho)
+ * Arquitetura de Tokens em 3 Camadas:
+ * - Modo Claro: Data-Dense Institutional Light
+ * - Modo Noturno: Desktop High-Contrast Dark Mode (Persistido via localStorage)
+ * - Tipografia Técnica: 'Fira Sans' (UI/Corpo) + 'Fira Code' (Códigos, HMAC, Datas, Notas)
  */
 
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Fira+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+
+/* ============================================================================== */
+/* 1. VARIÁVEIS SEMÂNTICAS — MODO CLARO (PADRÃO INSTITUCIONAL) */
+/* ============================================================================== */
 :root {
-  /* Modo Claro Padrão */
-  --bg-main: #f1f5f9;
-  --bg-panel: #ffffff;
-  --border-color: #cbd5e1;
-  --row-odd: #ffffff;
-  --row-even: #f8fafc;
-  --accent-purple: #84167A;
-  --accent-purple-hover: #9B1D90;
-  --text-primary: #0f172a;
-  --text-muted: #64748b;
-  --text-highlight-blue: #1d4ed8;
-  --status-success: #16a34a;
-  --status-pending-border: #f59e0b;
-  --status-pending-bg: #fef3c7;
-  --status-pending-text: #92400e;
-  --status-error: #dc2626;
-  --scrollbar-bg: #f1f5f9;
-  --scrollbar-thumb: #cbd5e1;
+  --font-sans: 'Fira Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Superfícies e Bordas */
+  --bg-main: #F8FAFC;
+  --bg-panel: #FFFFFF;
+  --bg-panel-elevated: #FFFFFF;
+  --bg-subtle: #F1F5F9;
+  --border-color: #CBD5E1;
+  --border-subtle: #DBEAFE;
+  --border-focus: #1E40AF;
+
+  /* Paleta Institucional */
+  --color-primary: #1E40AF;
+  --color-primary-hover: #1D4ED8;
+  --color-secondary: #3B82F6;
+  --color-accent: #D97706;
+  --color-accent-hover: #B45309;
+
+  /* Tipografia */
+  --text-primary: #0F172A;
+  --text-muted: #475569;
+  --text-subtle: #64748B;
+  --text-highlight-blue: #1D4ED8;
+
+  /* Zebrado de Tabelas e Matrizes */
+  --row-odd: #FFFFFF;
+  --row-even: #F8FAFC;
+  --row-hover: #EFF6FF;
+
+  /* Semântica de Status */
+  --status-success: #16A34A;
+  --status-success-bg: #DCFCE7;
+  --status-success-text: #166534;
+
+  --status-pending-border: #D97706;
+  --status-pending-bg: #FEF3C7;
+  --status-pending-text: #92400E;
+
+  --status-error: #DC2626;
+  --status-error-bg: #FEE2E2;
+  --status-error-text: #991B1B;
+
+  /* Scrollbars */
+  --scrollbar-bg: #F1F5F9;
+  --scrollbar-thumb: #CBD5E1;
+  --scrollbar-thumb-hover: #94A3B8;
+
+  /* Sombras */
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-modal: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
 }
 
 /* ============================================================================== */
-/* PALETA RIGOROSA — MODO NOTURNO (DARK MODE) */
+/* 2. VARIÁVEIS SEMÂNTICAS — MODO NOTURNO (DESKTOP RIGOROSO) */
 /* ============================================================================== */
 html.dark,
 html[data-theme="dark"],
 body.dark {
+  /* Superfícies e Bordas */
   --bg-main: #141414;
   --bg-panel: #2D2D2D;
+  --bg-panel-elevated: #363636;
+  --bg-subtle: #1F1F1F;
   --border-color: #454545;
-  --row-odd: #1C1C1C;
-  --row-even: #261324;
+  --border-subtle: #383838;
+  --border-focus: #84167A;
+
+  /* Paleta Noturna Rigorosa */
+  --color-primary: #84167A;
+  --color-primary-hover: #9B1D90;
+  --color-secondary: #3B9EFF;
+  --color-accent: #D97706;
+  --color-accent-hover: #B45309;
+
+  /* Acento Roxo Oficial */
   --accent-purple: #84167A;
   --accent-purple-hover: #9B1D90;
+
+  /* Tipografia Noturna */
   --text-primary: #F0F0F0;
   --text-muted: #B0B0B0;
+  --text-subtle: #8A8A8A;
   --text-highlight-blue: #3B9EFF;
+
+  /* Zebrado Noturno Profundo */
+  --row-odd: #1C1C1C;
+  --row-even: #261324; /* Tom ameixa / roxo profundo */
+  --row-hover: #331A30;
+
+  /* Semântica de Status Noturna */
   --status-success: #2ECC71;
+  --status-success-bg: rgba(46, 204, 113, 0.15);
+  --status-success-text: #2ECC71;
+
   --status-pending-border: #FF8C00;
   --status-pending-bg: #3D2200;
   --status-pending-text: #FFD580;
+
   --status-error: #E74C3C;
-  --scrollbar-bg: #1C1C1C;
+  --status-error-bg: rgba(231, 76, 60, 0.18);
+  --status-error-text: #FF8577;
+
+  /* Scrollbars Noturnas */
+  --scrollbar-bg: #141414;
   --scrollbar-thumb: #454545;
+  --scrollbar-thumb-hover: #5A5A5A;
+
+  /* Sombras */
+  --shadow-card: 0 2px 6px rgba(0, 0, 0, 0.5);
+  --shadow-modal: 0 25px 50px -12px rgba(0, 0, 0, 0.85);
 }
 
 /* ============================================================================== */
-/* REGRA OBRIGATÓRIA 1: BARRAS DE ROLAGEM NATIVAS DESKTOP */
+/* 3. REGRAS GERAIS DE TIPOGRAFIA E ELEMENTOS BASE */
 /* ============================================================================== */
-html.dark ::-webkit-scrollbar,
-html.dark::-webkit-scrollbar,
-body.dark ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+html {
+  font-size: 110%; /* Escala Global Proporcional (+10% Conforto Visual / Acessibilidade Desktop) */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+html, body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-main) !important;
+  color: var(--text-primary) !important;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+/* Classes Monoespaçadas Técnicas */
+.font-mono,
+.codigo-autenticidade,
+.tabela-nota-input,
+.badge-contador,
+.input-nota,
+.celula-nota input {
+  font-family: var(--font-mono) !important;
+}
+
+/* Links e Interativos */
+button,
+a,
+select,
+input[type="checkbox"],
+input[type="radio"],
+.btn-interativo {
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 2px var(--color-primary) !important;
+}
+
+/* ============================================================================== */
+/* 4. BARRAS DE ROLAGEM NATIVAS DESKTOP */
+/* ============================================================================== */
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
   background-color: var(--scrollbar-bg);
 }
 
-html.dark ::-webkit-scrollbar-track,
-html.dark::-webkit-scrollbar-track,
-body.dark ::-webkit-scrollbar-track {
+::-webkit-scrollbar-track {
   background-color: var(--scrollbar-bg);
 }
 
-html.dark ::-webkit-scrollbar-thumb,
-html.dark::-webkit-scrollbar-thumb,
-body.dark ::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb {
   background-color: var(--scrollbar-thumb);
   border-radius: 4px;
   border: 2px solid var(--scrollbar-bg);
 }
 
-html.dark ::-webkit-scrollbar-thumb:hover,
-html.dark::-webkit-scrollbar-thumb:hover,
-body.dark ::-webkit-scrollbar-thumb:hover {
-  background-color: #5a5a5a;
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-thumb-hover);
 }
 
-html.dark * {
+* {
   scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-bg);
   scrollbar-width: thin;
 }
 
 /* ============================================================================== */
-/* FUNDO PRINCIPAL, TEXTOS E ELEMENTOS ESTRUTURAIS */
+/* 5. OVERRIDES DE MODO NOTURNO (DARK MODE RIGOROSO) */
 /* ============================================================================== */
-html.dark body {
-  background-color: var(--bg-main) !important;
-  color: var(--text-primary) !important;
-}
-
-html.dark header {
+html.dark header,
+html[data-theme="dark"] header {
   background-color: var(--bg-panel) !important;
   border-color: var(--border-color) !important;
   color: var(--text-primary) !important;
 }
 
-/* Painéis de Abas */
-html.dark .bg-slate-200\/70 {
-  background-color: #1a1a1a !important;
-  border-color: var(--border-color) !important;
-}
-
-html.dark #tabAcervo,
-html.dark #tabFilaIa,
-html.dark #tabPainelSme {
-  color: var(--text-muted) !important;
-  border-color: var(--border-color) !important;
-}
-
-html.dark #tabAcervo.bg-white,
-html.dark nav button.tab-ativa {
-  background-color: var(--bg-panel) !important;
-  color: var(--text-highlight-blue) !important;
-  border-color: var(--border-color) !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
-}
-
-html.dark nav button:hover:not(.bg-white):not(.tab-ativa) {
-  background-color: var(--bg-panel) !important;
-  color: var(--text-primary) !important;
-}
-
-/* Cards e Contêineres */
 html.dark .bg-white,
-html.dark .bg-slate-50 {
+html[data-theme="dark"] .bg-white {
   background-color: var(--bg-panel) !important;
   border-color: var(--border-color) !important;
   color: var(--text-primary) !important;
 }
 
-html.dark .bg-slate-100 {
-  background-color: var(--bg-main) !important;
+html.dark .bg-slate-50,
+html[data-theme="dark"] .bg-slate-50 {
+  background-color: var(--bg-subtle) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
 }
 
-/* Bordas em geral */
+html.dark .bg-slate-100,
+html[data-theme="dark"] .bg-slate-100 {
+  background-color: var(--bg-panel-elevated) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
 html.dark .border-slate-200,
 html.dark .border-slate-300,
-html.dark .border-slate-400,
-html.dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]),
-html.dark .divide-slate-200 > :not([hidden]) ~ :not([hidden]) {
+html[data-theme="dark"] .border-slate-200,
+html[data-theme="dark"] .border-slate-300 {
   border-color: var(--border-color) !important;
 }
 
-/* Tipografia */
-html.dark .text-slate-900,
-html.dark .text-slate-800 {
-  color: var(--text-primary) !important;
-}
-
-html.dark .text-slate-700,
-html.dark .text-slate-600,
-html.dark .text-slate-500,
-html.dark .text-slate-400 {
-  color: var(--text-muted) !important;
-}
-
-/* Nomes de ex-alunos ou itens sincronizados em destaque */
-html.dark .nome-aluno,
-html.dark .text-destaque-blue,
-html.dark #tabelaAlunosBody td .font-bold.text-slate-900,
-html.dark .aluno-item-destaque {
-  color: var(--text-highlight-blue) !important;
-}
-
-/* ============================================================================== */
-/* INPUTS, SELECTS E TEXTAREAS */
-/* ============================================================================== */
-html.dark input[type="text"],
-html.dark input[type="password"],
-html.dark input[type="search"],
-html.dark input[type="number"],
+html.dark input,
 html.dark select,
-html.dark textarea {
+html.dark textarea,
+html[data-theme="dark"] input,
+html[data-theme="dark"] select,
+html[data-theme="dark"] textarea {
   background-color: var(--bg-main) !important;
-  color: var(--text-primary) !important;
   border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
 }
 
 html.dark input::placeholder,
-html.dark textarea::placeholder {
+html.dark textarea::placeholder,
+html[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder {
+  color: var(--text-subtle) !important;
+}
+
+/* Cores de textos no escuro */
+html.dark .text-slate-900,
+html.dark .text-slate-800,
+html.dark .text-slate-700,
+html[data-theme="dark"] .text-slate-900,
+html[data-theme="dark"] .text-slate-800,
+html[data-theme="dark"] .text-slate-700 {
+  color: var(--text-primary) !important;
+}
+
+html.dark .text-slate-600,
+html.dark .text-slate-500,
+html.dark .text-slate-400,
+html[data-theme="dark"] .text-slate-600,
+html[data-theme="dark"] .text-slate-500,
+html[data-theme="dark"] .text-slate-400 {
   color: var(--text-muted) !important;
-  opacity: 0.8;
 }
 
-html.dark input:focus,
-html.dark select:focus,
-html.dark textarea:focus {
-  border-color: var(--text-highlight-blue) !important;
-  box-shadow: 0 0 0 2px rgba(59, 158, 255, 0.25) !important;
-  outline: none !important;
-}
-
-/* ============================================================================== */
-/* BOTÕES: PRIMÁRIOS, SECUNDÁRIOS E AÇÕES */
-/* ============================================================================== */
-/* Botões Primários com --accent-purple */
-html.dark #btnNovoAluno,
-html.dark #btnSalvarHistoricoNormal,
-html.dark .btn-primario-accent {
-  background-color: var(--accent-purple) !important;
-  color: #FFFFFF !important;
-  border-color: var(--accent-purple) !important;
-  box-shadow: 0 2px 6px rgba(132, 22, 122, 0.4) !important;
-}
-
-html.dark #btnNovoAluno:hover,
-html.dark #btnSalvarHistoricoNormal:hover,
-html.dark .btn-primario-accent:hover {
-  background-color: var(--accent-purple-hover) !important;
-  border-color: var(--accent-purple-hover) !important;
-}
-
-/* Botões Secundários */
-html.dark #btnCancelarEdicao,
-html.dark #btnAdicionarDisciplinaManual,
-html.dark .btn-secundario {
-  background-color: var(--bg-panel) !important;
-  color: var(--text-primary) !important;
-  border-color: var(--border-color) !important;
-}
-
-html.dark #btnCancelarEdicao:hover,
-html.dark #btnAdicionarDisciplinaManual:hover,
-html.dark .btn-secundario:hover {
-  background-color: #383838 !important;
-}
-
-/* Botão Toggle Modo Noturno */
-#btnToggleTheme {
-  background-color: #f8fafc;
-  border: 1px solid #cbd5e1;
-  color: #334155;
-  transition: all 0.2s ease;
-  user-select: none;
-}
-#btnToggleTheme:hover {
-  background-color: #f1f5f9;
-  border-color: #94a3b8;
-}
-
-html.dark #btnToggleTheme {
-  background-color: var(--bg-panel) !important;
-  border-color: var(--border-color) !important;
-  color: var(--text-primary) !important;
-}
-html.dark #btnToggleTheme:hover {
-  background-color: #383838 !important;
-  border-color: var(--accent-purple) !important;
-  box-shadow: 0 0 8px rgba(132, 22, 122, 0.3) !important;
-}
-
-/* Botão Scanner no Header */
-html.dark #btnAbrirScanner {
-  background-color: #4338ca !important;
-}
-html.dark #btnAbrirScanner:hover {
-  background-color: #4f46e5 !important;
-}
-
-/* Botões na Tabela de Alunos (Editar e A4) */
-html.dark #tabelaAlunosBody button {
-  background-color: var(--bg-panel) !important;
-  border-color: var(--border-color) !important;
-  color: var(--text-primary) !important;
-}
-html.dark #tabelaAlunosBody button:hover {
-  background-color: var(--accent-purple) !important;
-  border-color: var(--accent-purple) !important;
-  color: #FFFFFF !important;
-}
-
-/* Catálogo de Disciplinas Históricas Rápidas */
-html.dark #containerBotoesRapidos button {
-  background-color: var(--bg-main) !important;
-  border-color: var(--border-color) !important;
-  color: var(--text-primary) !important;
-}
-html.dark #containerBotoesRapidos button:hover {
-  background-color: var(--accent-purple) !important;
-  border-color: var(--accent-purple) !important;
-  color: #FFFFFF !important;
-}
-
-/* ============================================================================== */
-/* TABELA DE ALUNOS DO ACERVO PASSIVO (ZEBRADO) */
-/* ============================================================================== */
-html.dark #tabelaAlunosBody tr:nth-child(odd) {
-  background-color: var(--row-odd) !important;
-}
-
-html.dark #tabelaAlunosBody tr:nth-child(even) {
-  background-color: var(--row-even) !important;
-}
-
-html.dark #tabelaAlunosBody tr:hover {
-  background-color: rgba(132, 22, 122, 0.22) !important;
-}
-
-/* ============================================================================== */
-/* REGRA OBRIGATÓRIA 2: PLANILHA DE LANÇAMENTO DE NOTAS */
-/* (1ª a 8ª Série / 1º ao 9º Ano / EJA) */
-/* ============================================================================== */
-html.dark #tabelaMatrizNotas,
-html.dark #tabelaSplitMatriz {
-  background-color: var(--bg-main) !important;
-  border-color: var(--border-color) !important;
-}
-
-html.dark #tabelaMatrizNotas thead tr,
-html.dark #tabelaSplitMatriz thead tr {
-  background-color: var(--bg-panel) !important;
-  border-color: var(--border-color) !important;
-  color: var(--text-primary) !important;
-}
-
-html.dark #tabelaMatrizNotas thead th,
-html.dark #tabelaMatrizNotas thead td,
-html.dark #tabelaSplitMatriz thead th,
-html.dark #tabelaSplitMatriz thead td {
-  border-color: var(--border-color) !important;
-  color: var(--text-primary) !important;
-}
-
-/* Título das Séries no thead */
-html.dark #tabelaMatrizNotas thead th span,
-html.dark #tabelaSplitMatriz thead th span,
-html.dark #tabelaMatrizNotas thead td.text-blue-900,
-html.dark #tabelaSplitMatriz thead td.text-blue-900 {
+html.dark .text-blue-900,
+html.dark .text-blue-800,
+html.dark .text-blue-700,
+html[data-theme="dark"] .text-blue-900,
+html[data-theme="dark"] .text-blue-800,
+html[data-theme="dark"] .text-blue-700 {
   color: var(--text-highlight-blue) !important;
 }
 
-/* Cabeçalhos de Seção Curricular: Base Comum e Diversificada */
-html.dark #tabelaMatrizNotas tr.secao-cat,
-html.dark #tabelaMatrizNotas tr.bg-slate-200\/80 {
-  background-color: #242424 !important;
-  border-color: var(--border-color) !important;
-  color: #FFFFFF !important;
-}
-
-/* ZEBRADO NAS LINHAS DAS DISCIPLINAS: */
-/* Linha ímpar (--row-odd): #1C1C1C | Linha par (--row-even): #261324 */
-html.dark #tabelaMatrizNotas tbody tr.linha-disciplina:nth-of-type(odd),
-html.dark #tabelaMatrizNotas tbody tr:not(.secao-cat):not(.bg-slate-200\/80):nth-child(odd),
-html.dark #tabelaSplitMatriz tbody tr:nth-child(odd) {
-  background-color: var(--row-odd) !important;
-}
-
-html.dark #tabelaMatrizNotas tbody tr.linha-disciplina:nth-of-type(even),
-html.dark #tabelaMatrizNotas tbody tr:not(.secao-cat):not(.bg-slate-200\/80):nth-child(even),
-html.dark #tabelaSplitMatriz tbody tr:nth-child(even) {
-  background-color: var(--row-even) !important;
-}
-
-html.dark #tabelaMatrizNotas tbody tr:hover,
-html.dark #tabelaSplitMatriz tbody tr:hover {
-  background-color: rgba(132, 22, 122, 0.28) !important;
-}
-
-html.dark #tabelaMatrizNotas tbody td,
-html.dark #tabelaSplitMatriz tbody td {
-  border-color: var(--border-color) !important;
-  color: var(--text-primary) !important;
-}
-
-/* Inputs das disciplinas e notas dentro da planilha zebrada */
-html.dark #tabelaMatrizNotas tbody td input,
-html.dark #tabelaSplitMatriz tbody td input {
-  background-color: transparent !important;
-  color: var(--text-primary) !important;
-  border-color: rgba(69, 69, 69, 0.6) !important;
-}
-
-/* DESTAQUE DA CÉLULA FOCADA NA PLANILHA: */
-/* Destaque com borda #3B9EFF e fundo #84167A com texto #FFFFFF */
-html.dark #tabelaMatrizNotas input:focus,
-html.dark #tabelaMatrizNotas select:focus,
-html.dark #tabelaSplitMatriz input:focus,
-html.dark #tabelaSplitMatriz select:focus {
+/* Botões Primários no Modo Noturno */
+html.dark .bg-blue-700,
+html.dark .bg-blue-800,
+html[data-theme="dark"] .bg-blue-700,
+html[data-theme="dark"] .bg-blue-800 {
   background-color: var(--accent-purple) !important;
-  border-color: var(--text-highlight-blue) !important;
-  color: #FFFFFF !important;
-  box-shadow: 0 0 0 2px var(--text-highlight-blue) !important;
-  outline: none !important;
-}
-
-html.dark #tabelaMatrizNotas td:focus-within,
-html.dark #tabelaSplitMatriz td:focus-within {
-  background-color: rgba(132, 22, 122, 0.35) !important;
-}
-
-/* ============================================================================== */
-/* CORES DE STATUS E ÍCONES */
-/* ============================================================================== */
-/* 1. Sincronizado / Sucesso: #2ECC71 (verde) */
-html.dark .status-sucesso,
-html.dark .bg-emerald-100,
-html.dark .text-emerald-800,
-html.dark .text-emerald-700 {
-  background-color: rgba(46, 204, 113, 0.18) !important;
-  color: var(--status-success) !important;
-  border-color: var(--status-success) !important;
-}
-
-html.dark #indicadorLuminosoSync,
-html.dark .indicador-sync-online {
-  background-color: var(--status-success) !important;
-  box-shadow: 0 0 10px rgba(46, 204, 113, 0.85) !important;
-}
-
-/* 2. Pendente / Campo de Baixa Confiança da IA: */
-/* borda #FF8C00 (laranja vivo) e fundo #3D2200 com texto #FFD580 */
-html.dark .campo-baixa-confianca,
-html.dark input.bg-amber-100,
-html.dark .bg-amber-100.border-amber-500,
-html.dark input.campo-duvidoso {
-  background-color: var(--status-pending-bg) !important;
-  border-color: var(--status-pending-border) !important;
-  color: var(--status-pending-text) !important;
-  box-shadow: 0 0 0 1px var(--status-pending-border) !important;
-}
-
-html.dark .bg-amber-50,
-html.dark .bg-amber-50\/70,
-html.dark .border-amber-200 {
-  background-color: #241604 !important;
-  border-color: #5c3202 !important;
-  color: var(--status-pending-text) !important;
-}
-
-html.dark .text-amber-950,
-html.dark .text-amber-900,
-html.dark .text-amber-800,
-html.dark .text-amber-700 {
-  color: var(--status-pending-text) !important;
-}
-
-/* Status Validado após clique no split */
-html.dark .campo-validado,
-html.dark input.bg-emerald-50 {
-  background-color: rgba(46, 204, 113, 0.15) !important;
-  border-color: var(--status-success) !important;
-  color: #FFFFFF !important;
-}
-
-/* 3. Erro / Excluir: #E74C3C (vermelho) */
-html.dark .text-rose-500,
-html.dark .text-rose-700,
-html.dark .btn-excluir-materia {
-  color: var(--status-error) !important;
-}
-
-html.dark .btn-excluir-materia:hover,
-html.dark .text-rose-500:hover {
-  background-color: rgba(231, 76, 60, 0.2) !important;
-  color: #ff6b6b !important;
-}
-
-/* ============================================================================== */
-/* MODAIS E TELAS DIVIDIDAS (SPLIT-SCREEN) */
-/* ============================================================================== */
-/* Fundo Backdrop */
-html.dark #modalSetupWizard,
-html.dark #modalScanner,
-html.dark #modalEdicaoMatriz {
-  background-color: rgba(0, 0, 0, 0.82) !important;
-}
-
-/* Seletor de Regime no Editor de Matriz */
-html.dark #btnRegime8,
-html.dark #btnRegime9,
-html.dark #btnRegimeEJA {
-  background-color: var(--bg-panel);
-  color: var(--text-muted);
-  border: 1px solid var(--border-color);
-}
-
-html.dark #btnRegime8.bg-blue-700,
-html.dark #btnRegime9.bg-blue-700,
-html.dark #btnRegimeEJA.bg-blue-700 {
-  background-color: var(--accent-purple) !important;
-  color: #FFFFFF !important;
   border-color: var(--accent-purple) !important;
-}
-
-/* Botão Salvar Turbo */
-html.dark #btnSalvarTurbo {
-  background-color: #92400e !important;
   color: #FFFFFF !important;
-  border: 1px solid #d97706 !important;
-}
-html.dark #btnSalvarTurbo:hover {
-  background-color: #b45309 !important;
 }
 
-/* Tela Dividida Split Review */
-html.dark #containerSplitReview .bg-slate-50 {
-  background-color: var(--bg-main) !important;
+html.dark .bg-blue-700:hover,
+html.dark .bg-blue-800:hover,
+html[data-theme="dark"] .bg-blue-700:hover,
+html[data-theme="dark"] .bg-blue-800:hover {
+  background-color: var(--accent-purple-hover) !important;
 }
-html.dark #containerSplitReview .bg-slate-900,
-html.dark #containerSplitReview .bg-slate-950 {
-  background-color: #121212 !important;
+
+/* Botões Secundários */
+html.dark .bg-slate-100:hover,
+html.dark .hover\:bg-slate-100:hover,
+html[data-theme="dark"] .bg-slate-100:hover,
+html[data-theme="dark"] .hover\:bg-slate-100:hover {
+  background-color: var(--bg-panel-elevated) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Barra de Abas */
+html.dark .bg-slate-200\/70,
+html[data-theme="dark"] .bg-slate-200\/70 {
+  background-color: #171717 !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .tab-inativa,
+html[data-theme="dark"] .tab-inativa {
+  color: var(--text-muted) !important;
+}
+
+html.dark .tab-inativa:hover,
+html[data-theme="dark"] .tab-inativa:hover {
+  background-color: var(--bg-panel) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .tab-ativa,
+html[data-theme="dark"] .tab-ativa {
+  background-color: var(--bg-panel) !important;
+  color: var(--text-highlight-blue) !important;
   border-color: var(--border-color) !important;
 }
 
 /* ============================================================================== */
-/* MODAL DE IMPRESSÃO EMBUTIDA (TEMA CLARO E ESCURO) */
+/* 6. TABELAS E MATRIZ CURRICULAR (ZEBRADO DE ALTA DENSIDADE) */
 /* ============================================================================== */
-#modalImpressaoEmbutida {
-  background-color: rgba(15, 23, 42, 0.45);
+table {
+  border-collapse: collapse;
 }
 
-#headerImpressaoModal {
-  background-color: #ffffff;
-  border-bottom: 1px solid #e2e8f0;
-  color: #0f172a;
+/* Linhas Zebradas Padrão */
+tr.linha-impar,
+tbody tr:nth-child(odd) {
+  background-color: var(--row-odd);
 }
 
-#tituloImpressaoModal {
-  color: #0f172a;
+tr.linha-par,
+tbody tr:nth-child(even) {
+  background-color: var(--row-even);
 }
 
-#areaDocImpressao {
-  background-color: #cbd5e1;
+tbody tr:hover {
+  background-color: var(--row-hover) !important;
 }
 
-#btnFecharImpressaoModal {
-  background-color: #ffffff;
-  border-color: #cbd5e1;
-  color: #334155;
+/* Células de Notas da Matriz */
+.input-nota {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  text-align: center;
+  border-radius: 4px;
+  font-size: 0.8125rem; /* ~14.3px com escala 110% (Leitura clara e confortável) */
+  padding: 4px 6px;
+  transition: all 120ms ease;
 }
 
-#btnFecharImpressaoModal:hover {
-  background-color: #f1f5f9;
-  color: #0f172a;
+.input-nota:focus {
+  background-color: var(--bg-panel) !important;
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 2px var(--color-primary) !important;
+  transform: scale(1.02);
+  z-index: 2;
 }
 
-html.dark #modalImpressaoEmbutida {
-  background-color: rgba(0, 0, 0, 0.85) !important;
+/* Coluna de Série "Não Cursado" (Atenuação Visual e Foco) */
+.coluna-nao-cursada {
+  opacity: 0.55 !important;
+  background-color: rgba(0, 0, 0, 0.05) !important;
 }
 
-html.dark #headerImpressaoModal {
-  background-color: #1e1e1e !important;
-  border-bottom: 1px solid #383838 !important;
-  color: #f1f5f9 !important;
+html.dark .coluna-nao-cursada,
+html[data-theme="dark"] .coluna-nao-cursada {
+  background-color: rgba(0, 0, 0, 0.3) !important;
+  opacity: 0.45 !important;
 }
 
-html.dark #tituloImpressaoModal {
-  color: #f1f5f9 !important;
-}
-
-html.dark #areaDocImpressao {
-  background-color: #141414 !important;
-}
-
-html.dark #btnFecharImpressaoModal {
-  background-color: #262626 !important;
-  border-color: #404040 !important;
-  color: #cbd5e1 !important;
-}
-
-html.dark #btnFecharImpressaoModal:hover {
-  background-color: #333333 !important;
-  color: #ffffff !important;
-}
-
-html.dark #iframeImpressaoA4 {
-  border-color: #383838 !important;
+.coluna-nao-cursada input {
+  color: var(--text-muted) !important;
+  font-weight: normal !important;
 }
 
 /* ============================================================================== */
-/* REGRA OBRIGATÓRIA 3: PROTEÇÃO DE IMPRESSÃO A4 */
+/* 7. GUIA VISUAL DE BAIXA CONFIANÇA IA & VALIDAÇÃO */
 /* ============================================================================== */
-@media print {
+.campo-baixa-confianca {
+  border-color: var(--status-pending-border) !important;
+  background-color: var(--status-pending-bg) !important;
+  color: var(--status-pending-text) !important;
+  font-weight: 700 !important;
+  box-shadow: 0 0 0 2px var(--status-pending-border) !important;
+  animation: pulse-border 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse-border {
+  0%, 100% {
+    box-shadow: 0 0 0 2px var(--status-pending-border);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(255, 140, 0, 0.4);
+  }
+}
+
+.campo-validado {
+  border-color: var(--status-success) !important;
+  background-color: var(--status-success-bg) !important;
+  color: var(--text-primary) !important;
+  transition: background-color 250ms ease, border-color 250ms ease;
+}
+
+/* ============================================================================== */
+/* 8. SISTEMA DE TOAST NOTIFICATIONS (ZERO ALERT NATIVO) */
+/* ============================================================================== */
+#sgmToastContainer {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 420px;
+  width: calc(100vw - 40px);
+  pointer-events: none;
+}
+
+.sgm-toast {
+  pointer-events: auto;
+  background-color: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: 10px;
+  padding: 12px 14px;
+  box-shadow: var(--shadow-modal);
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+  animation: toast-slide-in 200ms ease-out forwards;
+  transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1), transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sgm-toast.hiding {
+  opacity: 0;
+  transform: translateY(-4px) scale(0.98);
+  pointer-events: none;
+}
+
+.sgm-toast-icon {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.sgm-toast-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.sgm-toast-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.3;
+  margin-bottom: 2px;
+}
+
+.sgm-toast-message {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.sgm-toast-close {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  padding: 2px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sgm-toast-close:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-subtle);
+}
+
+.sgm-toast-progress {
+  display: none !important;
+}
+
+@keyframes toast-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ============================================================================== */
+/* 9. MODAIS E DIÁLOGOS ACESSÍVEIS (ZERO CONFIRM / PROMPT NATIVOS) */
+/* ============================================================================== */
+.sgm-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 99990;
+  background-color: rgba(10, 15, 29, 0.75);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: modal-fade-in 180ms ease-out;
+}
+
+html.dark .sgm-modal-backdrop,
+html[data-theme="dark"] .sgm-modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.85);
+}
+
+.sgm-modal-card {
+  background-color: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: var(--shadow-modal);
+  overflow: hidden;
+  animation: modal-scale-in 200ms ease-out;
+}
+
+@keyframes modal-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modal-scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* ============================================================================== */
+/* 10. HUD FLUTUANTE DE CONTROLE DE IMAGEM NO SPLIT REVIEW */
+/* ============================================================================== */
+.hud-controle-imagem {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(20, 20, 20, 0.88);
+  backdrop-filter: blur(8px);
+  border: 1px solid #454545;
+  border-radius: 30px;
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  z-index: 20;
+}
+
+.hud-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  color: #F0F0F0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  transition: background-color 150ms ease, color 150ms ease;
+  cursor: pointer;
+  user-select: none;
+}
+
+.hud-btn:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+}
+
+.hud-indicador-zoom {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #B0B0B0;
+  padding: 0 8px;
+  min-width: 50px;
+  text-align: center;
+}
+
+/* ============================================================================== */
+/* 11. ACCESSIBILITY: REDUCED MOTION */
+/* ============================================================================== */
+@media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
-    background: #FFFFFF !important;
-    color: #000000 !important;
-    border-color: #000000 !important;
-    box-shadow: none !important;
-    text-shadow: none !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-
-  body, html {
-    background: #FFFFFF !important;
-    color: #000000 !important;
-  }
-
-  .folha-a4,
-  .folha-a4 * {
-    background: #FFFFFF !important;
-    color: #000000 !important;
-    border-color: #000000 !important;
-    box-shadow: none !important;
-  }
-
-  .nao-imprimir,
-  .barra-ferramentas,
-  #btnToggleTheme {
-    display: none !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
+
+/* ============================================================================== */
+/* 12. CARD CARROSSEL DA MATRIZ CURRICULAR (1 ANO POR CARD) */
+/* ============================================================================== */
+.card-serie-item {
+  display: none !important;
+  width: 100%;
+}
+
+.card-serie-item.card-ativo {
+  display: flex !important;
+  flex-direction: column;
+  opacity: 1;
+}
+
+@keyframes cardSlideInRight {
+  0% {
+    opacity: 0;
+    transform: translateX(24px) scale(0.985);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes cardSlideInLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-24px) scale(0.985);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+.anim-card-next {
+  animation: cardSlideInRight 220ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.anim-card-prev {
+  animation: cardSlideInLeft 220ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.tab-serie-btn {
+  transition: all 180ms ease;
+  white-space: nowrap;
+  font-size: 0.75rem;
+}
+
+/* ============================================================================== */
+/* 13. ESCALA PROPORCIONAL DE SUBTEXTOS E BADGES (SUBSTITUI PIXELS FIXOS) */
+/* ============================================================================== */
+.text-\[9px\] { font-size: 0.65rem !important; }
+.text-\[10px\] { font-size: 0.72rem !important; }
+.text-\[11px\] { font-size: 0.78rem !important; }
+.text-\[13px\] { font-size: 0.88rem !important; }
+
+.tab-serie-btn.tab-ativa {
+  background-color: var(--color-primary);
+  color: #FFFFFF !important;
+  font-weight: 700;
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+html.dark .tab-serie-btn.tab-ativa,
+html[data-theme="dark"] .tab-serie-btn.tab-ativa {
+  background-color: var(--accent-purple) !important;
+  border-color: var(--accent-purple) !important;
+  color: #FFFFFF !important;
+}
+

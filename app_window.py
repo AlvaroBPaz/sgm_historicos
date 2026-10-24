@@ -83,7 +83,7 @@ def aguardar_servidor_online(timeout_segundos: int = 25) -> bool:
 def abrir_em_navegador_fallback():
     """Fallback caso o PyWebView não consiga inicializar a janela nativa."""
     logger.info("Abrindo aplicação via navegador Edge em modo App...")
-    cmd_edge = f'start msedge --app="{URL_LOCAL}"'
+    cmd_edge = f'start msedge --start-maximized --app="{URL_LOCAL}"'
     try:
         subprocess.Popen(cmd_edge, shell=True)
     except Exception:
@@ -118,6 +118,7 @@ def main():
             width=1280,
             height=820,
             min_size=(1024, 700),
+            maximized=True,
             text_select=True,
             zoomable=True,
             confirm_close=False

@@ -435,35 +435,100 @@
         });
         headRow.innerHTML = headHtml;
 
-        // Agrupa notas por disciplina
+        // Agrupa notas por disciplina preservando categoria
         const mapaDisciplinas = new Map();
+        const catalogoNomesDiversificada = [
+          "ensino da língua portuguesa", "ensino da lingua portuguesa",
+          "ensino da matemática", "ensino da matematica",
+          "esporte e lazer", "arte e cultura",
+          "educação ambiental", "educacao ambiental",
+          "comunicação: cultura digital e tecnológica", "comunicacao: cultura digital e tecnologica",
+          "língua estrangeira", "lingua estrangeira"
+        ];
+
         notasCurriculares.forEach(n => {
           const nomeDisc = (n.disciplina_nome || "").trim();
           if (!nomeDisc) return;
           if (!mapaDisciplinas.has(nomeDisc)) {
-            mapaDisciplinas.set(nomeDisc, {});
+            const ehDiversificadaPorNome = catalogoNomesDiversificada.includes(nomeDisc.toLowerCase());
+            const cat = (n.categoria === "DIVERSIFICADA" || ehDiversificadaPorNome) ? "DIVERSIFICADA" : (n.categoria || "BASE_COMUM");
+            mapaDisciplinas.set(nomeDisc, {
+              categoria: cat,
+              notas: {}
+            });
           }
-          mapaDisciplinas.get(nomeDisc)[n.ordem_coluna] = n.nota_ou_conceito || "---";
+          const colNum = Number(n.ordem_coluna);
+          const notaVal = (n.nota_ou_conceito !== null && n.nota_ou_conceito !== undefined && String(n.nota_ou_conceito).trim() !== "") ? String(n.nota_ou_conceito).trim() : "---";
+          mapaDisciplinas.get(nomeDisc).notas[colNum] = notaVal;
+        });
+
+        // Separa Base Comum e Parte Diversificada
+        const discBaseComum = [];
+        const discDiversificada = [];
+
+        mapaDisciplinas.forEach((dados, nome) => {
+          if (dados.categoria === "DIVERSIFICADA") {
+            discDiversificada.push({ nome, notas: dados.notas });
+          } else {
+            discBaseComum.push({ nome, notas: dados.notas });
+          }
         });
 
         const tbodyMatriz = document.getElementById("matriz-body");
         tbodyMatriz.innerHTML = "";
 
-        // Renderiza linhas de disciplinas
-        mapaDisciplinas.forEach((notas, nome) => {
-          let tr = `<tr><td class="disciplina-col">${nome}</td>`;
-          colunasSeries.forEach(c => {
-            const val = notas[c.col] || "---";
-            tr += `<td class="nota-col">${val}</td>`;
+        // 1. Renderiza cabeçalho e linhas de disciplinas da Base Comum
+        if (discBaseComum.length > 0) {
+          const totalColunas = colunasSeries.length + 1;
+          const trBaseComum = `
+            <tr class="secao-base-comum-row" style="background-color: #EFEFEF !important; font-weight: bold; border-bottom: 1px solid #000;">
+              <td colspan="${totalColunas}" style="text-align: left; padding: 2px 6px; font-size: 7pt; text-transform: uppercase; letter-spacing: 0.5px;">
+                BASE NACIONAL COMUM
+              </td>
+            </tr>
+          `;
+          tbodyMatriz.insertAdjacentHTML("beforeend", trBaseComum);
+
+          discBaseComum.forEach(d => {
+            let tr = `<tr><td class="disciplina-col">${d.nome}</td>`;
+            colunasSeries.forEach(c => {
+              const colKey = Number(c.col);
+              const val = (d.notas[colKey] !== undefined && d.notas[colKey] !== null && d.notas[colKey] !== "") ? d.notas[colKey] : (d.notas[String(colKey)] !== undefined ? d.notas[String(colKey)] : "---");
+              tr += `<td class="nota-col">${val}</td>`;
+            });
+            tr += `</tr>`;
+            tbodyMatriz.insertAdjacentHTML("beforeend", tr);
           });
-          tr += `</tr>`;
-          tbodyMatriz.insertAdjacentHTML("beforeend", tr);
-        });
+        }
+
+        // 2. Se houver Parte Diversificada, adiciona a separação sutil oficial
+        if (discDiversificada.length > 0) {
+          const totalColunas = colunasSeries.length + 1;
+          const trDivisor = `
+            <tr class="secao-diversificada-row" style="background-color: #EFEFEF !important; font-weight: bold; border-top: 1.5px solid #000; border-bottom: 1px solid #000;">
+              <td colspan="${totalColunas}" style="text-align: left; padding: 2px 6px; font-size: 7pt; text-transform: uppercase; letter-spacing: 0.5px;">
+                PARTE DIVERSIFICADA
+              </td>
+            </tr>
+          `;
+          tbodyMatriz.insertAdjacentHTML("beforeend", trDivisor);
+
+          discDiversificada.forEach(d => {
+            let tr = `<tr><td class="disciplina-col">${d.nome}</td>`;
+            colunasSeries.forEach(c => {
+              const colKey = Number(c.col);
+              const val = (d.notas[colKey] !== undefined && d.notas[colKey] !== null && d.notas[colKey] !== "") ? d.notas[colKey] : (d.notas[String(colKey)] !== undefined ? d.notas[String(colKey)] : "---");
+              tr += `<td class="nota-col">${val}</td>`;
+            });
+            tr += `</tr>`;
+            tbodyMatriz.insertAdjacentHTML("beforeend", tr);
+          });
+        }
 
         // Mapeia vida escolar por coluna
         const mapaVida = new Map();
         vidaEscolar.forEach(v => {
-          mapaVida.set(v.ordem_coluna, v);
+          mapaVida.set(Number(v.ordem_coluna), v);
         });
 
         // Função auxiliar para normalizar resultado
@@ -490,7 +555,7 @@
         resumoDefs.forEach(r => {
           let tr = `<tr class="resumo-row"><td class="disciplina-col">${r.nome}</td>`;
           colunasSeries.forEach(c => {
-            const v = mapaVida.get(c.col);
+            const v = mapaVida.get(Number(c.col));
             const valor = r.obter(v);
             tr += `<td class="nota-col">${valor}</td>`;
           });

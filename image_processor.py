@@ -243,7 +243,7 @@ def avaliar_qualidade_imagem(
     if score_foco < 18.0 or (score_foco < 24.0 and densidade_bordas < 0.005):
         return QualidadeFotoResult(
             aprovado=False,
-            motivo_rejeicao="Foto embaçada ou tremida (Índice de nitidez insuficiente). Apoie o celular, foque no documento e tire outra foto.",
+            motivo_rejeicao="Foto embaçada ou tremida. Apoie o celular, foque no documento e tire outra foto.",
             codigo_erro="FOTO_TREMIDA",
             score_nitidez=score_foco,
             brilho_medio=brilho_medio,

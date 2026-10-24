@@ -12,6 +12,15 @@ BASE_DIR = Path(__file__).resolve().parent
 os.chdir(BASE_DIR)
 
 import database
+TEST_DB_PATH = Path("./data_local/teste_acervo_fase4.db")
+if TEST_DB_PATH.exists():
+    try:
+        TEST_DB_PATH.unlink()
+    except Exception:
+        pass
+database.DB_PATH = TEST_DB_PATH
+database.init_db(TEST_DB_PATH)
+
 import main
 
 client = TestClient(main.app)
@@ -233,6 +242,11 @@ if __name__ == "__main__":
     test_ciclo_completo_cadastro_aluno_e_integridade();
     test_fila_ocr_e_aprovacao_split();
     test_painel_sme_estatisticas();
+    if TEST_DB_PATH.exists():
+        try:
+            TEST_DB_PATH.unlink()
+        except Exception:
+            pass
     print("\n======================================================================")
     print("  TODOS OS TESTES DA FASE 4 PASSARAM COM 100% DE SUCESSO!")
     print("======================================================================")

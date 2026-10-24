@@ -31,7 +31,7 @@ def executar_benchmark(qtd_amostras: int = 3):
         print("\n[ERRO CRÍTICO] Chave GEMINI_API_KEY não encontrada no .env!")
         return
 
-    modelo = os.getenv("GEMINI_MODEL", "gemini-flash-lite-latest")
+    modelo = worker.obter_modelo()
     print(f"Chave API configurada : {api_key[:8]}...{api_key[-4:]}")
     print(f"Modelo configurado    : {modelo}")
     print(f"Rate Limiter Local    : {ocr_queue_worker.INTERVALO_MINIMO_REQUISICAO_SEGUNDOS}s de pausa entre requisições")

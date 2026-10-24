@@ -4,51 +4,205 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>SGM-Históricos — Scanner Sem Fio</title>
+  
+  <!-- Tipografia Técnica Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Fira+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Inicialização Imediata Anti-FOUC (Detecta ?theme=, localStorage ou prefers-color-scheme) -->
+  <script>
+    (function() {
+      try {
+        var urlParams = new URLSearchParams(window.location.search);
+        var urlTheme = urlParams.get('theme');
+        var chosen = urlTheme;
+        if (!chosen) {
+          chosen = localStorage.getItem('sgm_theme');
+        }
+        if (!chosen && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          chosen = 'dark';
+        }
+        if (chosen === 'dark') {
+          document.documentElement.classList.add('dark');
+          document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+        if (urlTheme) {
+          localStorage.setItem('sgm_theme', urlTheme);
+        }
+      } catch (e) {}
+    })();
+  </script>
+
   <style>
+    /* ============================================================================== */
+    /* 1. VARIÁVEIS DE TEMA: MODO CLARO (PADRÃO) */
+    /* ============================================================================== */
     :root {
-      --primary: #1e3a8a;
-      --primary-hover: #172554;
-      --success: #059669;
-      --success-bg: #ecfdf5;
+      --bg-page: #f1f5f9;
+      --bg-card: #ffffff;
+      --bg-subtle: #f8fafc;
+      --border-color: #e2e8f0;
+      --border-subtle: #cbd5e1;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+      
+      --brand-icon-grad: linear-gradient(135deg, #1e3a8a, #1e40af);
+      --brand-icon-shadow: rgba(30, 64, 175, 0.25);
+      
+      --primary: #1e40af;
+      --primary-hover: #1d4ed8;
+      --btn-camera-grad: linear-gradient(135deg, #1e40af, #2563eb);
+      --btn-camera-shadow: rgba(37, 99, 235, 0.3);
+      --btn-camera-active: #1d4ed8;
+
+      --btn-sec-bg: #ffffff;
+      --btn-sec-color: #1e40af;
+      --btn-sec-border: #1e40af;
+      --btn-sec-active: #eff6ff;
+
+      --badge-session-bg: #f8fafc;
+      --badge-session-color: #1e40af;
+      --badge-session-border: #cbd5e1;
+
+      --gallery-item-bg: #f1f5f9;
+      --gallery-item-border: #cbd5e1;
+
+      --telemetria-bg: #f8fafc;
+      --telemetria-border: #e2e8f0;
+      --telemetria-color: #1e293b;
+
+      --spinner-border: #e2e8f0;
+      --spinner-top: #1e40af;
+      --spinner-text: #1e40af;
+
+      --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      --header-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+
+      --success: #16a34a;
+      --success-bg: #dcfce7;
+      --success-border: #bbf7d0;
+      --success-text: #15803d;
+
       --danger: #dc2626;
-      --danger-bg: #fef2f2;
+      --danger-bg: #fee2e2;
+      --danger-border: #fecaca;
+
       --warning: #d97706;
-      --warning-bg: #fffbeb;
-      --gray-50: #f8fafc;
-      --gray-100: #f1f5f9;
-      --gray-200: #e2e8f0;
-      --gray-600: #475569;
-      --gray-800: #1e293b;
-      --gray-900: #0f172a;
+      --warning-bg: #fef3c7;
+      --warning-border: #fde68a;
+      --warning-text: #b45309;
+
+      --modal-danger-card: #fef2f2;
+      --modal-danger-border: #ef4444;
+      --modal-danger-box: #ffffff;
+      --modal-danger-box-border: #fecaca;
+      --modal-danger-box-text: #7f1d1d;
+    }
+
+    /* ============================================================================== */
+    /* 2. VARIÁVEIS DE TEMA: MODO ESCURO (HIGH-CONTRAST SGM DESKTOP & MOBILE) */
+    /* ============================================================================== */
+    html.dark,
+    html[data-theme="dark"],
+    body.dark {
+      --bg-page: #141414;
+      --bg-card: #2D2D2D;
+      --bg-subtle: #1F1F1F;
+      --border-color: #454545;
+      --border-subtle: #383838;
+      --text-primary: #F0F0F0;
+      --text-secondary: #B0B0B0;
+      --text-muted: #8A8A8A;
+
+      --brand-icon-grad: linear-gradient(135deg, #84167A, #4a0b44);
+      --brand-icon-shadow: rgba(132, 22, 122, 0.4);
+
+      --primary: #84167A;
+      --primary-hover: #9B1D90;
+      --btn-camera-grad: linear-gradient(135deg, #84167A, #9B1D90);
+      --btn-camera-shadow: rgba(132, 22, 122, 0.45);
+      --btn-camera-active: #701168;
+
+      --btn-sec-bg: #1F1F1F;
+      --btn-sec-color: #F0F0F0;
+      --btn-sec-border: #555555;
+      --btn-sec-active: #331A30;
+
+      --badge-session-bg: #1F1F1F;
+      --badge-session-color: #3B9EFF;
+      --badge-session-border: #454545;
+
+      --gallery-item-bg: #1F1F1F;
+      --gallery-item-border: #454545;
+
+      --telemetria-bg: #1F1F1F;
+      --telemetria-border: #454545;
+      --telemetria-color: #E0E0E0;
+
+      --spinner-border: #454545;
+      --spinner-top: #9B1D90;
+      --spinner-text: #E272D8;
+
+      --card-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+      --header-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+
+      --success: #2ECC71;
+      --success-bg: rgba(46, 204, 113, 0.16);
+      --success-border: rgba(46, 204, 113, 0.35);
+      --success-text: #2ECC71;
+
+      --danger: #E74C3C;
+      --danger-bg: rgba(231, 76, 60, 0.18);
+      --danger-border: rgba(231, 76, 60, 0.4);
+
+      --warning: #FF8C00;
+      --warning-bg: #3D2200;
+      --warning-border: #FF8C00;
+      --warning-text: #FFD580;
+
+      --modal-danger-card: #261313;
+      --modal-danger-border: #E74C3C;
+      --modal-danger-box: #1A0D0D;
+      --modal-danger-box-border: #5A2020;
+      --modal-danger-box-text: #FFB3B3;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: 'Fira Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       -webkit-tap-highlight-color: transparent;
     }
 
     body {
-      background-color: var(--gray-100);
-      color: var(--gray-900);
+      background-color: var(--bg-page);
+      color: var(--text-primary);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      padding: 16px;
-      padding-bottom: 32px;
+      padding: 14px;
+      padding-bottom: 28px;
+      transition: background-color 0.2s ease, color 0.2s ease;
     }
 
+    /* Cabeçalho Mobile */
     header {
-      background: white;
-      padding: 14px 16px;
-      border-radius: 12px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-      margin-bottom: 16px;
+      background: var(--bg-card);
+      padding: 12px 14px;
+      border-radius: 14px;
+      box-shadow: var(--header-shadow);
+      margin-bottom: 12px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      border: 1px solid var(--border-color);
+      transition: background-color 0.2s ease, border-color 0.2s ease;
     }
 
     .brand {
@@ -58,177 +212,216 @@
     }
 
     .brand-icon {
-      width: 36px;
-      height: 36px;
-      background: var(--primary);
+      width: 38px;
+      height: 38px;
+      background: var(--brand-icon-grad);
       color: white;
-      border-radius: 8px;
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: bold;
-      font-size: 18px;
+      box-shadow: 0 2px 4px var(--brand-icon-shadow);
+      transition: background 0.2s ease;
     }
 
     .brand-text h1 {
       font-size: 15px;
-      font-weight: 700;
-      color: var(--gray-900);
-      line-height: 1.2;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1.1;
+      letter-spacing: -0.01em;
     }
 
     .brand-text p {
       font-size: 11px;
-      color: var(--gray-600);
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Botão de Alternância de Tema */
+    .btn-theme-toggle {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .btn-theme-toggle:active {
+      transform: scale(0.92);
+      background: var(--border-subtle);
     }
 
     .badge-session {
-      background: var(--gray-100);
-      padding: 4px 8px;
+      background: var(--badge-session-bg);
+      padding: 5px 8px;
       border-radius: 6px;
       font-size: 11px;
-      font-family: monospace;
-      color: var(--primary);
-      font-weight: 600;
-      border: 1px solid var(--gray-200);
+      font-family: 'Fira Code', monospace;
+      color: var(--badge-session-color);
+      font-weight: 700;
+      border: 1px solid var(--badge-session-border);
+      white-space: nowrap;
     }
 
     .card {
-      background: white;
+      background: var(--bg-card);
       border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-      margin-bottom: 16px;
-      text-align: center;
+      padding: 18px;
+      box-shadow: var(--card-shadow);
+      margin-bottom: 14px;
+      border: 1px solid var(--border-color);
+      transition: background-color 0.2s ease, border-color 0.2s ease;
     }
 
     /* Feedback Alerts */
     .alert {
-      padding: 14px;
-      border-radius: 10px;
-      font-size: 13px;
-      font-weight: 500;
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-size: 12.5px;
+      font-weight: 600;
       line-height: 1.4;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       display: none;
       text-align: left;
     }
 
     .alert.visible {
-      display: block;
-      animation: fadeIn 0.25s ease-in;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      animation: fadeIn 0.2s ease-in;
     }
 
     .alert-danger {
       background-color: var(--danger-bg);
       color: var(--danger);
-      border: 1px solid #fecaca;
+      border: 1px solid var(--danger-border);
     }
 
     .alert-success {
       background-color: var(--success-bg);
-      color: var(--success);
-      border: 1px solid #a7f3d0;
+      color: var(--success-text);
+      border: 1px solid var(--success-border);
     }
 
     .alert-warning {
       background-color: var(--warning-bg);
-      color: var(--warning);
-      border: 1px solid #fde68a;
+      color: var(--warning-text);
+      border: 1px solid var(--warning-border);
     }
 
-    /* Botão Principal da Câmera */
+    /* Botão Principal da Câmera - Alvo >= 48px */
     .btn-camera {
       width: 100%;
-      background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+      min-height: 54px;
+      background: var(--btn-camera-grad);
       color: white;
       border: none;
-      padding: 18px 20px;
       border-radius: 14px;
-      font-size: 17px;
+      font-size: 15px;
       font-weight: 700;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
+      gap: 10px;
       cursor: pointer;
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
-      transition: transform 0.1s, box-shadow 0.1s;
-      min-height: 60px;
+      box-shadow: 0 4px 12px var(--btn-camera-shadow);
+      transition: transform 0.1s, background 0.15s;
     }
 
     .btn-camera:active {
       transform: scale(0.98);
-      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+      background: var(--btn-camera-active);
     }
 
+    /* Botões Secundários */
     .btn-secondary {
       width: 100%;
-      background: white;
-      color: var(--primary);
-      border: 2px solid var(--primary);
-      padding: 14px 16px;
+      min-height: 48px;
+      background: var(--btn-sec-bg);
+      color: var(--btn-sec-color);
+      border: 2px solid var(--btn-sec-border);
       border-radius: 12px;
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 700;
-      cursor: pointer;
-      margin-top: 10px;
-      min-height: 52px;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+
+    .btn-secondary:active {
+      background: var(--btn-sec-active);
     }
 
     .btn-finish {
       width: 100%;
+      min-height: 50px;
       background: var(--success);
       color: white;
       border: none;
-      padding: 16px 20px;
-      border-radius: 14px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      margin-top: 16px;
-      min-height: 56px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 800;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      box-shadow: 0 4px 10px rgba(5, 150, 105, 0.3);
+      cursor: pointer;
+      margin-top: 12px;
+      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25);
     }
 
     .btn-finish:active {
+      background: #15803d;
       transform: scale(0.98);
     }
 
     /* Galeria de Miniaturas */
     .gallery-title {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--gray-600);
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text-primary);
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 12px;
-      text-align: left;
+      letter-spacing: 0.05em;
+      margin-bottom: 10px;
       display: flex;
       justify-content: space-between;
+      align-items: center;
     }
 
     .gallery-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
     }
 
     .gallery-item {
       position: relative;
-      background: var(--gray-100);
+      background: var(--gallery-item-bg);
       border-radius: 10px;
-      overflow: hidden;
-      border: 1px solid var(--gray-200);
+      border: 1px solid var(--gallery-item-border);
       aspect-ratio: 3/4;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
     }
 
     .gallery-item img {
@@ -239,20 +432,47 @@
 
     .gallery-badge {
       position: absolute;
-      bottom: 6px;
-      left: 6px;
-      background: rgba(0, 0, 0, 0.75);
+      bottom: 4px;
+      left: 4px;
+      background: rgba(15, 23, 42, 0.85);
       color: white;
-      font-size: 11px;
-      font-weight: 600;
-      padding: 3px 8px;
+      font-size: 10px;
+      font-family: 'Fira Code', monospace;
+      font-weight: 700;
+      padding: 2px 6px;
       border-radius: 4px;
     }
+
+    /* Telemetria de Qualidade */
+    .telemetria-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--telemetria-bg);
+      border: 1px solid var(--telemetria-border);
+      border-radius: 10px;
+      padding: 8px 12px;
+      margin-top: 10px;
+      font-size: 11px;
+      font-family: 'Fira Code', monospace;
+      color: var(--telemetria-color);
+    }
+
+    .score-gauge {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .score-green { background: #16a34a; }
+    .score-amber { background: #d97706; }
+    .score-red { background: #dc2626; }
 
     /* Loading Spinner */
     .spinner-container {
       display: none;
-      padding: 24px;
+      padding: 20px;
       text-align: center;
     }
 
@@ -261,33 +481,51 @@
     }
 
     .spinner {
-      width: 44px;
-      height: 44px;
-      border: 4px solid var(--gray-200);
-      border-top-color: var(--primary);
+      width: 40px;
+      height: 40px;
+      border: 3.5px solid var(--spinner-border);
+      border-top-color: var(--spinner-top);
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
-      margin: 0 auto 12px;
+      margin: 0 auto 10px;
     }
 
-    /* Tela de Conclusão */
-    .concluded-view {
-      display: none;
+    /* Modal de Rejeição e Bloqueio Rigoroso */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(10, 15, 29, 0.85);
+      backdrop-filter: blur(4px);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-card-danger {
+      background: var(--modal-danger-card);
+      border: 2px solid var(--modal-danger-border);
+      border-radius: 20px;
+      padding: 22px 18px;
       text-align: center;
-      padding: 32px 16px;
+      max-width: 360px;
+      width: 100%;
+      box-shadow: 0 10px 25px -5px rgba(220, 38, 38, 0.4);
+      animation: fadeIn 0.2s ease-out;
     }
 
-    .concluded-icon {
-      width: 72px;
-      height: 72px;
-      background: var(--success-bg);
-      color: var(--success);
+    .icon-danger-circle {
+      width: 58px;
+      height: 58px;
+      background: rgba(239, 68, 68, 0.15);
+      color: #dc2626;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 36px;
-      margin: 0 auto 16px;
+      margin: 0 auto 12px;
+      border: 1.5px solid rgba(239, 68, 68, 0.4);
     }
 
     @keyframes spin {
@@ -299,64 +537,131 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Modal de Rejeição e Bloqueio Visual */
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(15, 23, 42, 0.85);
-      backdrop-filter: blur(4px);
-      z-index: 9999;
+    /* ============================================================================== */
+    /* ANIMAÇÃO MODERNA DO CHECK DE SUCESSO (SVG STROKE DRAW & POP)                  */
+    /* ============================================================================== */
+    .checkmark-wrapper {
+      width: 84px;
+      height: 84px;
+      margin: 0 auto 16px;
+      position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 16px;
     }
 
-    .modal-card-danger {
-      background: #fef2f2;
-      border: 2px solid #ef4444;
-      border-radius: 20px;
-      padding: 24px 20px;
-      text-align: center;
-      max-width: 360px;
-      width: 100%;
-      box-shadow: 0 10px 25px -5px rgba(220, 38, 38, 0.4);
-      animation: fadeIn 0.25s ease-out;
-    }
-
-    .icon-danger-circle {
-      width: 64px;
-      height: 64px;
-      background: #fee2e2;
-      color: #dc2626;
+    .checkmark-svg {
+      width: 84px;
+      height: 84px;
       border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 32px;
-      margin: 0 auto 12px;
-      border: 1px solid #fca5a5;
+      display: block;
+      stroke-width: 3.5;
+      stroke: #16a34a;
+      stroke-miterlimit: 10;
+      box-shadow: inset 0px 0px 0px #16a34a;
+      animation: fillCircle 0.4s ease-in-out 0.4s forwards, scalePop 0.3s ease-in-out 0.85s both;
     }
 
-    .btn-tirar-outra {
+    .checkmark-circle {
+      stroke-dasharray: 166;
+      stroke-dashoffset: 166;
+      stroke-width: 3.5;
+      stroke-miterlimit: 10;
+      stroke: #16a34a;
+      fill: none;
+      animation: strokeCircle 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+    }
+
+    .checkmark-check {
+      transform-origin: 50% 50%;
+      stroke-dasharray: 48;
+      stroke-dashoffset: 48;
+      stroke-width: 4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke: #ffffff;
+      animation: strokeCheck 0.35s cubic-bezier(0.65, 0, 0.45, 1) 0.6s forwards;
+    }
+
+    @keyframes strokeCircle {
+      100% { stroke-dashoffset: 0; }
+    }
+
+    @keyframes strokeCheck {
+      100% { stroke-dashoffset: 0; }
+    }
+
+    @keyframes fillCircle {
+      100% { box-shadow: inset 0px 0px 0px 50px #16a34a; }
+    }
+
+    @keyframes scalePop {
+      0%, 100% { transform: none; }
+      50% { transform: scale3d(1.1, 1.1, 1); }
+    }
+
+    html.dark .checkmark-svg,
+    html[data-theme="dark"] .checkmark-svg {
+      stroke: #22c55e;
+      box-shadow: inset 0px 0px 0px #22c55e;
+      animation: fillCircleDark 0.4s ease-in-out 0.4s forwards, scalePop 0.3s ease-in-out 0.85s both;
+    }
+
+    html.dark .checkmark-circle,
+    html[data-theme="dark"] .checkmark-circle {
+      stroke: #22c55e;
+    }
+
+    @keyframes fillCircleDark {
+      100% { box-shadow: inset 0px 0px 0px 50px #15803d; }
+    }
+
+    /* Botão Verde com a mesma cor do Check */
+    .btn-sucesso-verde {
       width: 100%;
-      background: #dc2626;
-      color: white;
+      min-height: 52px;
+      background: linear-gradient(135deg, #16a34a, #22c55e);
+      color: #ffffff;
       border: none;
-      padding: 16px 20px;
-      border-radius: 12px;
-      font-size: 16px;
+      border-radius: 14px;
+      font-size: 15px;
       font-weight: 700;
-      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
-      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
-      transition: background 0.15s;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(34, 197, 94, 0.35);
+      transition: transform 0.1s, background 0.15s;
+      margin-bottom: 10px;
     }
 
-    .btn-tirar-outra:active {
+    .btn-sucesso-verde:active {
+      transform: scale(0.98);
+      background: #15803d;
+    }
+
+    /* Botão Vermelho Fechar Janela */
+    .btn-fechar-vermelho {
+      width: 100%;
+      min-height: 48px;
+      background: #dc2626;
+      color: #ffffff;
+      border: none;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.28);
+      transition: background 0.15s, transform 0.1s;
+      margin-bottom: 4px;
+    }
+
+    .btn-fechar-vermelho:active {
       background: #b91c1c;
       transform: scale(0.98);
     }
@@ -367,33 +672,45 @@
   <!-- Cabeçalho Mobile -->
   <header>
     <div class="brand">
-      <div class="brand-icon">📚</div>
+      <div class="brand-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+      </div>
       <div class="brand-text">
         <h1>SGM-Históricos</h1>
         <p>Scanner Sem Fio Oficial</p>
       </div>
     </div>
-    <div class="badge-session" id="badgeSessao">SESSÃO...</div>
+    <div class="header-actions">
+      <button id="btnToggleTheme" class="btn-theme-toggle" type="button" aria-label="Alternar modo claro ou escuro" title="Alternar tema">
+        <!-- Ícone preenchido via JS -->
+      </button>
+      <div class="badge-session" id="badgeSessao">SESSÃO...</div>
+    </div>
   </header>
 
-  <!-- Painel de Notificação / Porteiro de Qualidade -->
+  <!-- Painel de Notificação com Ícones SVG -->
   <div id="alertBox" class="alert">
-    <div id="alertMsg"></div>
+    <div id="alertIcon" style="flex-shrink: 0; margin-top: 1px;"></div>
+    <div id="alertMsg" style="flex: 1;"></div>
   </div>
 
-  <!-- Modal de Rejeição Visual de Foto (Bloqueio Rigoroso) -->
+  <!-- Modal de Rejeição Visual de Foto (Bloqueio Rigoroso com Vibração) -->
   <div id="modalRejeicaoFoto" class="modal-overlay" style="display: none;">
     <div class="modal-card-danger">
-      <div class="icon-danger-circle">⛔</div>
-      <h3 style="font-size: 18px; font-weight: 800; color: #991b1b; margin-bottom: 8px;">FOTO REPROVADA</h3>
-      <p id="txtMotivoRejeicaoModal" style="font-size: 13.5px; color: #7f1d1d; line-height: 1.5; margin-bottom: 20px; font-weight: 500; background: white; padding: 12px; border-radius: 10px; border: 1px solid #fecaca; text-align: left;">
-        Foto embaçada ou documento não reconhecido.
+      <div class="icon-danger-circle">
+        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="15" y1="9" x2="9" y2="15"/>
+          <line x1="9" y1="9" x2="15" y2="15"/>
+        </svg>
+      </div>
+      <h3 style="font-size: 16px; font-weight: 800; color: #dc2626; margin-bottom: 8px; text-transform: uppercase;">Foto Reprovada pelo Controle</h3>
+      <p id="txtMotivoRejeicaoModal" style="font-size: 13.5px; line-height: 1.5; margin-bottom: 22px; color: var(--text-secondary); text-align: center; font-weight: 500;">
+        Foto embaçada ou iluminação inadequada. Apoie o celular e tire outra foto.
       </p>
-      <button type="button" id="btnTirarOutraFotoModal" class="btn-tirar-outra">
-        📸 Tirar Outra Foto
-      </button>
-      <button type="button" id="btnForcarAceiteFotoModal" style="margin-top: 10px; background: transparent; border: 1.5px solid #dc2626; color: #dc2626; padding: 11px 16px; border-radius: 10px; font-weight: 700; font-size: 13px; width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
-        ⚠️ Usar Esta Imagem Mesmo Assim (Forçar)
+      <button type="button" id="btnTirarOutraFotoModal" class="btn-sucesso-verde" style="margin-bottom: 0;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+        <span>Tirar Outra Foto</span>
       </button>
     </div>
   </div>
@@ -401,62 +718,149 @@
   <!-- Vista Principal de Captura -->
   <main id="mainView">
     <div class="card" id="cardAcao">
-      <p style="font-size: 14px; color: var(--gray-600); margin-bottom: 16px;">
-        Apoie o documento sobre uma mesa bem iluminada e fotografe a folha inteira.
+      <p style="font-size: 13.5px; color: var(--text-secondary); margin-bottom: 14px; text-align: center;">
+        Apoie o documento sobre uma mesa plana bem iluminada e fotografe a folha inteira.
       </p>
 
-      <!-- Input de Câmera Nativa (máxima resolução, sem HTTPS exigido) -->
       <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;">
 
       <button id="btnFotografar" class="btn-camera" type="button">
-        <span style="font-size: 24px;">📸</span>
-        <span id="txtBtnFotografar">Fotografar Página 1 (Frente)</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+        <span id="txtBtnFotografar">Fotografar Página 1</span>
       </button>
 
-      <!-- Indicador de Envio e Análise -->
+      <!-- Indicador de Processamento OpenCV -->
       <div id="spinnerContainer" class="spinner-container">
         <div class="spinner"></div>
-        <p style="font-size: 13px; font-weight: 600; color: var(--primary);">
+        <p style="font-size: 13px; font-weight: 700; color: var(--spinner-text);">
           Porteiro OpenCV analisando nitidez e contraste...
         </p>
       </div>
+
+      <!-- Telemetria da Última Captura -->
+      <div id="telemetriaBox" class="telemetria-badge" style="display: none;">
+        <span id="scoreGauge" class="score-gauge score-green"></span>
+        <span id="telemetriaTexto">Nitidez: 0 | WebP: 0 KB</span>
+      </div>
     </div>
 
-    <!-- Lista de Páginas do Aluno já Capturadas -->
+    <!-- Lista de Páginas do Envelope -->
     <div class="card" id="cardGaleria" style="display: none;">
       <div class="gallery-title">
         <span>Páginas deste Aluno</span>
-        <span id="contadorPaginas" style="color: var(--primary);">0 páginas</span>
+        <span id="contadorPaginas" style="color: var(--badge-session-color); font-family: 'Fira Code', monospace;">0 páginas</span>
       </div>
 
       <div class="gallery-grid" id="gridPaginas"></div>
 
-      <!-- Botão para Próxima Página -->
       <button id="btnProximaPagina" class="btn-secondary" type="button">
-        <span>➕</span> Fotografar Próxima Página (Verso)
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+        <span>Fotografar Próxima Página</span>
       </button>
 
-      <!-- Botão de Finalização do Aluno -->
       <button id="btnFinalizarAluno" class="btn-finish" type="button">
-        <span>✓</span> Finalizar Todas as Páginas deste Aluno
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+        <span>Concluir Envelope e Enviar para IA</span>
       </button>
     </div>
   </main>
 
-  <!-- Vista de Conclusão -->
-  <div id="concludedView" class="card concluded-view">
-    <div class="concluded-icon">✓</div>
-    <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">Envelope Concluído!</h2>
-    <p style="font-size: 14px; color: var(--gray-600); line-height: 1.4; margin-bottom: 24px;">
-      Todas as páginas deste aluno foram enviadas para o computador da escola e já estão na fila de Inteligência Artificial para transcrição automática.
+  <!-- Vista de Sucesso Imediato com Animação de Check -->
+  <div id="sucessoScanView" class="card" style="display: none; text-align: center; padding: 36px 18px; animation: fadeIn 0.3s ease-out;">
+    <div class="checkmark-wrapper">
+      <svg class="checkmark-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+        <circle class="checkmark-circle" cx="26" cy="26" r="24" fill="none"/>
+        <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+      </svg>
+    </div>
+
+    <h2 style="font-size: 20px; font-weight: 800; margin-bottom: 8px; color: var(--text-primary); letter-spacing: -0.01em;">
+      Arquivo escaneado com sucesso!
+    </h2>
+
+    <p style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 20px;">
+      O documento foi aprovado com alta nitidez e já foi recebido no computador da escola para transcrição pela Inteligência Artificial.
     </p>
-    <button class="btn-camera" onclick="window.location.reload();">
-      Escanear Próximo Aluno
+
+    <!-- Indicador da Página Escaneada (Apenas informação da Página) -->
+    <div id="sucessoTelemetria" class="telemetria-badge" style="display: inline-flex; justify-content: center; margin-bottom: 22px; padding: 6px 16px;">
+      <span class="score-gauge score-green"></span>
+      <span id="sucessoTelemetriaTexto">Página 1</span>
+    </div>
+
+    <!-- 1º BOTÃO: Fotografar Próxima Página (Na mesma cor verde do Check) -->
+    <button id="btnFotografarVersoOpcao" type="button" class="btn-sucesso-verde">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+      <span>Fotografar Próxima Página</span>
     </button>
+
+    <!-- 2º BOTÃO: Fechar Janela (No Vermelho) -->
+    <button id="btnFecharAbaMobile" type="button" class="btn-fechar-vermelho">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      <span>Fechar Janela</span>
+    </button>
+
+    <div id="msgFecharAbaAviso" style="display: none; font-size: 13px; font-weight: 600; color: var(--success-text); background: var(--success-bg); border: 1px solid var(--success-border); border-radius: 12px; padding: 12px 14px; margin-top: 10px; margin-bottom: 6px; text-align: center;">
+      ✓ Tudo concluído! Você já pode fechar esta aba no seu navegador móvel.
+    </div>
   </div>
 
   <script>
-    // Recupera a sessao_id da URL (ex: /mobile/scan/UUID ou ?sessao_id=UUID)
+    // ============================================================================
+    // CONTROLE DE MODO CLARO / ESCURO (TEMA MOBILE)
+    // ============================================================================
+    function aplicarTemaMobile(tema) {
+      const btn = document.getElementById('btnToggleTheme');
+      if (tema === 'dark') {
+        document.documentElement.classList.add('dark');
+        document.documentElement.setAttribute('data-theme', 'dark');
+        if (btn) {
+          btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #f59e0b;"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`;
+          btn.title = "Alternar para Modo Claro";
+        }
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.setAttribute('data-theme', 'light');
+        if (btn) {
+          btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #475569;"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>`;
+          btn.title = "Alternar para Modo Escuro";
+        }
+      }
+    }
+
+    function alternarTemaMobile() {
+      const ehDark = document.documentElement.classList.contains('dark');
+      const novoTema = ehDark ? 'light' : 'dark';
+      aplicarTemaMobile(novoTema);
+      try {
+        localStorage.setItem('sgm_theme', novoTema);
+      } catch (e) {}
+    }
+
+    // Inicializa o botão de tema assim que o DOM carregar
+    document.addEventListener("DOMContentLoaded", function() {
+      const ehDark = document.documentElement.classList.contains('dark');
+      aplicarTemaMobile(ehDark ? 'dark' : 'light');
+
+      const btn = document.getElementById('btnToggleTheme');
+      if (btn) {
+        btn.addEventListener('click', alternarTemaMobile);
+      }
+
+      // Ouve alterações de preferências do SO se o usuário não tiver forçado manualmente
+      if (window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+          var urlParams = new URLSearchParams(window.location.search);
+          if (!urlParams.get('theme') && !localStorage.getItem('sgm_theme')) {
+            aplicarTemaMobile(e.matches ? 'dark' : 'light');
+          }
+        });
+      }
+    });
+
+    // ============================================================================
+    // GERENCIAMENTO DA SESSÃO DE ESCANEAMENTO
+    // ============================================================================
     function obterSessaoId() {
       const urlParams = new URLSearchParams(window.location.search);
       const paramId = urlParams.get('sessao_id');
@@ -476,6 +880,7 @@
     const badgeSessao = document.getElementById('badgeSessao');
     const alertBox = document.getElementById('alertBox');
     const alertMsg = document.getElementById('alertMsg');
+    const alertIcon = document.getElementById('alertIcon');
     const cameraInput = document.getElementById('cameraInput');
     const btnFotografar = document.getElementById('btnFotografar');
     const txtBtnFotografar = document.getElementById('txtBtnFotografar');
@@ -486,19 +891,27 @@
     const gridPaginas = document.getElementById('gridPaginas');
     const contadorPaginas = document.getElementById('contadorPaginas');
     const mainView = document.getElementById('mainView');
-    const concludedView = document.getElementById('concludedView');
+    const telemetriaBox = document.getElementById('telemetriaBox');
+    const scoreGauge = document.getElementById('scoreGauge');
+    const telemetriaTexto = document.getElementById('telemetriaTexto');
 
     if (sessaoId) {
       badgeSessao.textContent = `ID: ${sessaoId.substring(0, 8)}...`;
       carregarStatusSessao();
     } else {
-      mostrarAlerta("danger", "Erro: Nenhuma sessão de escaneamento identificada nesta URL. Abra pelo QR Code na tela do PC.");
+      mostrarAlerta("danger", "Nenhuma sessão de escaneamento identificada nesta URL. Abra pelo QR Code na tela do computador da escola.");
       btnFotografar.disabled = true;
     }
 
     function mostrarAlerta(tipo, mensagem) {
       alertBox.className = `alert alert-${tipo} visible`;
-      alertMsg.innerHTML = mensagem;
+      alertMsg.textContent = mensagem;
+
+      const svgCheck = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 12 2 2 4-4"/></svg>`;
+      const svgAlert = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>`;
+
+      alertIcon.innerHTML = (tipo === "success") ? svgCheck : svgAlert;
+
       if (tipo === "danger" && navigator.vibrate) {
         navigator.vibrate([150, 80, 150]);
       }
@@ -506,20 +919,23 @@
 
     function ocultarAlerta() {
       alertBox.className = 'alert';
-      alertMsg.innerHTML = '';
+      alertMsg.textContent = '';
+      alertIcon.innerHTML = '';
     }
 
     function exibirModalRejeicao(motivo) {
       const modal = document.getElementById('modalRejeicaoFoto');
       const txt = document.getElementById('txtMotivoRejeicaoModal');
-      txt.textContent = motivo;
+      // Remove qualquer parte entre parênteses do texto explicativo
+      const textoLimpo = (motivo || "Foto embaçada ou iluminação inadequada. Apoie o celular e tire outra foto.")
+        .replace(/\s*\([^)]*\)/g, '')
+        .trim();
+      txt.textContent = textoLimpo;
       modal.style.display = 'flex';
       if (navigator.vibrate) {
         navigator.vibrate([200, 100, 200, 100, 200]);
       }
     }
-
-    let ultimoArquivoTentado = null;
 
     function fecharModalRejeicaoETirarOutra() {
       const modal = document.getElementById('modalRejeicaoFoto');
@@ -528,66 +944,60 @@
       cameraInput.click();
     }
 
-    async function fecharModalEForcarAceite() {
-      const modal = document.getElementById('modalRejeicaoFoto');
-      modal.style.display = 'none';
-      if (!ultimoArquivoTentado) {
-        mostrarAlerta("warning", "Nenhuma foto recente disponível para forçar aceite.");
-        return;
+    function exibirTelemetria(nitidez, tamanhoKb) {
+      telemetriaBox.style.display = "flex";
+      scoreGauge.className = "score-gauge " + (nitidez >= 100 ? "score-green" : (nitidez >= 50 ? "score-amber" : "score-red"));
+      telemetriaTexto.textContent = `Nitidez: ${nitidez || '---'} | WebP: ${tamanhoKb || '---'} KB`;
+    }
+
+    async function exibirSucessoImediato(nitidez, tamanhoKb, numPag) {
+      // 1. Oculta completamente os cards e botões atuais da tela
+      mainView.style.display = 'none';
+      alertBox.style.display = 'none';
+      const modalRej = document.getElementById('modalRejeicaoFoto');
+      // 2. Atualiza o indicador para mostrar apenas a página
+      const telTexto = document.getElementById('sucessoTelemetriaTexto');
+      if (telTexto) {
+        telTexto.textContent = `Página ${numPag || 1}`;
       }
 
-      ocultarAlerta();
-      btnFotografar.style.display = 'none';
-      spinnerContainer.classList.add('active');
-      const spinnerTexto = spinnerContainer.querySelector('p');
-      if (spinnerTexto) spinnerTexto.textContent = "Processando e aceitando página sob autorização manual...";
-
-      const formData = new FormData();
-      formData.append('arquivo', ultimoArquivoTentado);
-      formData.append('forcar_aceite', 'true');
-
-      try {
-        const response = await fetch(`/api/scan/${sessaoId}/upload-pagina`, {
-          method: 'POST',
-          body: formData
-        });
-
-        const data = await response.json();
-        spinnerContainer.classList.remove('active');
-        if (spinnerTexto) spinnerTexto.textContent = "Porteiro OpenCV analisando nitidez e contraste...";
-        btnFotografar.style.display = 'flex';
-
-        if (response.ok && data.sucesso) {
-          totalPaginas = data.total_paginas || (totalPaginas + 1);
-          mostrarAlerta("warning", `✓ Página ${data.pagina_numero} aceita sob autorização do operador! (Compactado: ${data.tamanho_kb} KB)`);
-          adicionarMiniatura(data.pagina_numero, data.caminho_preview || ultimoArquivoTentado);
-          atualizarInterfaceGaleria();
-          ultimoArquivoTentado = null;
-        } else {
-          const motivo = data.detail || data.mensagem || "Erro ao processar página forçada.";
-          mostrarAlerta("danger", `⛔ ${motivo}`);
-        }
-      } catch (err) {
-        spinnerContainer.classList.remove('active');
-        if (spinnerTexto) spinnerTexto.textContent = "Porteiro OpenCV analisando nitidez e contraste...";
-        btnFotografar.style.display = 'flex';
-        mostrarAlerta("danger", `Falha de conexão com o computador da escola: ${err.message}`);
+      // 4. Exibe a tela de sucesso com a animação e permanece nela
+      const sucessoView = document.getElementById('sucessoScanView');
+      if (sucessoView) {
+        sucessoView.style.display = 'block';
       }
     }
 
-    document.getElementById('btnTirarOutraFotoModal').addEventListener('click', fecharModalRejeicaoETirarOutra);
-    document.getElementById('btnForcarAceiteFotoModal').addEventListener('click', fecharModalEForcarAceite);
+    function fecharAbaMobile() {
+      try {
+        window.close();
+      } catch (e) {}
 
-    // Abertura da câmera
+      // Se o navegador móvel bloquear o fechamento da aba por segurança:
+      const aviso = document.getElementById('msgFecharAbaAviso');
+      if (aviso) {
+        aviso.style.display = 'block';
+      }
+    }
+
+    document.getElementById('btnFecharAbaMobile')?.addEventListener('click', fecharAbaMobile);
+    document.getElementById('btnFotografarVersoOpcao')?.addEventListener('click', () => {
+      const sucessoView = document.getElementById('sucessoScanView');
+      if (sucessoView) sucessoView.style.display = 'none';
+      mainView.style.display = 'block';
+      txtBtnFotografar.textContent = `Fotografar Página ${totalPaginas + 1}`;
+      cameraInput.click();
+    });
+
+    document.getElementById('btnTirarOutraFotoModal').addEventListener('click', fecharModalRejeicaoETirarOutra);
+
     btnFotografar.addEventListener('click', () => cameraInput.click());
     btnProximaPagina.addEventListener('click', () => cameraInput.click());
 
-    // Disparado quando o operador tira a foto
     cameraInput.addEventListener('change', async (e) => {
       const file = e.target.files[0];
       if (!file) return;
 
-      ultimoArquivoTentado = file;
       ocultarAlerta();
       btnFotografar.style.display = 'none';
       spinnerContainer.classList.add('active');
@@ -607,25 +1017,21 @@
 
         if (response.ok && data.sucesso) {
           totalPaginas = data.total_paginas || (totalPaginas + 1);
-          mostrarAlerta("success", `✓ Página ${data.pagina_numero} aprovada! (Nitidez: ${data.score_nitidez} | Compactado: ${data.tamanho_kb} KB)`);
-          adicionarMiniatura(data.pagina_numero, data.caminho_preview || file);
-          atualizarInterfaceGaleria();
+          exibirSucessoImediato(data.score_nitidez, data.tamanho_kb, data.pagina_numero);
         } else {
-          // Reprovado pelo Porteiro de Qualidade OpenCV (Erro 422 ou similar)
           const motivo = data.detail || data.mensagem || "Foto rejeitada pelo Porteiro de Qualidade.";
-          mostrarAlerta("danger", `⛔ ${motivo}`);
+          mostrarAlerta("danger", motivo);
           exibirModalRejeicao(motivo);
         }
       } catch (err) {
         spinnerContainer.classList.remove('active');
         btnFotografar.style.display = 'flex';
-        mostrarAlerta("danger", `Falha de conexão com o computador da escola: ${err.message}`);
+        mostrarAlerta("danger", `Falha de conexão com o computador: ${err.message}`);
       } finally {
         cameraInput.value = '';
       }
     });
 
-    // Finalizar Envelope
     btnFinalizarAluno.addEventListener('click', async () => {
       if (totalPaginas === 0) {
         mostrarAlerta("warning", "Fotografe ao menos uma página antes de finalizar.");
@@ -642,71 +1048,60 @@
 
         const data = await response.json();
         if (response.ok && data.sucesso) {
-          mainView.style.display = 'none';
-          alertBox.style.display = 'none';
-          concludedView.style.display = 'block';
+          exibirSucessoImediato(null, null, totalPaginas);
         } else {
           mostrarAlerta("danger", data.detail || "Erro ao finalizar sessão.");
           btnFinalizarAluno.disabled = false;
-          btnFinalizarAluno.innerHTML = '<span>✓</span> Finalizar Todas as Páginas deste Aluno';
+          btnFinalizarAluno.textContent = "Concluir Envelope e Enviar para IA";
         }
       } catch (err) {
-        mostrarAlerta("danger", `Erro de comunicação: ${err.message}`);
+        mostrarAlerta("danger", `Erro de rede ao finalizar: ${err.message}`);
         btnFinalizarAluno.disabled = false;
+        btnFinalizarAluno.textContent = "Concluir Envelope e Enviar para IA";
       }
     });
 
-    function adicionarMiniatura(numero, previewUrl) {
+    function adicionarMiniatura(numPag, fonte) {
       const item = document.createElement('div');
       item.className = 'gallery-item';
 
-      if (typeof previewUrl === 'string') {
-        item.innerHTML = `<img src="${previewUrl}" alt="Página ${numero}"><div class="gallery-badge">Pág ${numero}</div>`;
+      const img = document.createElement('img');
+      if (typeof fonte === 'string') {
+        img.src = fonte;
       } else {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          item.innerHTML = `<img src="${e.target.result}" alt="Página ${numero}"><div class="gallery-badge">Pág ${numero}</div>`;
-        };
-        reader.readAsDataURL(previewUrl);
+        img.src = URL.createObjectURL(fonte);
       }
 
+      const badge = document.createElement('div');
+      badge.className = 'gallery-badge';
+      badge.textContent = `Pág ${numPag}`;
+
+      item.appendChild(img);
+      item.appendChild(badge);
       gridPaginas.appendChild(item);
     }
 
     function atualizarInterfaceGaleria() {
-      if (totalPaginas > 0) {
-        cardGaleria.style.display = 'block';
-        btnFotografar.style.display = 'none';
-        contadorPaginas.textContent = `${totalPaginas} página(s)`;
-        txtBtnFotografar.textContent = `Fotografar Próxima Página (${totalPaginas + 1})`;
-      }
+      cardGaleria.style.display = 'block';
+      contadorPaginas.textContent = `${totalPaginas} página${totalPaginas > 1 ? 's' : ''}`;
+      txtBtnFotografar.textContent = `Fotografar Página ${totalPaginas + 1}`;
     }
 
     async function carregarStatusSessao() {
       try {
         const res = await fetch(`/api/scan/${sessaoId}/status`);
         if (res.ok) {
-          const data = await res.json();
-          if (data.paginas && data.paginas.length > 0) {
-            totalPaginas = data.paginas.length;
+          const dados = await res.json();
+          if (dados.paginas && dados.paginas.length > 0) {
+            totalPaginas = dados.paginas.length;
             gridPaginas.innerHTML = '';
-            data.paginas.forEach((p, idx) => {
+            dados.paginas.forEach((p, idx) => {
               adicionarMiniatura(idx + 1, `/api/scan/imagem-preview?caminho=${encodeURIComponent(p)}`);
             });
             atualizarInterfaceGaleria();
           }
-          if (data.status === 'CONCLUIDO' || data.status === 'PENDENTE_IA') {
-            mainView.style.display = 'none';
-            concludedView.style.display = 'block';
-          } else if (data.status === 'REJEITADO_INVALIDO') {
-            const motivo = data.ultimo_erro || "Documento rejeitado pela IA por não ser Histórico Escolar ou estar ilegível.";
-            mostrarAlerta("danger", `⛔ ${motivo}`);
-            exibirModalRejeicao(motivo);
-          }
         }
-      } catch (e) {
-        console.warn("Status offline da sessão:", e);
-      }
+      } catch (e) {}
     }
   </script>
 </body>

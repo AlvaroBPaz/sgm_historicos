@@ -10,6 +10,16 @@ from fastapi.testclient import TestClient
 BASE_DIR = Path(__file__).resolve().parent
 os.chdir(BASE_DIR)
 
+import database
+TEST_DB_PATH = Path("./data_local/teste_acervo_fase5.db")
+if TEST_DB_PATH.exists():
+    try:
+        TEST_DB_PATH.unlink()
+    except Exception:
+        pass
+database.DB_PATH = TEST_DB_PATH
+database.init_db(TEST_DB_PATH)
+
 import main
 import app_window
 
@@ -181,6 +191,11 @@ if __name__ == "__main__":
     test_app_window_e_launcher()
     test_template_impressao_a4_oficial()
     test_rota_impressao_com_aluno_real()
+    if TEST_DB_PATH.exists():
+        try:
+            TEST_DB_PATH.unlink()
+        except Exception:
+            pass
     print("\n======================================================================")
     print("  TODOS OS TESTES DA FASE 5 PASSARAM COM 100% DE SUCESSO!")
     print("======================================================================")

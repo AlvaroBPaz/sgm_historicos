@@ -35,8 +35,8 @@ import database
 logger = logging.getLogger("sgm_historicos.ocr_worker")
 
 # Modelo oficial do Gemini para visão multimodal e transcrição de documentos
-# Por padrão, utiliza o modelo ativo mais barato (gemini-flash-lite-latest) ou override via GEMINI_MODEL
-MODELO_GEMINI = os.getenv("GEMINI_MODEL", "gemini-flash-lite-latest").strip()
+# Por padrão, utiliza o modelo gemini-3.5-flash-lite ou override via GEMINI_MODEL no .env
+MODELO_GEMINI = os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite").strip()
 
 # Intervalo mínimo obrigatório de 6 segundos entre chamadas (máximo 10 requisições por minuto)
 INTERVALO_MINIMO_REQUISICAO_SEGUNDOS = 6.0
@@ -85,12 +85,20 @@ class SerieVidaEscolarExtraida(BaseModel):
     """Dados de uma série ou ano letivo específico cursado."""
     ordem_coluna: int = Field(description="Ordem sequencial da coluna (1 a 9)")
     label_serie: CampoExtraido = Field(description="Nome da série/ano (ex: '1ª Série', '8ª Série', '1º Ano')")
-    ano_letivo: CampoExtraido = Field(description="Ano letivo cursado (ex: '1987', '1993')")
-    escola_nome: CampoExtraido = Field(description="Nome da escola onde cursou a referida série")
-    escola_municipio_uf: CampoExtraido = Field(description="Município e UF do estabelecimento escolar")
+    ano_letivo: CampoExtraido = Field(description="Ano letivo cursado (ex: '1987', '1993', '2006')")
+    escola_nome: CampoExtraido = Field(
+        description="Nome oficial da escola ou estabelecimento onde cursou a série (ex: 'COLÉGIO SÃO LUIZ - ENSINO FUNDAMENTAL E MÉDIO', 'Escola Estadual...'). Extraia do campo ESTABELECIMENTO / ESCOLA / COLÉGIO no cabeçalho ou registros."
+    )
+    escola_municipio_uf: CampoExtraido = Field(
+        description="Município e UF da escola onde cursou a série (ex: 'Foz do Iguaçu - PR', 'Jandaíra - RN'). Extraia do cabeçalho ou registros."
+    )
+    turno: Optional[CampoExtraido] = Field(
+        default_factory=lambda: CampoExtraido(valor="DIURNO", baixa_confianca=False),
+        description="Turno da série cursada (ex: 'DIURNO', 'MANHÃ', 'TARDE', 'NOTURNO'). Se for 'M', transcreva como 'MANHÃ' ou 'DIURNO'."
+    )
     dias_letivos: CampoExtraido = Field(description="Total de dias letivos (ex: '180', '200')")
-    carga_horaria_total: CampoExtraido = Field(description="Carga horária total anual em horas")
-    frequencia_percentual: CampoExtraido = Field(description="Frequência global percentual (ex: '85%')")
+    carga_horaria_total: CampoExtraido = Field(description="Carga horária total anual em horas (ex: '800', '760')")
+    frequencia_percentual: CampoExtraido = Field(description="Frequência global percentual (ex: '85%', '98.25%')")
     resultado_final: CampoExtraido = Field(
         description="Resultado final: 'Aprovado', 'Reprovado', 'Promovido', 'Transferido', 'Desistente' ou 'Não Cursado'"
     )
@@ -189,6 +197,15 @@ ETAPA 2: DIRETRIZES DE TRANSCRIÇÃO (CASO O DOCUMENTO SEJA VÁLIDO E LEGÍVEL):
 5. SÉRIES NÃO CURSADAS OU TRANSFERÊNCIAS:
    - Se uma série/coluna não foi cursada naquela escola, preencha o resultado como 'Não Cursado'
      e preencha as notas das disciplinas correspondentes com o traço padrão: '---'.
+
+6. ESTABELECIMENTO DE ENSINO (ESCOLA), MUNICÍPIO/UF E TURNO:
+   - ATENÇÃO CRUCIAL: O aluno pode ter cursado séries em escolas diferentes da que emite o histórico!
+   - Extraia SEMPRE o nome oficial da escola ('escola_nome') e localização ('escola_municipio_uf') onde cada série foi cursada:
+     * Em Fichas Individuais ou Históricos, examine o campo 'ESTABELECIMENTO:', 'ESCOLA:' ou cabeçalho superior (ex: 'COLÉGIO SÃO LUIZ - ENSINO FUNDAMENTAL E MÉDIO').
+     * Identifique o 'MUNICÍPIO' e 'UF' (ex: 'FOZ DO IGUAÇU - PR').
+     * Identifique o 'TURNO' (ex: 'M', 'T', 'N', 'DIURNO'). Se estiver 'M', transcreva 'MANHÃ' ou 'DIURNO'.
+     * Preencha 'escola_nome', 'escola_municipio_uf' e 'turno' na série correspondente em 'series_cursadas'.
+     * NUNCA omita nem deixe 'escola_nome' em branco se houver o nome do estabelecimento expresso no documento!
 """
 
 
@@ -239,6 +256,26 @@ class GeminiClientWorker:
 
         # 3. Se não encontrada em nenhuma fonte
         return None
+
+    def obter_modelo(self) -> str:
+        """Recupera o modelo oficial configurado no .env ou variáveis de ambiente."""
+        modelo = os.getenv("GEMINI_MODEL")
+        if modelo and modelo.strip():
+            return modelo.strip()
+
+        env_file = Path(__file__).resolve().parent / ".env"
+        if env_file.exists():
+            try:
+                for linha in env_file.read_text(encoding="utf-8").splitlines():
+                    linha = linha.strip()
+                    if linha.startswith("GEMINI_MODEL="):
+                        val = linha.split("=", 1)[1].strip().strip('"').strip("'")
+                        if val:
+                            return val
+            except Exception:
+                pass
+
+        return "gemini-3.5-flash-lite"
 
     def _esperar_taxa_limite(self) -> None:
         """Garante o espaçamento mínimo obrigatório de 6 segundos entre requisições (máx 10/min)."""
@@ -304,9 +341,9 @@ class GeminiClientWorker:
         # Rate Limiter Local: pausa mínima obrigatória de 6 segundos entre chamadas
         self._esperar_taxa_limite()
 
-        # Determina modelo a ser utilizado (removidas quaisquer referências a versões inexistentes)
-        # Prioriza o modelo configurado (gemini-flash-lite-latest ou gemini-2.5-flash / gemini-2.0-flash)
-        modelo_primario = MODELO_GEMINI
+        # Determina modelo a ser utilizado (prioriza gemini-3.5-flash-lite)
+        modelo_primario = self.obter_modelo()
+        logger.info(f"Enviando envelope multimodal para transcrição com o modelo '{modelo_primario}'...")
 
         try:
             resposta = client.models.generate_content(
@@ -316,11 +353,10 @@ class GeminiClientWorker:
             )
         except Exception as exc:
             erro_str = str(exc)
-            # Se gemini-2.5-flash ou gemini-2.0-flash retornar 404 (descontinuado para novas contas pelo Google),
-            # tenta única transição de segurança para o modelo mais barato e ativo (gemini-flash-lite-latest)
-            if ("404" in erro_str or "NOT_FOUND" in erro_str) and "flash-lite" not in modelo_primario:
+            # Se o modelo retornar 404 (caso a conta não tenha acesso), fallback de segurança para gemini-flash-lite-latest
+            if ("404" in erro_str or "NOT_FOUND" in erro_str) and modelo_primario != "gemini-flash-lite-latest":
                 logger.warning(
-                    f"Modelo '{modelo_primario}' indisponível para esta conta (404). Acionando modelo econômico 'gemini-flash-lite-latest'..."
+                    f"Modelo '{modelo_primario}' indisponível para esta conta (404). Acionando modelo econômico de fallback 'gemini-flash-lite-latest'..."
                 )
                 self._esperar_taxa_limite()
                 resposta = client.models.generate_content(

@@ -140,6 +140,7 @@ class SalvarHistoricoCompletoRequest(BaseModel):
 class IniciarSessaoScanRequest(BaseModel):
     escola_id: Optional[int] = None
     origem_captura: Optional[str] = "MOBILE_QR"
+    tema: Optional[str] = None
 
 class AprovarRevisaoIARequest(BaseModel):
     aluno: Dict[str, Any]
@@ -463,6 +464,8 @@ def iniciar_sessao_digitalizacao(dados: IniciarSessaoScanRequest):
     ip_local = obter_ip_rede_local()
     sessao_id = sessao["sessao_id"]
     mobile_url = f"http://{ip_local}:8000/mobile/scan/{sessao_id}"
+    if dados.tema:
+        mobile_url += f"?theme={dados.tema}"
     
     # Gera QR Code Base64
     import qrcode
@@ -486,10 +489,12 @@ def iniciar_sessao_digitalizacao(dados: IniciarSessaoScanRequest):
     }
 
 @app.get("/api/scan/{sessao_id}/qrcode")
-def obter_qrcode_imagem(sessao_id: str):
+def obter_qrcode_imagem(sessao_id: str, theme: Optional[str] = None):
     """Retorna o PNG bruto do QR Code de conexão sem fio."""
     ip_local = obter_ip_rede_local()
     mobile_url = f"http://{ip_local}:8000/mobile/scan/{sessao_id}"
+    if theme:
+        mobile_url += f"?theme={theme}"
     
     import qrcode
     qr = qrcode.QRCode(version=1, box_size=10, border=2)
